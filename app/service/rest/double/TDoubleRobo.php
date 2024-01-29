@@ -20,7 +20,7 @@ class TDoubleRobo
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_SERVIDOR_MANUTENCAO);
             
 
-        $object = TUtils::openConnection('unit_database', function () use ($param) {
+        $object = TUtils::openConnection('double', function () use ($param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id);
 
             if (!$object) {
@@ -55,7 +55,7 @@ class TDoubleRobo
 
     public function atualizar($param)
     {
-        $object = TUtils::openConnection('unit_database', function () use ($param) {
+        $object = TUtils::openConnection('double', function () use ($param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id);
 
             if (!$object) {
@@ -115,7 +115,7 @@ class TDoubleRobo
             }
         } catch (\Throwable $e) {
             $mensagem = $e->getMessage();
-            TUtils::openConnection('unit_database', function() use ($param, $mensagem) {
+            TUtils::openConnection('double', function() use ($param, $mensagem) {
                 $error = new DoubleErros();
                 $error->classe = 'TDoubleRobo';
                 $error->metodo = 'handle';
@@ -133,7 +133,7 @@ class TDoubleRobo
         // if (empty($param['chat_id']))
             throw new Exception("Operação não suportada");
 
-        // TUtils::openConnection('unit_database');
+        // TUtils::openConnection('double');
         // try {
         //     $object = DoublePlataforma::where('LOWER(nome)', '=', $param['plataforma'])
         //     ->where('idioma', '=', $param['idioma'])
@@ -165,7 +165,7 @@ class TDoubleRobo
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('unit_database', function () use ($param, $plataforma) {
+        $object = TUtils::openConnection('double', function () use ($param, $plataforma) {
             $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
 
             $token = $plataforma->service->logar($param['email'], $param['password']);
@@ -193,7 +193,7 @@ class TDoubleRobo
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('unit_database', function () use ($param, $plataforma) {
+        $object = TUtils::openConnection('double', function () use ($param, $plataforma) {
             $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
     
             $object->robo_status = 'INICIANDO';
@@ -223,7 +223,7 @@ class TDoubleRobo
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('unit_database', function() use ($plataforma, $param) {
+        $object = TUtils::openConnection('double', function() use ($plataforma, $param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
 
             $object->robo_status = 'INICIANDO';
@@ -253,7 +253,7 @@ class TDoubleRobo
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('unit_database', function() use ($plataforma, $param) {
+        $object = TUtils::openConnection('double', function() use ($plataforma, $param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
 
             $object->robo_status = 'PARANDO';

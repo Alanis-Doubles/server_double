@@ -13,7 +13,7 @@ class TDoubleUsuarioForm  extends TStandardForm
     use TStandardFormTrait;
 
     const ACTIVERECORD = 'DoubleUsuario';
-    const DATABASE = 'unit_database';
+    const DATABASE = 'double';
 
     protected function onBuild($param)
     {
@@ -30,7 +30,7 @@ class TDoubleUsuarioForm  extends TStandardForm
                     'name' => 'plataforma_id', 
                     'label' => $label, 
                     'required' => true, 
-                    'database' => 'unit_database', 
+                    'database' => 'double', 
                     'model' => 'DoublePlataforma', 
                     'key' => 'id', 
                     'display' => '[{idioma}] {nome}',
@@ -44,7 +44,7 @@ class TDoubleUsuarioForm  extends TStandardForm
                 [
                     'name' => 'canal_id', 
                     'label' => $label, 
-                    'database' => 'unit_database', 
+                    'database' => 'double', 
                     'required' => !isset($param['usuarios_canal']) ? false : $param['usuarios_canal'] == 'Y',
                     'model' => 'DoubleCanal', 
                     'key' => 'id', 
@@ -245,14 +245,14 @@ class TDoubleUsuarioForm  extends TStandardForm
         {
             if (!empty($param['plataforma_id']))
             {
-                $plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+                $plataforma = TUtils::openFakeConnection('double', function() use ($param){
                     return new DoublePlataforma($param['plataforma_id'], false);
                 });
                 $param['usuarios_canal'] = $plataforma->usuarios_canal;
                 if ($plataforma->usuarios_canal == 'Y')
                     TCombo::enableField('form_TDoubleUsuarioForm', 'canal_id');
                 $criteria = TCriteria::create( ['plataforma_id' => $param['plataforma_id'] ] );
-                TDBCombo::reloadFromModel('form_TDoubleUsuarioForm', 'canal_id', 'unit_database', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
+                TDBCombo::reloadFromModel('form_TDoubleUsuarioForm', 'canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
             }
             else
             {

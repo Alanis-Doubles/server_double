@@ -103,7 +103,7 @@ class TWeplay implements IDoublePlataforma
                 $content = json_decode($response->getBody()->getContents());
                 $usuario->token_plataforma = $content->accessToken;
                 $usuario->token_expiracao = date_format($now->modify('+3 hours'), 'Y-m-d H:i:s');
-                $usuario->saveInTransaction('unit_database');
+                $usuario->saveInTransaction('double');
                 return $content->accessToken;
             }
         } else {
@@ -186,6 +186,38 @@ class TWeplay implements IDoublePlataforma
 
     public function jogar(DoubleUsuario $usuario, string $cor, float $valor)
     {
-        return '';
+        $id = null;
+
+        // aguardar status watting para jogar
+        $url = 'wss://api.weplay.games/socket.io/?EIO=4&transport=websocket';
+        $config = new ClientConfig();
+        $client = new WebSocketClient($url, $config);
+        $client->send('40/game/roulette');
+        while ($client->isConnected())
+        {
+            try {
+                $message = $client->receive();
+                
+                if (str_starts_with($message, '42/game/roulette,')){
+                    $message = str_replace('42/game/roulette,', '', $message);
+                    $content = json_decode($message);
+                    if (!$content)
+                      continue;
+                    if ($content[1]->status == 'Queue') {
+                        $id = $content[1]->id;
+                        break;
+                    } else {
+                        sleep(1);
+                    } 
+                }
+            } catch (BadOpcodeException $e) {
+                $erro = $e->getMessage();
+            } catch (\Throwable $e) {
+               $erro = $e->getMessage();   
+            }
+        }
+
+        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
+            return '';
     }
 }

@@ -78,7 +78,7 @@ class TBlaze implements IDoublePlataforma
                 $content = json_decode($response->getBody()->getContents());
                 $usuario->token_plataforma = $content->access_token;
                 $usuario->token_expiracao = date_format($now->modify('+3 hours'), 'Y-m-d H:i:s');
-                $usuario->saveInTransaction('unit_database');
+                $usuario->saveInTransaction('double');
                 return $content->access_token;
             }
         } else {

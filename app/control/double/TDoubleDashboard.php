@@ -29,7 +29,7 @@ class TDoubleDashboard extends TPage
                 [
                     'name' => 'plataforma_id',
                     'label' => $label,
-                    'database' => 'unit_database',
+                    'database' => 'double',
                     'model' => 'DoublePlataforma',
                     'key' => 'id',
                     'display' => '[{idioma}] {nome}',
@@ -91,7 +91,7 @@ class TDoubleDashboard extends TPage
     }
 
     public function consultarDados($param) {
-        return TUtils::openFakeConnection('unit_database', function() use ($param){
+        return TUtils::openFakeConnection('double', function() use ($param){
             $filterPlataforma = null;
             // $filterData = null;
 

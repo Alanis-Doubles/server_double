@@ -15,12 +15,12 @@ class DoubleCanal extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public function get_statusSinais()
     {
-        $canal =  TUtils::openFakeConnection('unit_database', function() {
+        $canal =  TUtils::openFakeConnection('double', function() {
             return new self($this->id, false);
         });
 
@@ -29,14 +29,14 @@ class DoubleCanal extends DoubleRecord
 
     public static function identificar($canal_id)
     {
-        return TUtils::openFakeConnection('unit_database', function() use($canal_id) {
+        return TUtils::openFakeConnection('double', function() use($canal_id) {
             return new DoubleCanal($canal_id, false);
         });
     }
 
     public function set_statusSinais($value)
     {
-        TUtils::openConnection('unit_database', function() use ($value) {
+        TUtils::openConnection('double', function() use ($value) {
             $canal = new self($this->id, false);
             $canal->status_sinais = $value;
             $canal->save();
@@ -45,7 +45,7 @@ class DoubleCanal extends DoubleRecord
 
     public function get_inicioSinais()
     {
-        $canal = TUtils::openFakeConnection('unit_database', function() {
+        $canal = TUtils::openFakeConnection('double', function() {
             return  new self($this->id, false);
         });
         
@@ -54,7 +54,7 @@ class DoubleCanal extends DoubleRecord
 
     public function set_inicioSinais($value)
     {
-        TUtils::openConnection('unit_database', function () use ($value) {
+        TUtils::openConnection('double', function () use ($value) {
             $canal = new self($this->id, false);
             $canal->inicio_sinais = $value;
             $canal->save();
@@ -64,7 +64,7 @@ class DoubleCanal extends DoubleRecord
     public function get_plataforma()
     {
         if (!$this->obj_plataforma) {
-            $this->obj_plataforma =  TUtils::openConnection('unit_database', function () {
+            $this->obj_plataforma =  TUtils::openConnection('double', function () {
                 return new DoublePlataforma($this->plataforma_id, false);
             });
         }

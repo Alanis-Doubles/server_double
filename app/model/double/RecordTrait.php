@@ -64,7 +64,7 @@ use Adianti\Database\TTransaction;
         return $data;
     }
 
-    public function saveInTransaction($database = 'unit_database') {
+    public function saveInTransaction($database = 'double') {
         TUtils::openConnection($database, function() {
             $this->save();
         });

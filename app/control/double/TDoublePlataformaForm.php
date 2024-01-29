@@ -11,7 +11,7 @@ class TDoublePlataformaForm  extends TStandardForm
     use TStandardFormTrait;
 
     const ACTIVERECORD = 'DoublePlataforma';
-    const DATABASE = 'unit_database';
+    const DATABASE = 'double';
 
     protected function onBuild($param)
     {

@@ -26,7 +26,7 @@ class TDoubleSinais
         TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
 
         if ($data->plataforma->tipo_sinais == 'GERA') {
-            $canais = TUtils::openFakeConnection('unit_database', function() use ($data){
+            $canais = TUtils::openFakeConnection('double', function() use ($data){
                 return DoubleCanal::where('plataforma_id', '=', $data->plataforma->id)
                     ->where('ativo', '=', 'Y')
                     ->load();
@@ -78,7 +78,7 @@ class TDoubleSinais
                         $service = $data->plataforma->service;
                     $service->aguardarSinal();
 
-                    TUtils::openConnection('unit_database', function() use ($data, $service) {
+                    TUtils::openConnection('double', function() use ($data, $service) {
                         $sinal = new DoubleSinal();
                         $sinal->plataforma_id = $data->plataforma->id;
                         $sinal->numero = $service->ultimoSinal();
@@ -97,7 +97,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar';
@@ -109,7 +109,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar';
@@ -134,7 +134,7 @@ class TDoubleSinais
     public static function registrar($param)
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
-        $historico = TUtils::openConnection('unit_database', function () use ($plataforma, $param) {
+        $historico = TUtils::openConnection('double', function () use ($plataforma, $param) {
             $historico = new DoubleHistorico();
             $historico->plataforma_id = $plataforma->id;
             if (isset($param['cor']))
@@ -221,7 +221,7 @@ class TDoubleSinais
                     if (!$service)
                         $service = $data->plataforma->service;
 
-                    $estrategias = TUtils::openFakeConnection('unit_database', function() use ($data) {
+                    $estrategias = TUtils::openFakeConnection('double', function() use ($data) {
                         return DoubleEstrategia::where('canal_id', '=', $data->canal->id)
                             ->where('ativo', '=', 'Y')
                             ->where('usuario_id', 'is', null)
@@ -330,7 +330,6 @@ class TDoubleSinais
                                             ),
                                         );
 
-                                        TTransaction::open('unit_database');
                                         $payload = [
                                             'plataforma' => strtolower($data->plataforma->nome),
                                             'idioma' => $data->plataforma->idioma,
@@ -355,7 +354,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_canal';
@@ -368,7 +367,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_canal';
@@ -477,7 +476,7 @@ class TDoubleSinais
                 } catch (\Throwable $e) // in case of exception
                 {
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_canal_propagar_sinal';
@@ -489,7 +488,7 @@ class TDoubleSinais
                 } catch (Exception $e) // in case of exception
                 {
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_canal_propagar_sinal';
@@ -702,7 +701,7 @@ class TDoubleSinais
                                     // self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
                                     break;
                                 } else {
-                                    TUtils::openConnection('unit_database', function() use ($retornoJogada, $data) {
+                                    TUtils::openConnection('double', function() use ($retornoJogada, $data) {
                                         $error = new DoubleErros();
                                         $error->classe = 'TDoubleSinais';
                                         $error->metodo = 'executar_usuario';
@@ -758,7 +757,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_usuario';
@@ -772,7 +771,7 @@ class TDoubleSinais
                 {
                     $service = null;
                     $mensagem = $e->getMessage();
-                    TUtils::openConnection('unit_database', function() use ($mensagem, $data) {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
                         $error = new DoubleErros();
                         $error->classe = 'TDoubleSinais';
                         $error->metodo = 'executar_usuario';
@@ -797,7 +796,7 @@ class TDoubleSinais
 
     public static function criarUsuarioHistorico($usuario, $valor)
     {
-        TUtils::openConnection('unit_database', function() use ($usuario, $valor) {
+        TUtils::openConnection('double', function() use ($usuario, $valor) {
             $bet = new DoubleUsuarioHistorico;
             $bet->sequencia = $usuario->robo_sequencia;
             $bet->usuario_id = $usuario->id;
@@ -826,7 +825,7 @@ class TDoubleSinais
 
     public static function gerarStatus($telegram, $data)
     {
-        $dados = TUtils::openFakeConnection('unit_database', function() use ($data){
+        $dados = TUtils::openFakeConnection('double', function() use ($data){
             $conn = TTransaction::get(); 
             return $conn->query("SELECT tipo, count(1) total FROM double_historico 
                                   WHERE plataforma_id = {$data->plataforma->id}

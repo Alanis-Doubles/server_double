@@ -11,7 +11,7 @@ class TDoubleCanalForm  extends TStandardForm
     use TStandardFormTrait;
 
     const ACTIVERECORD = 'DoubleCanal';
-    const DATABASE = 'unit_database';
+    const DATABASE = 'double';
 
     protected function onBuild($param)
     {
@@ -33,7 +33,7 @@ class TDoubleCanalForm  extends TStandardForm
                     'name' => 'plataforma_id', 
                     'label' => $label, 
                     'required' => true, 
-                    'database' => 'unit_database', 
+                    'database' => 'double', 
                     'model' => 'DoublePlataforma', 
                     'key' => 'id', 
                     'display' => '[{idioma}] {nome}',

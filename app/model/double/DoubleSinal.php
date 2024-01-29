@@ -13,7 +13,7 @@ class DoubleSinal extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public static function buscarSinal($ant, $inicio, $plataforma_id, $call_status){
@@ -22,7 +22,7 @@ class DoubleSinal extends DoubleRecord
         do {
             sleep(1);
             try {
-                $sinais = TUtils::openFakeConnection('unit_database', function () use ($plataforma_id, $inicio) {
+                $sinais = TUtils::openFakeConnection('double', function () use ($plataforma_id, $inicio) {
                     return self::select()
                         ->where('plataforma_id', '=', $plataforma_id)
                         ->where('created_at', '>=', $inicio)
@@ -50,7 +50,7 @@ class DoubleSinal extends DoubleRecord
             } catch (\Throwable $e) {
                 // $service = null;
                 // $mensagem = $e->getMessage();
-                // TUtils::openConnection('unit_database');;
+                // TUtils::openConnection('double');;
                 // $error = new DoubleErros();
                 // $error->classe = 'DoubleSinais';
                 // $error->metodo = 'buscarSinal';
@@ -61,7 +61,7 @@ class DoubleSinal extends DoubleRecord
             } catch (Exception $e) {
                 // $service = null;
                 // $mensagem = $e->getMessage();
-                // TUtils::openConnection('unit_database');;
+                // TUtils::openConnection('double');;
                 // $error = new DoubleErros();
                 // $error->classe = 'DoubleSinais';
                 // $error->metodo = 'buscarSinal';
@@ -73,7 +73,7 @@ class DoubleSinal extends DoubleRecord
         } while ($list == $ant AND $status == 'EXECUTANDO');
         
         if ($status != 'EXECUTANDO')
-            throw new Exception("Ocorreu um erro interno.");
+            throw new Exception("Ocorreu um erro interno. [" . $status . "]");
 
         return $list;
     }

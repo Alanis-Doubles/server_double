@@ -18,7 +18,7 @@ class TDoubleCanalList extends TCustomStandardList
         
         // $filterCount = TSession::getValue(get_class($this).'_filter_counter');
         // if (!$filterCount) {
-        //     $plataforma = TUtils::openFakeConnection('unit_database', function () {
+        //     $plataforma = TUtils::openFakeConnection('double', function () {
         //         return DoublePlataforma::first();
         //     });
 
@@ -31,7 +31,7 @@ class TDoubleCanalList extends TCustomStandardList
 
         parent::__construct([
             'title'          => 'Canais',
-            'database'       => 'unit_database',
+            'database'       => 'double',
             'activeRecord'   => 'DoubleCanal',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoubleCanalForm',
@@ -39,7 +39,7 @@ class TDoubleCanalList extends TCustomStandardList
                 [
                     'name'   => 'plataforma_id',
                     'label'  => 'Plataforma',
-                    'widget' => ['class' => 'TDBCombo', 'database' => 'unit_database', 'model' => 'DoublePlataforma', 'key' => 'id', 'display' => '[{idioma}] {nome}', 'operator' => '='],
+                    'widget' => ['class' => 'TDBCombo', 'database' => 'double', 'model' => 'DoublePlataforma', 'key' => 'id', 'display' => '[{idioma}] {nome}', 'operator' => '='],
                     // 'filter' => ['width' => '250', 'height' => '100%']
                 ],
                 [
@@ -95,7 +95,7 @@ class TDoubleCanalList extends TCustomStandardList
     public function doChangeValue($param)
     {
         TUtils::openConnection(
-            'unit_database',
+            'double',
             function () use ($param) {
                 $plataforma = new DoubleUsuario($param['id'], false);
                 $plataforma->{$param['campo']} = $param['valor'];
@@ -143,7 +143,7 @@ class TDoubleCanalList extends TCustomStandardList
         unset($param['class']);
         unset($param['method']);
 
-        $plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
             return new DoublePlataforma($param['plataforma_id'], False);
         });
 
@@ -197,11 +197,11 @@ class TDoubleCanalList extends TCustomStandardList
 
         $data = new stdClass;
         $data->token = $token;
-        $data->plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+        $data->plataforma = TUtils::openFakeConnection('double', function() use ($param){
             return new DoublePlataforma($param['plataforma_id'], false);
         });
         $data->tipo = 'cmd';
-        $data->canal =  TUtils::openFakeConnection('unit_database', function() use ($param){
+        $data->canal =  TUtils::openFakeConnection('double', function() use ($param){
             return new DoubleCanal($param['id'], false);
         });
 

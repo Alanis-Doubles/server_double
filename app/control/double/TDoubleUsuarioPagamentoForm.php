@@ -10,7 +10,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
     use TStandardFormTrait;
 
     const ACTIVERECORD = 'DoublePagamentoHistorico';
-    const DATABASE = 'unit_database';
+    const DATABASE = 'double';
 
     protected function onBuild($param)
     {
@@ -95,7 +95,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
 
     public function onInsert($param)
     {
-        $usuario = TUtils::openFakeConnection('unit_database', function () use ($param) {
+        $usuario = TUtils::openFakeConnection('double', function () use ($param) {
             return new DoubleUsuario($param['id'], false);
         });
 

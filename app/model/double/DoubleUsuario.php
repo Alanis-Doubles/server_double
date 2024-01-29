@@ -21,7 +21,7 @@ class DoubleUsuario extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public function get_logado()
@@ -75,7 +75,7 @@ class DoubleUsuario extends DoubleRecord
 
     public static function identificar($chat_id, $plataforma_id)
     {
-        return TUtils::openFakeConnection('unit_database', function() use($chat_id, $plataforma_id) {
+        return TUtils::openFakeConnection('double', function() use($chat_id, $plataforma_id) {
             return DoubleUsuario::where('chat_id', '=', $chat_id)
                 ->where('plataforma_id', '=', $plataforma_id)
                 ->first();
@@ -189,7 +189,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function get_roboStatus()
     {
-        $plataforma = TUtils::openFakeConnection('unit_database', function () {
+        $plataforma = TUtils::openFakeConnection('double', function () {
             return new self($this->id, false);
         });
 
@@ -198,7 +198,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function set_roboStatus($value)
     {
-        TUtils::openConnection('unit_database', function () use ($value) {
+        TUtils::openConnection('double', function () use ($value) {
             $plataforma = new self($this->id, false);
             $plataforma->robo_status = $value;
             $plataforma->save();
@@ -207,7 +207,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function get_roboInicio()
     {
-        $plataforma =TUtils::openFakeConnection('unit_database', function () {
+        $plataforma =TUtils::openFakeConnection('double', function () {
             return new self($this->id, false);
         });
         
@@ -216,7 +216,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function set_roboInicio($value)
     {
-        TUtils::openConnection('unit_database', function () use ($value) {
+        TUtils::openConnection('double', function () use ($value) {
             $plataforma = new self($this->id, false);
             $plataforma->robo_inicio = $value;
             $plataforma->save();
@@ -226,7 +226,7 @@ class DoubleUsuario extends DoubleRecord
     public function get_valorJogada()
     {
         if ($this->ciclo == 'Y') {
-            $result = TUtils::openFakeConnection('unit_database', function () {
+            $result = TUtils::openFakeConnection('double', function () {
                 return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                     ->where('sequencia', '=', $this->robo_sequencia)
                     ->select(['valor'])
@@ -246,7 +246,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function get_lucro()
     {
-        $result = TUtils::openFakeConnection('unit_database', function() {
+        $result = TUtils::openFakeConnection('double', function() {
             return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                 ->where('sequencia', '=', $this->robo_sequencia)
                 ->sumBy('valor', 'total');
@@ -261,7 +261,7 @@ class DoubleUsuario extends DoubleRecord
     public function get_plataforma()
     {
         if (!$this->obj_plataforma) {
-            $this->obj_plataforma =  TUtils::openConnection('unit_database', function () {
+            $this->obj_plataforma =  TUtils::openConnection('double', function () {
                 return new DoublePlataforma($this->plataforma_id, false);
             });
         }
@@ -272,7 +272,7 @@ class DoubleUsuario extends DoubleRecord
     public function get_canal()
     {
         if (!$this->obj_canal) {
-            $this->obj_canal =  TUtils::openConnection('unit_database', function () {
+            $this->obj_canal =  TUtils::openConnection('double', function () {
                 $result = new DoubleCanal($this->canal_id, false);
                 if (!$result)
                     $result = new DoubleCanal();

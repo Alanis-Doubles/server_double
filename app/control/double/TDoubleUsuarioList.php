@@ -17,7 +17,7 @@ class TDoubleUsuarioList extends TCustomStandardList
                
         parent::__construct([
             'title'          => 'Usuarios',
-            'database'       => 'unit_database',
+            'database'       => 'double',
             'activeRecord'   => 'DoubleUsuario',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoubleUsuarioForm',
@@ -27,7 +27,7 @@ class TDoubleUsuarioList extends TCustomStandardList
                     'label'  => 'Plataforma',
                     'widget' => [
                         'class' => 'TDBCombo', 
-                        'database' => 'unit_database', 
+                        'database' => 'double', 
                         'model' => 'DoublePlataforma', 
                         'key' => 'id', 
                         'display' => '[{idioma}] {nome}', 
@@ -42,7 +42,7 @@ class TDoubleUsuarioList extends TCustomStandardList
                     'label'  => 'Canal',
                     'widget' => [
                         'class' => 'TDBCombo', 
-                        'database' => 'unit_database', 
+                        'database' => 'double', 
                         'model' => 'DoubleCanal', 
                         'key' => 'id', 
                         'display' => '{nome}', 
@@ -152,7 +152,7 @@ class TDoubleUsuarioList extends TCustomStandardList
             if (!empty($param['search_plataforma_id']))
             {
                 $criteria = TCriteria::create( ['plataforma_id' => $param['search_plataforma_id'] ] );
-                TDBCombo::reloadFromModel('form_search_TDoubleUsuarioList', 'search_canal_id', 'unit_database', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
+                TDBCombo::reloadFromModel('form_search_TDoubleUsuarioList', 'search_canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
             }
             else
             {
@@ -169,7 +169,7 @@ class TDoubleUsuarioList extends TCustomStandardList
     public function doChangeValue($param)
     {
         TUtils::openConnection(
-            'unit_database',
+            'double',
             function () use ($param) {
                 $plataforma = new DoubleUsuario($param['id'], false);
                 $plataforma->{$param['campo']} = $param['valor'];

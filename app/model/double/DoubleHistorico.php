@@ -15,7 +15,7 @@ class DoubleHistorico extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public static function buscarHistorico($ant, $inicio, $plataforma_id, $call_status){
@@ -24,7 +24,7 @@ class DoubleHistorico extends DoubleRecord
         do {
             sleep(1);
             try {
-                $historico = TUtils::openFakeConnection('unit_database', function() use ($plataforma_id, $inicio){
+                $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $inicio){
                     return self::select()
                         ->where('plataforma_id', '=', $plataforma_id)
                         ->where('created_at', '>=', $inicio)
@@ -65,7 +65,7 @@ class DoubleHistorico extends DoubleRecord
             } catch (\Throwable $e) {
                 // $service = null;
                 // $mensagem = $e->getMessage();
-                // TUtils::openConnection('unit_database');;
+                // TUtils::openConnection('double');;
                 // $error = new DoubleErros();
                 // $error->classe = 'DoubleHistorico';
                 // $error->metodo = 'buscarHistorico';
@@ -76,7 +76,7 @@ class DoubleHistorico extends DoubleRecord
             } catch (Exception $e) {
                 // $service = null;
                 // $mensagem = $e->getMessage();
-                // TUtils::openConnection('unit_database');;
+                // TUtils::openConnection('double');;
                 // $error = new DoubleErros();
                 // $error->classe = 'DoubleHistorico';
                 // $error->metodo = 'buscarHistorico';
@@ -96,7 +96,7 @@ class DoubleHistorico extends DoubleRecord
 
     public function get_estrategia(){
         if (!$this->obj_estrategia and $this->estrategia_id) {
-            $this->obj_estrategia = TUtils::openFakeConnection('unit_database', function() {
+            $this->obj_estrategia = TUtils::openFakeConnection('double', function() {
                 return new DoubleEstrategia($this->estrategia_id);
             });
         }

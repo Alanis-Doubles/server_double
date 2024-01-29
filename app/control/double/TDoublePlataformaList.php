@@ -18,7 +18,7 @@ class TDoublePlataformaList extends TCustomStandardList
 
         parent::__construct([
             'title'          => 'Plataformas',
-            'database'       => 'unit_database',
+            'database'       => 'double',
             'activeRecord'   => 'DoublePlataforma',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoublePlataformaForm',
@@ -139,7 +139,7 @@ class TDoublePlataformaList extends TCustomStandardList
     public function doChangeValue($param)
     {
         TUtils::openConnection(
-            'unit_database',
+            'double',
             function () use ($param) {
                 $plataforma = new DoublePlataforma($param['id'], false);
                 $plataforma->ativo = $param['valor'];
@@ -154,7 +154,7 @@ class TDoublePlataformaList extends TCustomStandardList
         unset($param['class']);
         unset($param['method']);
 
-        $plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
             return new DoublePlataforma($param['id'], False);
         });
 
@@ -184,7 +184,7 @@ class TDoublePlataformaList extends TCustomStandardList
         $param['first_page'] = $_REQUEST['first_page'] ?? 1;
         $param['register_state'] = 'false';
 
-        $plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
             return new DoublePlataforma($param['id'], false);
         });
         TDoubleSinais::finalizar(['plataforma' => strtolower($plataforma->nome), 'idioma' => $plataforma->idioma]);
@@ -202,7 +202,7 @@ class TDoublePlataformaList extends TCustomStandardList
         $param['first_page'] = $_REQUEST['first_page'] ?? 1;
         $param['register_state'] = 'false';
 
-        $plataforma = TUtils::openFakeConnection('unit_database', function() use ($param){
+        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
             return new DoublePlataforma($param['id'], false);
         });
 

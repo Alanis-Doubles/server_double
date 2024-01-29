@@ -24,7 +24,7 @@ class TCustomStandardList extends TStandardList
         }
 
         $wFilters = [];
-        $database = (string) isset($this->properties->{'database'}) ? (string) $this->properties->{'database'} : 'unit_database';
+        $database = (string) isset($this->properties->{'database'}) ? (string) $this->properties->{'database'} : 'double';
         parent::setDatabase($database);          
         parent::setActiveRecord((string) $this->properties->{'activeRecord'}); 
 

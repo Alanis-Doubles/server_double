@@ -7,7 +7,7 @@ class TDoubleUsuarioHistoricoForm  extends TStandardForm
     use TStandardFormTrait;
 
     const ACTIVERECORD = 'DoublePagamentoHistorico';
-    const DATABASE = 'unit_database';
+    const DATABASE = 'double';
 
     private $datagrid;
 
@@ -44,7 +44,7 @@ class TDoubleUsuarioHistoricoForm  extends TStandardForm
     {
         // $data = parent::onEdit($param);
 
-        $historico = TUtils::openFakeConnection('unit_database', function () use ($param) {
+        $historico = TUtils::openFakeConnection('double', function () use ($param) {
             return DoublePagamentoHistorico::where('usuario_id', '=', $param['id'])
                 ->orderBy('created_at', 'desc')
                 ->load();

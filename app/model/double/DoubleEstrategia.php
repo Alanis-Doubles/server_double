@@ -13,7 +13,7 @@ class DoubleEstrategia extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public function validar($sinais, IDoublePlataforma $plataforma)

@@ -19,12 +19,12 @@ class DoublePlataforma extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('unit_database');
+        $this->loadAttributes('double');
     }
 
     public function get_statusSinais()
     {
-        $plataforma =  TUtils::openFakeConnection('unit_database', function() {
+        $plataforma =  TUtils::openFakeConnection('double', function() {
             return new self($this->id, false);
         });
 
@@ -33,7 +33,7 @@ class DoublePlataforma extends DoubleRecord
 
     public function set_statusSinais($value)
     {
-        TUtils::openConnection('unit_database', function() use ($value) {
+        TUtils::openConnection('double', function() use ($value) {
             $plataforma = new self($this->id, false);
             $plataforma->status_sinais = $value;
             $plataforma->save();
@@ -42,7 +42,7 @@ class DoublePlataforma extends DoubleRecord
 
     public function get_inicioSinais()
     {
-        $plataforma = TUtils::openFakeConnection('unit_database', function() {
+        $plataforma = TUtils::openFakeConnection('double', function() {
             return  new self($this->id, false);
         });
         
@@ -51,7 +51,7 @@ class DoublePlataforma extends DoubleRecord
 
     public function set_inicioSinais($value)
     {
-        TUtils::openConnection('unit_database', function () use ($value) {
+        TUtils::openConnection('double', function () use ($value) {
             $plataforma = new self($this->id, false);
             $plataforma->inicio_sinais = $value;
             $plataforma->save();
@@ -122,7 +122,7 @@ class DoublePlataforma extends DoubleRecord
 
     public static function indentificar($nome, $idioma)
     {
-        $plataforma = TUtils::openConnection('unit_database', function() use ($nome, $idioma) {
+        $plataforma = TUtils::openConnection('double', function() use ($nome, $idioma) {
             return DoublePlataforma::where('LOWER(nome)', '=', $nome)
                 ->where('idioma', '=', $idioma)
                 ->where('ativo', '=', 'Y')
