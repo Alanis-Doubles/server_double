@@ -1,0 +1,49 @@
+.main-header.navbar .navbar-brand{
+	background-color:#000000 !important;
+	color:#ffffff !important; 
+	border-color:#000000;
+}
+
+div[form=form_login] .panel-heading{
+	background-color:#000000 !important;
+}
+
+/* #tbutton_btn_entrar{
+	background-color:#000000 !important;
+} */
+
+.btn-primary {
+	background-color: #000000 !important;
+	border-color: #000000 !important;
+}
+
+.btn.btn-primary:hover {
+    background-color: #33170C !important;
+    border-color: #33170C !important;
+    color: #fff !important;
+}
+
+.main-header>.navbar{
+	background-color:#000000 !important;
+}
+
+.main-header .logo{
+	background-color:#000000 !important;
+}
+
+.skin-blue .main-header li.user-header {
+    background-color: #000000 !important;
+}
+
+.dropdown-menu>.divider {
+    background-color: #eee;
+    border-top: 1px solid #e9ecef !important;
+}
+
+.content-wrapper {
+	background-color: #ecf0f5 !important;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+	background-color: rgba(0, 0, 0, 0.02) !important;
+  }

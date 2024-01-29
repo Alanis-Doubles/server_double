@@ -1,0 +1,105 @@
+<?php
+
+use Adianti\Database\TRecord;
+
+class DoubleHistorico extends DoubleRecord
+{
+    const TABLENAME  = 'double_historico';
+    const PRIMARYKEY = 'id';
+    const IDPOLICY   = 'max';
+
+    use RecordTrait;
+
+    private $obj_estrategia;
+
+    public function __construct($id = NULL, $callObjectLoad = TRUE)
+    {
+        parent::__construct($id, $callObjectLoad);
+        $this->loadAttributes('unit_database');
+    }
+
+    public static function buscarHistorico($ant, $inicio, $plataforma_id, $call_status){
+        $list = [];
+        $status = '';
+        do {
+            sleep(1);
+            try {
+                $historico = TUtils::openFakeConnection('unit_database', function() use ($plataforma_id, $inicio){
+                    return self::select()
+                        ->where('plataforma_id', '=', $plataforma_id)
+                        ->where('created_at', '>=', $inicio)
+                        ->last();
+                        // ->orderBy('created_at', 'desc')
+                        // ->take(5)
+                        // ->load();
+                });
+
+                // if ($historico)
+                //     DoubleErros::registrar(1, 'DoubleHistorico', 'buscarHistorico', $historico->toJson());
+                // else
+                //     DoubleErros::registrar(1, 'DoubleHistorico', 'buscarHistorico', 'não encontrado');
+
+
+                if ($historico) {
+                    // continue;
+
+                    // $dataInicio = strtotime($inicio);
+                    $list = [];
+                    // foreach ($historico as $key => $hist) {
+                        // $data = strtotime($historico->created_at);
+                        // if ($data > $dataInicio) {
+                            $estrategia = $historico->estrategia;
+                            if ($estrategia)
+                                $estrategia->resultado = $historico->cor;
+                            $list = [
+                                'id' => $historico->id,
+                                'tipo' => $historico->tipo, 
+                                'estrategia' => $estrategia,
+                                'cor' => $historico->cor, 
+                                'created_at' => $historico->created_at
+                            ];
+                        // }
+                    // }
+                }
+                $status = $call_status();
+            } catch (\Throwable $e) {
+                // $service = null;
+                // $mensagem = $e->getMessage();
+                // TUtils::openConnection('unit_database');;
+                // $error = new DoubleErros();
+                // $error->classe = 'DoubleHistorico';
+                // $error->metodo = 'buscarHistorico';
+                // $error->erro = $mensagem;
+                // $error->plataforma_id = $data->plataforma->id;
+                // $error->save();
+                // TTransaction::close();
+            } catch (Exception $e) {
+                // $service = null;
+                // $mensagem = $e->getMessage();
+                // TUtils::openConnection('unit_database');;
+                // $error = new DoubleErros();
+                // $error->classe = 'DoubleHistorico';
+                // $error->metodo = 'buscarHistorico';
+                // $error->erro = $mensagem;
+                // $error->plataforma_id = $data->plataforma->id;
+                // $error->save();
+                // TTransaction::close();
+            }
+        } while ($list == $ant AND $status == 'EXECUTANDO');
+        
+        if ($status != 'EXECUTANDO')
+            return [];
+            // throw new Exception("Ocorreu um erro interno.");
+
+        return $list;
+    }
+
+    public function get_estrategia(){
+        if (!$this->obj_estrategia and $this->estrategia_id) {
+            $this->obj_estrategia = TUtils::openFakeConnection('unit_database', function() {
+                return new DoubleEstrategia($this->estrategia_id);
+            });
+        }
+        return $this->obj_estrategia;
+    }
+}
