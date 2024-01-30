@@ -57,6 +57,8 @@ class DoublePagamentoHistorico extends DoubleRecord
                 $usuario->data_expiracao = $data;
                 if (date('Y-m-d') > $data)
                     $usuario->status = 'INATIVO';
+                if ($this->email)
+                    $usuario->email = $this->email;
                 $usuario->save();
 
                 $plataforma = $usuario->plataforma;

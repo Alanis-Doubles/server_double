@@ -6,8 +6,7 @@ use Phinx\Config\FeatureFlags;
 use Phinx\Migration\AbstractMigration;
 
 final class DoubleHistoricoInformacao extends AbstractMigration
-{
-   
+{   
     public function change(): void
     {
         $this->output->writeln('<info>Tabela</info> double_historico');

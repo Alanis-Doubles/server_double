@@ -130,32 +130,50 @@ class TDoubleRobo
 
     public function validar_pagamento($param)
     {
-        // if (empty($param['chat_id']))
+        if (empty($param['chat_id']))
             throw new Exception("Operação não suportada");
 
-        // TUtils::openConnection('double');
-        // try {
-        //     $object = DoublePlataforma::where('LOWER(nome)', '=', $param['plataforma'])
-        //     ->where('idioma', '=', $param['idioma'])
-        //     ->first();
-        //     $pagamento = ArbetyWebhook::where('email', '=', $param['email'])
-        //         ->where('id_usuario', 'is', null)
-        //         ->first();
+        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $busca = TUtils::openConnection('double', function() use ($param, $plataforma){
+            $canal = Doublecanal::where('channel_id', '=', $param['channel_id'])->first();
+            if ($plataforma->usuarios_canal == 'N') {
+                $usuario = DoubleUsuario::where('chat_id', '=', $param['chat_id'])
+                    ->where('plataforma_id', '=', $plataforma->id)
+                    ->first();
 
-        //     if (!$pagamento)
-        //         throw new Exception("Pagamento não encontrado para o email {$param['email']}");
+                return [
+                    'usuario' => $usuario,
+                    'pagamento' => DoublePagamentoHistorico::where('email', '=', $param['email'])
+                                    ->where('plataforma_id', '=', $plataforma->id)
+                                    ->where('usuario_id', 'is', null)
+                                    ->first()
+                ];
+            } else {
+                $usuario = DoubleUsuario::where('chat_id', '=', $param['chat_id'])
+                    ->where('plataforma_id', '=', $plataforma->id)
+                    ->where('canal_id', $plataforma->id)
+                    ->first();
 
-        //     $pagamento->id_usuario = $object->id;
-        //     $pagamento->save();
+                return [
+                    'usuario' => $usuario, 
+                    'pagametno' => DoublePagamentoHistorico::where('email', '=', $param['email'])
+                                    ->where('plataforma_id', '=', $plataforma->id)
+                                    ->where('canal_id', $canal->id)
+                                    ->where('usuario_id', 'is', null)
+                                    ->first()
+                ];
+            }
+        });
 
-        //     $object->expiration_date = date('Y-m-d', strtotime('+30 days'));
-        //     $object->status = 'ATIVO';
-        //     $object->email = $param['email'];
-        //     $object->save();
-        // } finally {
-        //     TTransaction::close();
-        // }
-        // return $object->toArray(static::ATTRIBUTES);
+        
+        if (!$busca['pagamento'])
+            throw new Exception("Pagamento não encontrado para o email {$param['email']}");
+
+        return TUtils::openConnection('double', function() use ($busca){
+            $busca['pagamento']->usuario_id = $busca['usuario']->id;
+            $busca['pagamento']->save();
+            new DoubleUsuario($busca['$usuario']->id, False);
+        });
     }
 
     public function logar($param)

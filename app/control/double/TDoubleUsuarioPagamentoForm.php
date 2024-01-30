@@ -2,6 +2,7 @@
 
 use Adianti\Widget\Form\TForm;
 use Adianti\Base\TStandardForm;
+use Adianti\Widget\Form\TEntry;
 use Adianti\Validator\TMinValueValidator;
 
 class TDoubleUsuarioPagamentoForm  extends TStandardForm
@@ -15,6 +16,8 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
     protected function onBuild($param)
     {
         $this->form->addFields(
+            [$this->makeTHidden(['name' => 'plataforma_id'])],
+            [$this->makeTHidden(['name' => 'canal_id'])],
             [$this->makeTHidden(['name' => 'usuario_id'])],
         );
 
@@ -27,7 +30,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
             [$label = $this->makeTLabel(['value' => 'Usuário'])],
             [$this->makeTEntry(['name' => 'nome_usuario', 'label' => $label, 'editable' => false])],
             [$label = $this->makeTLabel(['value' => 'E-mail'])],
-            [$this->makeTEntry(['name' => 'email', 'label' => $label, 'editable' => false])],
+            [$this->makeTEntry(['name' => 'email', 'label' => $label, 'required' => true])],
         );
 
         $this->form->addContent([new TFormSeparator('')]);
@@ -85,6 +88,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
             [],[]
         );
 
+        TUtils::setValidation($this->form, 'email', [['validator' => new TEmailValidator]]);
         TUtils::setValidation($this->form, 'valor', [['validator' => new TMinValueValidator, 'params' => '1']]);
     }
 
@@ -107,12 +111,14 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
         $data->tipo_evento = 'PAGAMENTO';
         $data->plataforma_pagamento = 'PIX';
         $data->valor = 0;
-        $data->nome = $usuario->nome;
+        $data->nome_completo = $usuario->nome_completo;
         $data->nome_usuario = $usuario->nome_usuario;
         $data->email = $usuario->email;
-        if ($usuario->plataforma->usuarios_canal == "Y")
+        $data->plataforma_id = $usuario->plataforma->id;
+        if ($usuario->plataforma->usuarios_canal == "Y") {
+            $data->canal_id = $usuario->canal->id;
             $data->produto = 'Acesso ao canal: ' . $usuario->canal->nome;
-        else
+        } else
         $data->produto = 'Acesso a plataforma: ' . $usuario->plataforma->nome;
         $this->form->setData($data);
     }

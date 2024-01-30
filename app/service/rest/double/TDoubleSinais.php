@@ -267,7 +267,7 @@ class TDoubleSinais
                         ->load();
                 });
 
-                $sinal = DoubleSinal::buscarSinal($sinal, $data->canal->inicioSinais, $data->plataforma->id, $call_status);
+                // $sinal = DoubleSinal::buscarSinal($sinal, $data->canal->inicioSinais, $data->plataforma->id, $call_status);
                 foreach ($estrategias as $key => $estrategia) {
                     if ($estrategia->validar($sinal, $service)) {
                         if ($estrategia->aguardarProximoSinal()) {
