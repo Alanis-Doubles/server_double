@@ -234,6 +234,8 @@ class TBlaze implements IDoublePlataforma
             $content = json_decode($response->getBody()->getContents());
             if ($content->error->code == '1010') 
                 return 'saldo_insuficiente';
+            elseif ($content->error->code == '1005') 
+                return 'saldo_insuficiente';
             else 
                 return $content->error->message;
         } else {
