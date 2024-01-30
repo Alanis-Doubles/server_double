@@ -101,6 +101,7 @@ class TCustomStandardList extends TStandardList
         $dataGrid->name = 'datagrid';
         $dataGrid->pagenavigator = property_exists($this->properties, 'pagenavigator') ? $this->properties->{'pagenavigator'} : true;
         $dataGrid->columns =[];
+        
         foreach ($this->properties->{'items'} as $key => $item) {
             if (is_array($item))
                 $item = (object) $item;

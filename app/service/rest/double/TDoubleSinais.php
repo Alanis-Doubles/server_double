@@ -80,16 +80,17 @@ class TDoubleSinais
             $data->plataforma->statusSinais = 'EXECUTANDO';
             $data->plataforma->inicioSinais = (new DateTime())->format('Y-m-d H:i:s');
             $status = $data->plataforma->statusSinais;
+            $data->ultimo_sinal = [];
         }
 
+        $ultimo_sinal = $data->ultimo_sinal;
         $service = null;
         try
         {
             try {
                 if (!$service)
                     $service = $data->plataforma->service;
-                $service->aguardarSinal();
-
+                $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
                 TUtils::openConnection('double', function() use ($data, $service) {
                     $sinal = new DoubleSinal();
                     $sinal->plataforma_id = $data->plataforma->id;
@@ -144,6 +145,8 @@ class TDoubleSinais
             $data->inicio = false;
             $data->token = $token;
             $data->tipo = 'cmd';
+            $data->ultimo_sinal = $ultimo_sinal;
+
             unset($data->plataforma);
 
             TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
@@ -726,7 +729,7 @@ class TDoubleSinais
                                 $numero_retornado = $sinal[0]['numero'];
                                 $cor_retornada = $sinal[0]['cor'];
 
-                                if ($historico['estrategia']) {
+                                if (isset($historico['estrategia'])) {
                                     $estrategia = TUtils::openFakeConnection('double', function() use($historico){
                                         return new DoubleEstrategia($historico['estrategia'], false);
                                     });

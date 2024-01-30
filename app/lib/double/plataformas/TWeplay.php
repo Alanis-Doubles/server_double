@@ -31,8 +31,9 @@ class TWeplay implements IDoublePlataforma
         echo $this->saldo($object);
     }
 
-    public function aguardarSinal()
+    public function aguardarSinal($ultimo_sinal)
     {
+        self::$ultimo_sinal = $ultimo_sinal;
         $url = 'wss://api.weplay.games/socket.io/?EIO=4&transport=websocket';
         $config = new ClientConfig();
         $client = new WebSocketClient($url, $config);
@@ -52,7 +53,7 @@ class TWeplay implements IDoublePlataforma
                         $sinal->id = $content[1]->slug;
                         $sinal->cor = $content[1]->betColor;
                         $sinal->numero = $content[1]->betNumber;
-                        if (self::$ultimo_sinal != $sinal)
+                        if (self::$ultimo_sinal != (array) $sinal)
                         {
                             self::$ultimo_sinal = $sinal;
                             return self::$ultimo_sinal;              
@@ -114,7 +115,7 @@ class TWeplay implements IDoublePlataforma
     public function saldo(DoubleUsuario $usuario)
     {
         if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
-            return 100;
+            return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
         } else {
             $token_plataforma = self::getToken($usuario);
             $client = new Client(['http_errors' => false]);

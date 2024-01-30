@@ -36,14 +36,14 @@ class DoubleSinal extends DoubleRecord
                 foreach ($sinais as $key => $sinal) {
                     $data = strtotime($sinal->created_at);
                     // if ($data > $dataInicio) {
-                        $estrategia = $sinal->estrategia;
-                        if ($estrategia)
-                            $estrategia->resultado = $sinal->cor;
-                            $list[] = [
-                                'numero' => $sinal->numero, 
-                                'cor' => $sinal->cor, 
-                                'created_at' => $sinal->created_at
-                            ];
+                        // $estrategia = $sinal->estrategia;
+                        // if ($estrategia)
+                        //     $estrategia->resultado = $sinal->cor;
+                        $list[] = [
+                            'numero' => $sinal->numero, 
+                            'cor' => $sinal->cor, 
+                            'created_at' => $sinal->created_at
+                        ];
                     // }
                 }
                 $status = $call_status();

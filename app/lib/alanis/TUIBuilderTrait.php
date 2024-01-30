@@ -1055,7 +1055,8 @@ trait TUIBuilderTrait
 
         $widget = new BootstrapDatagridWrapper(new TCustomDataGrid);
         // $widget->datatable = 'true';
-        $widget->style = 'width: 100%';
+        // $widget->style = 'width: 100%';
+        $widget->style = 'min-width: 900px';
         $widget->setId((string) $properties->{'name'});
         $widget->generateHiddenFields();
 
@@ -1174,6 +1175,7 @@ trait TUIBuilderTrait
         $this->fieldsByName[(string) $properties->{'name'} . '_pnl'] = $panel;
         $this->fieldsByName[(string) $properties->{'name'}] = $widget;
         
+        $panel->getBody()->style = "overflow-x:auto;";
         $widget = $panel;
         
         return $widget;

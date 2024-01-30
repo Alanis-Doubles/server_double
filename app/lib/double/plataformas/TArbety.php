@@ -76,7 +76,7 @@ class TArbety implements IDoublePlataforma
             substr(str_shuffle(str_repeat($x = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil($length / strlen($x)))), 1, $length);
     }
 
-    public function aguardarSinal()
+    public function aguardarSinal($ultimo_sinal)
     {
         $client = new Client(['http_errors' => false, 'decode_content' => false, 'verify' => false]);
 

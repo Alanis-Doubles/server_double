@@ -48,7 +48,7 @@ class TReals implements IDoublePlataforma
         }
     }
 
-    public function aguardarSinal()
+    public function aguardarSinal($ultimo_sinal)
     {
         $config = new ClientConfig();
         $url = 'wss://games.casinogate.io/ws/DoubleDouble/';

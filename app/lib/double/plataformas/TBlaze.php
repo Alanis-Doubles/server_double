@@ -11,8 +11,9 @@ class TBlaze implements IDoublePlataforma
         return 'Blaze';
     }
 
-    public function aguardarSinal()
+    public function aguardarSinal($ultimo_sinal)
     {
+        self::$ultimo_sinal = $ultimo_sinal;
         $client = new Client(['http_errors' => false]);
         while (true)
         {
@@ -35,7 +36,7 @@ class TBlaze implements IDoublePlataforma
                     $sinal->id = $content->id;
                     $sinal->cor = $content->color;
                     $sinal->numero = $content->roll;
-                    if (self::$ultimo_sinal != $sinal)
+                    if (self::$ultimo_sinal != (array) $sinal)
                     {
                         self::$ultimo_sinal = $sinal;
                         return self::$ultimo_sinal;              

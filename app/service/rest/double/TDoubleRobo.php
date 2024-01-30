@@ -16,7 +16,7 @@ class TDoubleRobo
         $manutencao = DoubleConfiguracao::getConfiguracao('manutencao');
         $manutencao_chat_ids = DoubleConfiguracao::getConfiguracao('manutencao_chat_ids');
 
-        if ($manutencao and !in_array($param['chat_id'], explode(',', $manutencao_chat_ids)))
+        if ($manutencao == 'Y' and !in_array($param['chat_id'], explode(',', $manutencao_chat_ids)))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_SERVIDOR_MANUTENCAO);
             
 

@@ -6,7 +6,7 @@ interface IDoublePlataforma
 {
     public static function nome();
 
-    public function aguardarSinal();
+    public function aguardarSinal($ultimo_sinal);
 
     public function ultimoSinal();
 

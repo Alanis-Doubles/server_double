@@ -32,7 +32,7 @@ class TWebDriverPlataforma implements IDoublePlataforma
     }
 
     public static function nome(){}
-    public function aguardarSinal(){}
+    public function aguardarSinal($ultimo_sinal){}
     public function ultimoSinal(){}
     public function getToken(DoubleUsuario $usuario){}
     public function saldo(DoubleUsuario $usuario){}
