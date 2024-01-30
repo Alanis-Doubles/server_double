@@ -219,5 +219,38 @@ class TWeplay implements IDoublePlataforma
 
         if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
             return '';
+
+        $payload = [
+            "amount" => 1,
+            "roundId" => $id,
+            "betColor" => ['red' => "RED", 'black' => "BLACK", 'white' => "WHITE"][$cor],
+            "gameId" => 2,
+            "coinId" => 1
+        ];
+
+        $token_plataforma = self::getToken($usuario);
+        $client = new Client(['http_errors' => false]);
+        $response = $client->request(
+            'POST',
+            'https://api.weplay.games/api/v1/roulette/enter-bet',
+            [
+                'json' => $payload,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '. $token_plataforma
+                ]
+            ]
+        );
+
+        if ($response->getStatusCode() != 200) {
+            $content = json_decode($response->getBody()->getContents());
+            if ($content->message == 'Saldo insuficiente para fazer esta aposta.') 
+                return 'saldo_insuficiente';
+            else 
+                return $content->message;
+        } else {
+            return '';
+        }
     }
 }

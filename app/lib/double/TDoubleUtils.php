@@ -17,14 +17,12 @@ class TDoubleUtils
         if (!$server_root) 
             {
                 $server_root = $_SERVER['DOCUMENT_ROOT'];
-                // if (substr(php_uname(), 0, 7) == "Windows")
-                //     $server_root .=  '/server_double';
                 DoubleConfiguracao::setConfiguracao('server_root', $server_root);
             }
 
-        $param = base64_encode(serialize($data));
+        $param = http_build_query(['data' => $data]);
         
-        $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&data=' . $param . '"';
+        $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
         if (substr(php_uname(), 0, 7) == "Windows") {
             pclose(popen("start /B " . $command, "r"));
         } else {

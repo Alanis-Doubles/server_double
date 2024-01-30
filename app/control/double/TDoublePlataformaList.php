@@ -202,11 +202,7 @@ class TDoublePlataformaList extends TCustomStandardList
         $param['first_page'] = $_REQUEST['first_page'] ?? 1;
         $param['register_state'] = 'false';
 
-        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
-            return new DoublePlataforma($param['id'], false);
-        });
-
-        TDoubleSinais::iniciar(['plataforma' => strtolower($plataforma->nome), 'idioma' => $plataforma->idioma]);
+        TDoubleSinais::iniciar(['plataforma' => $param['nome'], 'idioma' => $param['idioma']]);
 
         new TMessage('info', 'Serviço iniciado.', new TAction([$this, 'onReload'], $param));
     }

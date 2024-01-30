@@ -42,7 +42,7 @@ class ZeraBaseJoao extends AbstractSeed
                     'url_double' => 'https://realsbet.com/casino/game/2377405?provider=CasinoGate',
                     'url_cadastro' => 'https://fwd.cx/vCUusCqAGJpo',
                     'url_tutorial' => 'https://t.me/tutorialdbreals_bot',
-                    'url_suporte' => 'https://t.me/joaogrobman"',
+                    'url_suporte' => 'https://t.me/joaogrobman',
                 ]
             ]
         );

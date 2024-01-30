@@ -29,37 +29,22 @@ class DoubleHistorico extends DoubleRecord
                         ->where('plataforma_id', '=', $plataforma_id)
                         ->where('created_at', '>=', $inicio)
                         ->last();
-                        // ->orderBy('created_at', 'desc')
-                        // ->take(5)
-                        // ->load();
                 });
 
-                // if ($historico)
-                //     DoubleErros::registrar(1, 'DoubleHistorico', 'buscarHistorico', $historico->toJson());
-                // else
-                //     DoubleErros::registrar(1, 'DoubleHistorico', 'buscarHistorico', 'não encontrado');
-
-
                 if ($historico) {
-                    // continue;
-
-                    // $dataInicio = strtotime($inicio);
                     $list = [];
-                    // foreach ($historico as $key => $hist) {
-                        // $data = strtotime($historico->created_at);
-                        // if ($data > $dataInicio) {
-                            $estrategia = $historico->estrategia;
-                            if ($estrategia)
-                                $estrategia->resultado = $historico->cor;
-                            $list = [
-                                'id' => $historico->id,
-                                'tipo' => $historico->tipo, 
-                                'estrategia' => $estrategia,
-                                'cor' => $historico->cor, 
-                                'created_at' => $historico->created_at
-                            ];
-                        // }
-                    // }
+                        $estrategia = $historico->estrategia;
+                        if ($estrategia)
+                            $estrategia->resultado = $historico->cor;
+                        $list['id'] = $historico->id;
+                        $list['tipo'] = $historico->tipo;
+                        if ($estrategia)
+                            $list['estrategia'] = $estrategia->id;
+                        if ($historico->cor)
+                            $list['cor'] = $historico->cor;
+                        if ($historico->informacao)
+                            $list['informacao'] = $historico->informacao;
+                        $list['created_at'] = $historico->created_at;                           
                 }
                 $status = $call_status();
             } catch (\Throwable $e) {
@@ -89,7 +74,6 @@ class DoubleHistorico extends DoubleRecord
         
         if ($status != 'EXECUTANDO')
             return [];
-            // throw new Exception("Ocorreu um erro interno.");
 
         return $list;
     }

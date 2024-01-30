@@ -9,6 +9,9 @@ class TDoubleTranslate
         $this->list["COLOR_RED"] = "🔴 VERMELHO 🔴";
         $this->list["COLOR_BLACK"] = "⚫ PRETO ⚫";
         $this->list["COLOR_WHITE"] = "⚪️ BRANCO ⚪️";
+        $this->list["RED"] = "🔴";
+        $this->list["BLACK"] = "⚫";
+        $this->list["WHITE"] = "⚪️";
         $this->list["MSG_OPERACAO_NAO_SUPORTADA"] = "Operação não suportada.";
         $this->list["MSG_OPERACAO_SERVIDOR_MANUTENCAO"] = "Servidor em manutenção.";
         $this->list["MSG_OPERACAO_METODO_NAO_SUPORTADO"] = "Método não suportado.";
@@ -89,7 +92,7 @@ class TDoubleTranslate
         $this->list["MSG_CONFIRMADO_AGUARDANDO"] = "⚠️🚨ENTRADA CONFIRMADA🚨⚠️\n\n📊 ENTRAR NA COR: {cor}\n\n⏰ Aguardando para realizar a jogada";
         $this->list["MSG_CONFIGURAR"] = "➡️Seu robô está com a seguinte configuração:\n\n💸 Valor aposta: {value}\n🐓 Gales: {gales}\n✅ Stop WIN: {stop_win}\n❌ Stop LOSS: {stop_loss}\n↪️ Ciclo: {ciclo}\n\nSe você desejar alterar algum valor, por favor selecione uma das opções.";
         $this->list["MSG_SINAIS_OPORTUNIDADE"] = "🥁 POSSÍVEL OPORTUNIDADE 🔔";
-        $this->list["MSG_SINAIS_ENTRADA_CONFIRMADA"] = "⚠️🚨ENTRADA CONFIRMADA🚨⚠️\n\n📊 ENTRAR NA COR: {cor}\n⚪️ Fazer proteção no BRANCO\n\n🚨 FUNCIONA SOMENTE NA PLATAFORMA ABAIXO! ⬇️";
+        $this->list["MSG_SINAIS_ENTRADA_CONFIRMADA"] = "⚠️🚨ENTRADA CONFIRMADA🚨⚠️\n\n🔮 TIPO DE ESTRATÉGIA: {estrategia}\n\n📊 ENTRAR NA COR: {cor}\n🚨 FUNCIONA SOMENTE NA PLATAFORMA ABAIXO! ⬇️";
         $this->list["MSG_SINAIS_WIN"] = "✅✅✅";
         $this->list["MSG_SINAIS_LOSS"] = "Não bateu! 😥\n\n⏺️ Opcional: Faça mais um gale ☑️";
         $this->list["MSG_SINAIS_GALE"] = "🤞🏻 Façam a {protecao} proteção";

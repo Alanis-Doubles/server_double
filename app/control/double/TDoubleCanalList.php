@@ -197,13 +197,10 @@ class TDoubleCanalList extends TCustomStandardList
 
         $data = new stdClass;
         $data->token = $token;
-        $data->plataforma = TUtils::openFakeConnection('double', function() use ($param){
-            return new DoublePlataforma($param['plataforma_id'], false);
-        });
+        $data->plataforma_id = $param['plataforma_id'];
         $data->tipo = 'cmd';
-        $data->canal =  TUtils::openFakeConnection('double', function() use ($param){
-            return new DoubleCanal($param['id'], false);
-        });
+        $data->canal_id = $param['id'];
+        $data->inicio = true;
 
         if ($param['tipo_sinais'] == 'GERA')
             TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);

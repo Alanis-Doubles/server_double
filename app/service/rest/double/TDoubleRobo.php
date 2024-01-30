@@ -208,9 +208,10 @@ class TDoubleRobo
         });
 
         $data = new stdClass;
-        $data->usuario = $object;
-        $data->plataforma = $plataforma;
+        $data->usuario_id = $object->id;
+        $data->plataforma_id = $plataforma->id;
         $data->tipo = 'cmd';
+        $data->inicio = true;
         TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
 
         return $object->toArray(static::ATTRIBUTES);
@@ -238,9 +239,10 @@ class TDoubleRobo
         });
         
         $data = new stdClass;
-        $data->usuario = $object;
-        $data->plataforma = $plataforma;
+        $data->usuario_id = $object->id;
+        $data->plataforma_id = $plataforma->id;
         $data->tipo = 'cmd';
+        $data->inicio = true;
         TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
 
         return $object->toArray(static::ATTRIBUTES);

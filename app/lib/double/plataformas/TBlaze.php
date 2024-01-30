@@ -235,6 +235,8 @@ class TBlaze implements IDoublePlataforma
                 return 'saldo_insuficiente';
             else 
                 return $content->error->message;
+        } else {
+            return '';
         }
     }
 }
