@@ -140,6 +140,8 @@ class TDoubleRobo
                 $usuario = DoubleUsuario::where('chat_id', '=', $param['chat_id'])
                     ->where('plataforma_id', '=', $plataforma->id)
                     ->first();
+                $usuario->email = $param['email'];
+                $usuario->save();
 
                 return [
                     'usuario' => $usuario,
@@ -153,6 +155,8 @@ class TDoubleRobo
                     ->where('plataforma_id', '=', $plataforma->id)
                     ->where('canal_id', $plataforma->id)
                     ->first();
+                $usuario->email = $param['email'];
+                $usuario->save();
 
                 return [
                     'usuario' => $usuario, 
@@ -164,7 +168,6 @@ class TDoubleRobo
                 ];
             }
         });
-
         
         if (!$busca['pagamento'])
             throw new Exception("Pagamento não encontrado para o email {$param['email']}");
@@ -287,63 +290,4 @@ class TDoubleRobo
         });
         return $object->toArray(static::ATTRIBUTES);
     }
-
-    // public function teste($param)
-    // {
-    //     $client = new Client(['cookies' => true]);
-    //     $jar = new \GuzzleHttp\Cookie\CookieJar;
-    //     $response = $client->request(
-    //         'POST',
-    //         'https://doublevegas.bet/painel/backend/be_login',
-    //         [
-    //             'headers' => [
-    //                 'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-    //                 'accept-language' => 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
-    //                 'content-type' => 'application/x-www-form-urlencoded',
-    //             ],
-    //             'form_params' => [
-    //                 'useremail' => 'edson.alanis@gmail.com',
-    //                 'password' => '#6FkM3LhBhwDt'
-    //             ],
-    //             'cookies' => $jar
-    //         ]
-    //     );
-
-    //     if ($response->getStatusCode() == 200) {
-    //         $cookie = $jar->getCookieByName('PHPSESSID');
-    //         return $cookie->getValue();
-    //     } else {
-    //         throw new Exception("Login inválido, por favor refaça a operação.");
-    //     }
-    // }
-
-    // public function teste1($param)
-    // {
-    //     $client = new Client(['cookies' => true]);
-    //     $jar = \GuzzleHttp\Cookie\CookieJar::fromArray(
-    //         [
-    //             'PHPSESSID' => $param['cookie']
-    //         ],
-    //         'doublevegas.bet'
-    //     );
-    //     $response = $client->request(
-    //         'GET',
-    //         'https://doublevegas.bet/api/user/balance/',
-    //         [
-    //             'headers' => [
-    //                 'accept' => 'application/json',
-    //                 'accept-language' => 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
-    //                 'content-type' => 'application/json',
-    //             ],
-    //             'cookies' => $jar
-    //         ]
-    //     );
-
-    //     if ($response->getStatusCode() == 200) {
-    //         $content = json_decode($response->getBody()->getContents());
-    //         return $content->data;
-    //     } else {
-    //         throw new Exception("Login inválido, por favor refaça a operação.");
-    //     }
-    // }
 }

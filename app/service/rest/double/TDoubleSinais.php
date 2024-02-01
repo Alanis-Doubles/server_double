@@ -295,7 +295,16 @@ class TDoubleSinais
                             'channel_id' => $data->canal->channel_id,
                             'estrategia_id' => $estrategia->id
                         ];
+
                         self::registrar($payload);
+
+                        $botao = [];
+                        if ($data->plataforma->url_cadastro)
+                            $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $data->plataforma->url_cadastro]];
+                        if ($data->plataforma->url_tutorial)
+                            $botao[] = [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]];
+                        if ($data->plataforma->url_suporte)
+                            $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]];
 
                         $telegram->sendMessage(
                             $data->canal->channel_id,
@@ -311,11 +320,7 @@ class TDoubleSinais
                             ),
                             [
                                 "resize_keyboard" => true, 
-                                "inline_keyboard" => [
-                                    [["text" => $data->plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $data->plataforma->url_cadastro]], 
-                                    [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]], 
-                                    [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]], 
-                                ]
+                                "inline_keyboard" => $botao
                             ]
                         );
 
