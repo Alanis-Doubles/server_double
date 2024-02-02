@@ -63,7 +63,8 @@ class TApplication extends AdiantiCoreApplication
                                 'MessageList' => TRUE,
                                 'NotificationList' => TRUE,
                                 'SearchBox' => TRUE,
-                                'SearchInputBox' => TRUE];
+                                'SearchInputBox' => TRUE,
+                                'TDoubleDashboardContadores' => TRUE];
         
         return (isset($default_permissions[$class]) && $default_permissions[$class]);
     } 

@@ -21,12 +21,13 @@ class TDoubleRobo
             
 
         $object = TUtils::openConnection('double', function () use ($param) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id);
+            $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id, $param['canal']->id);
 
             if (!$object) {
                 $object = new DoubleUsuario();
                 $object->chat_id = $param['chat_id'];
                 $object->plataforma_id = $param['plataforma']->id;
+                $object->canal_id = $param['canal']->id;
                 $object->nome = $param['nome'];
                 $object->nome_usuario = $param['nome_usuario'];
                 $object->save();
@@ -56,7 +57,7 @@ class TDoubleRobo
     public function atualizar($param)
     {
         $object = TUtils::openConnection('double', function () use ($param) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id);
+            $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id, $param['canal']->id);
 
             if (!$object) {
                 $object = new DoubleUsuario();
@@ -74,6 +75,7 @@ class TDoubleRobo
             }
 
             unset($param['data']['idioma']);
+            unset($param['data']['channel_id']);
             $object->fromArray((array) $param['data']);
             $object->store();
 
@@ -90,7 +92,11 @@ class TDoubleRobo
         unset($param['method']);
         $param['data'] = $param;
 
-        $param['plataforma'] = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);;
+        $param['plataforma'] = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $param['canal'] = DoubleCanal::identificarPorChannel($param['channel_id']);
+
+        if (!$param['canal'])
+            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
         try {
             switch ($method) {
@@ -135,7 +141,7 @@ class TDoubleRobo
 
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $busca = TUtils::openConnection('double', function() use ($param, $plataforma){
-            $canal = Doublecanal::where('channel_id', '=', $param['channel_id'])->first();
+            $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
             if ($plataforma->usuarios_canal == 'N') {
                 $usuario = DoubleUsuario::where('chat_id', '=', $param['chat_id'])
                     ->where('plataforma_id', '=', $plataforma->id)
@@ -153,16 +159,16 @@ class TDoubleRobo
             } else {
                 $usuario = DoubleUsuario::where('chat_id', '=', $param['chat_id'])
                     ->where('plataforma_id', '=', $plataforma->id)
-                    ->where('canal_id', $plataforma->id)
+                    ->where('canal_id', '=', $canal->id)
                     ->first();
                 $usuario->email = $param['email'];
                 $usuario->save();
 
                 return [
                     'usuario' => $usuario, 
-                    'pagametno' => DoublePagamentoHistorico::where('email', '=', $param['email'])
+                    'pagamento' => DoublePagamentoHistorico::where('email', '=', $param['email'])
                                     ->where('plataforma_id', '=', $plataforma->id)
-                                    ->where('canal_id', $canal->id)
+                                    ->where('canal_id', '=', $canal->id)
                                     ->where('usuario_id', 'is', null)
                                     ->first()
                 ];
@@ -182,12 +188,13 @@ class TDoubleRobo
     public function logar($param)
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
 
         if (empty($param['chat_id']))
-            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
+            throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('double', function () use ($param, $plataforma) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
+        $object = TUtils::openConnection('double', function () use ($param, $plataforma, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
 
             $token = $plataforma->service->logar($param['email'], $param['password']);
 
@@ -210,12 +217,13 @@ class TDoubleRobo
     public static function iniciar($param)
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
         if (empty($param['chat_id']))
-            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
+            throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('double', function () use ($param, $plataforma) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
+        $object = TUtils::openConnection('double', function () use ($param, $plataforma, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
     
             $object->robo_status = 'INICIANDO';
             $object->robo_iniciar = 'Y';
@@ -241,12 +249,13 @@ class TDoubleRobo
     public static function iniciar_apos_loss($param)
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
         if (empty($param['chat_id']))
-            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
+            throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('double', function() use ($plataforma, $param) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
+        $object = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->idioma);
 
             $object->robo_status = 'INICIANDO';
             $object->robo_iniciar = 'Y';
@@ -272,12 +281,13 @@ class TDoubleRobo
     public function parar($param)
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $object = TUtils::openConnection('double', function() use ($plataforma, $param) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id);
+        $object = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal);
 
             $object->robo_status = 'PARANDO';
             $object->robo_iniciar = 'N';

@@ -52,42 +52,42 @@ class TDoubleUsuarioList extends TCustomStandardList
                 [
                     'name'   => 'nome_completo',
                     'label'  => 'Nome',
-                    'widget' => ['class' => 'TEntry', 'operator' => '='],
-                    'column' => ['width' => '25%', 'align' => 'left', 'order' => true]
+                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT name FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
+                    'column' => ['width' => '25%', 'align' => 'left', 'order' => false]
                 ],
                 [
                     'name'   => 'plataforma->nome',
                     'label'  => 'Plataforma/Canal',
-                    'column' => ['width' => '20%', 'align' => 'left', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'nomePlataformaTransformer'])]
+                    'column' => ['width' => '20%', 'align' => 'left', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'nomePlataformaTransformer'])]
                 ],
                 [
                     'name'   => 'nome_usuario',
                     'label'  => 'Usuário',
-                    'widget' => ['class' => 'TEntry', 'operator' => '='],
-                    'column' => ['width' => '5%', 'align' => 'left', 'order' => true]
+                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT login FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
+                    'column' => ['width' => '5%', 'align' => 'left', 'order' => false]
                 ],
                 [
                     'name'   => 'email',
                     'label'  => 'E-mail',
-                    'widget' => ['class' => 'TEntry', 'operator' => '='],
-                    'column' => ['width' => '10%', 'align' => 'left', 'order' => true]
+                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT email FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
+                    'column' => ['width' => '10%', 'align' => 'left', 'order' => false]
                 ],
                 [
                     'name'   => 'data_expiracao',
                     'label'  => 'Vencimento',
-                    'column' => ['width' => '15%', 'align' => 'left', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'dateTransformer'])]
+                    'column' => ['width' => '15%', 'align' => 'left', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'dateTransformer'])]
                 ],
                 [
                     'name'   => 'status',
                     'label'  => 'Status',
                     'widget' => ['class'  => 'TCombo', 'operator' => '=', 'items' => $this->status],
-                    'column' => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_status'])]
+                    'column' => ['width' => '10%', 'align' => 'center', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'transform_status'])]
                 ],
                 [
                     'name'   => 'robo_status',
                     'label'  => 'Status Robô',
                     'widget' => ['class'  => 'TCombo', 'operator' => '=', 'items' => $this->robo_status],
-                    'column' => ['width' => '15%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_robo_status'])]
+                    'column' => ['width' => '15%', 'align' => 'center', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'transform_robo_status'])]
                 ],
             ],
             'actions' => [

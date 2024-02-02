@@ -645,7 +645,7 @@ class TDoubleSinais
                     return;
                 }
                 
-                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                 if ($historico['tipo'] == 'LOSS' and $data->usuario->robo_iniciar_apos_loss == 'Y') {
                     $data->usuario->robo_iniciar_apos_loss = 'N';
                     $data->usuario->robo_processando_jogada = 'N';
@@ -711,7 +711,7 @@ class TDoubleSinais
                                         $message .= $data->plataforma->translate->MSG_OPERACAO_ENTRADA_CICLO;
                                     
                                     if ($data->usuario->status == 'DEMO') {
-                                        $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                                        $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                                         $data->usuario->demo_jogadas -= 1;
                                         $data->usuario->saveInTransaction();
                                         $message .= str_replace(
@@ -762,7 +762,7 @@ class TDoubleSinais
                                     else if ($ocorreu_stop_win)
                                         $message = $data->plataforma->translate->MSG_BET_5;
                                     
-                                    $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                                    $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                                     $data->usuario->robo_iniciar = 'N';
                                     $data->usuario->robo_status = 'PARANDO';
                                     $data->usuario->saveInTransaction();
@@ -780,7 +780,9 @@ class TDoubleSinais
                                     sleep(1);
                                 }
                             } elseif ($retornoJogada == 'saldo_insuficiente') {
-                                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                                self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+
+                                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                                 $data->usuario->robo_iniciar = 'N';
                                 $data->usuario->robo_status = 'PARANDO';
                                 $data->usuario->saveInTransaction();
@@ -803,7 +805,7 @@ class TDoubleSinais
                             }
 
                             if ($data->usuario->ultimo_saldo + $lucro <= $data->plataforma->valor_minimo) {
-                                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                                $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                                 $data->usuario->robo_iniciar = 'N';
                                 $data->usuario->robo_status = 'PARANDO';
                                 $data->usuario->saveInTransaction();
@@ -819,24 +821,53 @@ class TDoubleSinais
                             $valor *= 2;
                         }
                     } finally {
-                        $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id);
+                        $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                         if ($data->usuario->status == 'DEMO' and $data->usuario->demo_jogadas == 0) {
+                            self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+
                             $data->usuario->status = 'AGUARDANDO_PAGAMENTO';
                             $data->usuario->roboStatus = 'PARANDO';
                             $data->usuario->robo_iniciar = 'N';
+
+                            $botaoAgPgamento = [
+                                "resize_keyboard" => true, 
+                                "keyboard" => [
+                                    [["text" => $data->plataforma->translate->BOTAO_JA_ASSINEI]], 
+                                    [["text" => $data->plataforma->translate->BOTAO_QUERO_ASSINAR]], 
+                                ]
+                            ];
+                            
+                            if ($data->plataforma->translate->MSG_STATUS_AG_PGTO == '')
+                            {
+                                $botaoAgPgamento = ["remove_keyboard" => true];
+                            }
 
                             $message = $data->plataforma->translate->MSG_BET_9;
                             $telegram->sendMessage(
                                 $data->usuario->chat_id, 
                                 $message,
-                                [
-                                    "resize_keyboard" => true, 
-                                    "keyboard" => [
-                                            [["text" => $data->plataforma->translate->BOTAO_JA_ASSINEI]], 
-                                            [["text" => $data->plataforma->translate->BOTAO_QUERO_ASSINAR]], 
-                                        ] 
-                                ]
+                                $botaoAgPgamento
                             );
+
+                            if ($data->plataforma->translate->MSG_STATUS_AG_PGTO == '')
+                            {
+                                $message = str_replace(
+                                    ['{usuario}'],
+                                    [$data->usuario->nome],
+                                    $data->plataforma->translate->MSG_AG_PAGAMENTO_SUPORTE,
+                                );
+                                $telegram->sendMessage(
+                                    $data->usuario->chat_id, 
+                                    $message,
+                                    [
+                                        "resize_keyboard" => true, 
+                                        "inline_keyboard" => [
+                                            [["text" => $data->plataforma->translate->MSG_SUPORTE,  "url" => $data->plataforma->url_suporte]], 
+                                        ]
+                                    ]
+                                );
+                            }
+
                         }
                         $data->usuario->robo_processando_jogada = 'N';
                         $data->usuario->saveInTransaction();

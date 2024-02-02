@@ -73,11 +73,12 @@ class DoubleUsuario extends DoubleRecord
         parent::store();
     }
 
-    public static function identificar($chat_id, $plataforma_id)
+    public static function identificar($chat_id, $plataforma_id, $canal_id)
     {
-        return TUtils::openFakeConnection('double', function() use($chat_id, $plataforma_id) {
+        return TUtils::openFakeConnection('double', function() use($chat_id, $plataforma_id, $canal_id) {
             return DoubleUsuario::where('chat_id', '=', $chat_id)
                 ->where('plataforma_id', '=', $plataforma_id)
+                ->where('canal_id', '=', $canal_id)
                 ->first();
         });
     }

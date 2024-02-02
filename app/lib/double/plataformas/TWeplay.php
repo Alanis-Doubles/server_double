@@ -4,6 +4,7 @@ use GuzzleHttp\Client;
 use WSSC\WebSocketClient;
 use GuzzleHttp\Psr7\Request;
 use WSSC\Components\ClientConfig;
+use WSSC\Exceptions\ConnectionException;
 
 class TWeplay implements IDoublePlataforma
 {
@@ -66,10 +67,12 @@ class TWeplay implements IDoublePlataforma
                 }
                 // $client->send('40/game/roulette');
                 // $client->send('3');
-            } catch (BadOpcodeException $e) {
+            // } catch (BadOpcodeException $e) {
+                // $erro = $e->getMessage();
+            } catch (ConnectionException $e) {
                 $erro = $e->getMessage();
-            } catch (\Throwable $e) {
-               $erro = $e->getMessage();   
+            // } catch (\Throwable $e) {
+            //    $erro = $e->getMessage();   
             }
         }
     }
@@ -222,7 +225,7 @@ class TWeplay implements IDoublePlataforma
             return '';
 
         $payload = [
-            "amount" => 1,
+            "amount" => $valor,
             "roundId" => $id,
             "betColor" => ['red' => "RED", 'black' => "BLACK", 'white' => "WHITE"][$cor],
             "gameId" => 2,

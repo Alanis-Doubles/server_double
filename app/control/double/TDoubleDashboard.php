@@ -16,21 +16,21 @@ class TDoubleDashboard extends TPage
 {
     use TUIBuilderTrait;
 
-    private $formFilter;
+    private $form;
 
     public function __construct($param = null)
     {
         parent::__construct();
 
-        $this->formFilter = new BootstrapFormBuilder('form_filter');
-        $this->formFilter->setFormTitle('Filtros');
-        $this->formFilter->addExpandButton('');
+        $this->form = new BootstrapFormBuilder('form_TDoubleDashboard');
+        $this->form->setFormTitle('Filtros');
+        $this->form->addExpandButton('');
 
-        $this->formFilter->addFields(
+        $this->form->addFields(
             [$this->makeTHidden(['name' => 'usuarios_canal', 'value' => 'N'])],
         );
 
-        $this->formFilter->addFields(
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Plataforma'])],
             [$this->makeTDBCombo(
                 [
@@ -60,7 +60,7 @@ class TDoubleDashboard extends TPage
                 ]
             )],
         );
-        $this->formFilter->addFields(
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Início'])],
             [$this->makeTDate(['name' => 'data_inicio','label' => $label, 'mask' => 'dd/mm/yyyy', 'databaseMask' => 'yyyy-mm-dd'], function($object) {
                 $object->setValue(date('01/m/Y'));
@@ -71,18 +71,16 @@ class TDoubleDashboard extends TPage
             })],
         );
 
-        $btn = $this->formFilter->addAction('Atualizar', new TAction([$this, 'onReload'], $param), 'fa:sync');
+        $btn = $this->form->addAction('Atualizar', new TAction([$this, 'onSearch'], $param), 'fa:sync');
         $btn->class = 'btn btn-sm btn-primary';
-
-        $dados = $this->consultarDados($param);
 
         $html1 = new THtmlRenderer('app/resources/double/dashboard.html');
         $html1->enableSection(
             'main',
             [
-                'indicator1' => TUtils::renderInfoBox('Total de Usuários', 'users', 'green', $dados['totalUsuarios'] ? $dados['totalUsuarios'] : 0),
-                'indicator2' => TUtils::renderInfoBox('Novos de Usuários', 'user-plus', 'orange', $dados['novosUsuarios'] ? $dados['novosUsuarios'] : 0),
-                'indicator3' => TUtils::renderInfoBox('Total Planos Assinado', 'dollar-sign', 'green', $dados['totalPlanosAssinados'] ? $dados['totalPlanosAssinados'] : 0),
+                'indicator1' => TUtils::renderInfoBox('totalUsuarios', 'Total de Usuários', 'users', 'green', 0),
+                'indicator2' => TUtils::renderInfoBox('novosUsuarios', 'Novos de Usuários', 'user-plus', 'orange', 0),
+                'indicator3' => TUtils::renderInfoBox('totalPlanosAssinados', 'Total Planos Assinado', 'dollar-sign', 'green', 0),
             ]
         );
 
@@ -90,62 +88,75 @@ class TDoubleDashboard extends TPage
         $html2->enableSection(
             'main',
             [
-                'indicator1' => TUtils::renderInfoBox('Usuários Ativos', 'trophy', 'red', $dados['usuariosAtivos'] ? $dados['usuariosAtivos'] : 0),
-                'indicator2' => TUtils::renderInfoBox('Total Testes Iniciados', 'gamepad', 'aqua', $dados['totalTestesIniciados'] ? $dados['totalTestesIniciados'] : 0),
-                'indicator3' => TUtils::renderInfoBox('Valor Total Assinaturas', 'dollar-sign', 'orange',' R$ ' . number_format($dados['valorTotalAssinaturas'] ? $dados['valorTotalAssinaturas'] : 0, 2, ',', '.')),
+                'indicator1' => TUtils::renderInfoBox('usuariosAtivos', 'Usuários Ativos', 'trophy', 'red', 0),
+                'indicator2' => TUtils::renderInfoBox('totalTestesIniciados', 'Total Testes Iniciados', 'gamepad', 'aqua', 0),
+                'indicator3' => TUtils::renderInfoBox('valorTotalAssinaturas', 'Valor Total Assinaturas', 'dollar-sign', 'orange',' R$ 0,00'),
             ]
         );
 
         $container = new TVBox;
         $container->style = 'width: 100%';
         $container->add(TUtils::createXMLBreadCrumb('menu.xml', __CLASS__));
-        $container->add($this->formFilter);
+        $container->add($this->form);
         $container->add($html1);
         $container->add($html2);
 
         parent::add($container);
 
-        $data = new stdClass;
-        $data->plataforma_id = TSession::getValue('dasboard_platafora_id');
-        $data->canal_id = TSession::getValue('dasboard_canal_id');
-        $data->data_inicio = TSession::getValue('dasboard_data_inicio');
-        $data->data_fim = TSession::getValue('dasboard_data_fim');
+        $this->form->setData( TSession::getValue('form_TDoubleDashboard_filter_data') );
 
-        if (!$data->data_inicio)
-            $data->data_inicio = date('01/m/Y');
-        else
-            $data->data_inicio = TDate::convertToMask($data->data_inicio, 'yyyy-mm-dd', 'dd/mm/yyyy');
+        TScript::create('
+            function atualiza_contadores() {
+                $.get("engine.php?class=TDoubleDashboard&method=doConsultar&static=1", function(data) {
+                    const options = { 
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                        style: "currency",
+                        currency: "BRL"
+                    };
 
-        if (!$data->data_fim)
-            $data->data_fim = date('t/m/Y');
-        else
-            $data->data_fim = TDate::convertToMask($data->data_fim, 'yyyy-mm-dd', 'dd/mm/yyyy');
-        
-        TForm::sendData('form_filter', $data, False, False);
+                    const dados = JSON.parse(data);
+
+                    document.querySelector("#totalUsuarios").textContent = dados["totalUsuarios"];
+                    document.querySelector("#novosUsuarios").textContent = dados["novosUsuarios"];
+                    document.querySelector("#totalPlanosAssinados").textContent = dados["totalPlanosAssinados"];
+                    document.querySelector("#usuariosAtivos").textContent = dados["usuariosAtivos"];
+                    document.querySelector("#totalTestesIniciados").textContent = dados["totalTestesIniciados"];
+                    document.querySelector("#valorTotalAssinaturas").textContent = Number(dados["valorTotalAssinaturas"]).toLocaleString("pt-BR", options);;
+                });
+            }
+
+            atualiza_contadores();
+
+            setInterval( atualiza_contadores, 5000);
+        ');
     }
 
-    public function onReload($param)
+    public function onSearch($param)
     {
-    //     AdiantiCoreApplication::gotoPage(self::class, null, $param);
+        $object = $this->form->getData();
+        TSession::setValue('form_TDoubleDashboard_filter_data', $object);
     }
 
-    public function consultarDados($param) 
+    public static function doConsultar($param) 
     {
-        if (isset($param['data_inicio']))
-            $param['data_inicio'] = TDate::convertToMask($param['data_inicio'], 'dd/mm/yyyy', 'yyyy-mm-dd');
-        if (isset($param['data_fim']))
-            $param['data_fim'] = TDate::convertToMask($param['data_fim'], 'dd/mm/yyyy', 'yyyy-mm-dd');
-    
-        if (isset($param['plataforma_id']) and $param['plataforma_id'])
-            TSession::setValue('dasboard_platafora_id', $param['plataforma_id']);
-        if (isset($param['canal_id']) and $param['canal_id'])
-            TSession::setValue('dasboard_canal_id', $param['canal_id']);
-        if (isset($param['data_inicio']))
-             TSession::setValue('dasboard_data_inicio', $param['data_inicio']);
-        if (isset($param['data_fim']))
-             TSession::setValue('dasboard_data_fim', $param['data_fim']);
+        $object = TSession::getValue('form_TDoubleDashboard_filter_data');
+        if (!$object)
+        {
+            $object = new stdClass;
+            $object->plataforma_id = '';
+            $object->canal_id = '';
+            $object->usuarios_canal = '';
+            $object->data_inicio = date('Y-m-0');
+            $object->data_fim = date('Y/m/t');
+        }    
 
-        return TUtils::openFakeConnection('double', function() use ($param){
+        if ($object->data_inicio)
+            $object->data_inicio = TDate::convertToMask($object->data_inicio, 'dd/mm/yyyy', 'yyyy-mm-dd');
+        if ($object->data_fim)
+            $object->data_fim = TDate::convertToMask($object->data_fim, 'dd/mm/yyyy', 'yyyy-mm-dd');
+
+        $dados = TUtils::openFakeConnection('double', function() use ($object){
             $usuariosTotal       = DoubleUsuario::where(1, '=', 1);
             $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');
             $usuariosNovos       = DoubleUsuario::where(1, '=', 1);
@@ -154,26 +165,26 @@ class TDoubleDashboard extends TPage
             $totalCancelamentos  = DoublePagamentoHistorico::where('tipo_evento', '=', 'CANCELAMENTO');
             $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'CANCELAMENTO']);
 
-            if (isset($param['plataforma_id']) and $param['plataforma_id'])
+            if (isset($object->plataforma_id) and $object->plataforma_id)
             {
-                $usuariosTotal       = $usuariosTotal->where('plataforma_id', '=', $param['plataforma_id']);
-                $usuariosAtivos      = $usuariosAtivos->where('plataforma_id', '=', $param['plataforma_id']);
-                $usuariosNovos       = $usuariosNovos->where('plataforma_id', '=', $param['plataforma_id']);
-                $totalTestes         = $totalTestes->where('plataforma_id', '=', $param['plataforma_id']);
-                $totalPagamentos     = $totalPagamentos->where('plataforma_id', '=', $param['plataforma_id']);
-                $totalCancelamentos  = $totalCancelamentos->where('plataforma_id', '=', $param['plataforma_id']);
-                $totalAssinaturas    = $totalAssinaturas->where('plataforma_id', '=', $param['plataforma_id']);
+                $usuariosTotal       = $usuariosTotal->where('plataforma_id', '=', $object->plataforma_id);
+                $usuariosAtivos      = $usuariosAtivos->where('plataforma_id', '=', $object->plataforma_id);
+                $usuariosNovos       = $usuariosNovos->where('plataforma_id', '=', $object->plataforma_id);
+                $totalTestes         = $totalTestes->where('plataforma_id', '=', $object->plataforma_id);
+                $totalPagamentos     = $totalPagamentos->where('plataforma_id', '=', $object->plataforma_id);
+                $totalCancelamentos  = $totalCancelamentos->where('plataforma_id', '=', $object->plataforma_id);
+                $totalAssinaturas    = $totalAssinaturas->where('plataforma_id', '=', $object->plataforma_id);
             }
 
             if (isset($param['canal_id']) and $param['canal_id'])
             {
-                $usuariosTotal       = $usuariosTotal->where('canal_id', '=', $param['canal_id']);
-                $usuariosAtivos      = $usuariosAtivos->where('canal_id', '=', $param['canal_id']);
-                $usuariosNovos       = $usuariosNovos->where('canal_id', '=', $param['canal_id']);
-                $totalTestes         = $totalTestes->where('canal_id', '=', $param['canal_id']);
-                $totalPagamentos     = $totalPagamentos->where('canal_id', '=', $param['canal_id']);
-                $totalCancelamentos  = $totalCancelamentos->where('canal_id', '=', $param['canal_id']);
-                $totalAssinaturas    = $totalAssinaturas->where('canal_id', '=', $param['canal_id']);
+                $usuariosTotal       = $usuariosTotal->where('canal_id', '=', $object->canal_id);
+                $usuariosAtivos      = $usuariosAtivos->where('canal_id', '=', $object->canal_id);
+                $usuariosNovos       = $usuariosNovos->where('canal_id', '=', $object->canal_id);
+                $totalTestes         = $totalTestes->where('canal_id', '=', $object->canal_id);
+                $totalPagamentos     = $totalPagamentos->where('canal_id', '=', $object->canal_id);
+                $totalCancelamentos  = $totalCancelamentos->where('canal_id', '=', $object->canal_id);
+                $totalAssinaturas    = $totalAssinaturas->where('canal_id', '=', $object->canal_id);
             }
 
             $adicionarFiltroData = function(TRepository $objeto, $campo, $data_inicio, $data_fim)
@@ -189,22 +200,23 @@ class TDoubleDashboard extends TPage
                 }
             };
 
-            $usuariosAtivos      = $adicionarFiltroData($usuariosAtivos, 'created_at', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
-            $usuariosNovos       = $adicionarFiltroData($usuariosNovos, 'created_at', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
-            $totalTestes         = $adicionarFiltroData($totalTestes, 'demo_inicio', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
-            $totalPagamentos     = $adicionarFiltroData($totalPagamentos, 'created_at', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
-            $totalCancelamentos  = $adicionarFiltroData($totalCancelamentos, 'created_at', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
-            $totalAssinaturas    = $adicionarFiltroData($totalAssinaturas, 'created_at', isset($param['data_inicio']) ? $param['data_inicio'] : null, isset($param['data_fim']) ? $param['data_fim'] : null);
+            $usuariosNovos       = $adicionarFiltroData($usuariosNovos, 'created_at', $object->data_inicio, $object->data_fim);
+            $totalTestes         = $adicionarFiltroData($totalTestes, 'demo_inicio', $object->data_inicio, $object->data_fim);
+            $totalPagamentos     = $adicionarFiltroData($totalPagamentos, 'created_at', $object->data_inicio, $object->data_fim);
+            $totalCancelamentos  = $adicionarFiltroData($totalCancelamentos, 'created_at', $object->data_inicio, $object->data_fim);
+            $totalAssinaturas    = $adicionarFiltroData($totalAssinaturas, 'created_at', $object->data_inicio, $object->data_fim);
 
-            $dados['totalUsuarios']         = $usuariosTotal->count();
-            $dados['usuariosAtivos']        = $usuariosAtivos->count();
-            $dados['novosUsuarios']         = $usuariosNovos->count();
-            $dados['totalTestesIniciados']  = $totalTestes->count();
-            $dados['totalPlanosAssinados']  = $totalPagamentos->count() - $totalCancelamentos->count();
-            $dados['valorTotalAssinaturas'] = $totalAssinaturas->sumBy('valor');
+            $dados['totalUsuarios']         = $usuariosTotal->count() ?? 0;
+            $dados['usuariosAtivos']        = $usuariosAtivos->count() ?? 0;
+            $dados['novosUsuarios']         = $usuariosNovos->count() ?? 0;
+            $dados['totalTestesIniciados']  = $totalTestes->count() ?? 0;
+            $dados['totalPlanosAssinados']  = ($totalPagamentos->count() ?? 0) - ($totalCancelamentos->count() ?? 0);
+            $dados['valorTotalAssinaturas'] = $totalAssinaturas->sumBy('valor') ?? 0;
 
-            return $dados;
+            return json_encode($dados);
         });
+
+        echo $dados;
     }
 
     public static function onPlataformaChange($param)
@@ -218,32 +230,46 @@ class TDoubleDashboard extends TPage
                 });
                 $param['usuarios_canal'] = $plataforma->usuarios_canal;
                 if ($plataforma->usuarios_canal == 'Y') {
-                    TCombo::enableField('form_filter', 'canal_id');
+                    TCombo::enableField('form_TDoubleDashboard', 'canal_id');
                     $criteria = TCriteria::create( ['plataforma_id' => $param['plataforma_id'] ] );
-                    TDBCombo::reloadFromModel('form_filter', 'canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
+                    TDBCombo::reloadFromModel('form_TDoubleDashboard', 'canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
                 } else
                 {
                     TCombo::clearField('form_DoubleUsuarioForm', 'plataforma_id');
-                    TDBCombo::disableField('form_filter', 'canal_id');
+                    TDBCombo::disableField('form_TDoubleDashboard', 'canal_id');
                 }
             }
             else
             {
                 TCombo::clearField('form_DoubleUsuarioForm', 'plataforma_id');
-                TDBCombo::disableField('form_filter', 'canal_id');
+                TDBCombo::disableField('form_TDoubleDashboard', 'canal_id');
             }
 
             $data = new stdClass;
             $data->plataforma_id = $param['plataforma_id'];
             $data->canal_id = $param['canal_id'];
             $data->data_inicio = $param['data_inicio'];
-            $data->data_fim = $param['data_fim'];
-            $data->usuarios_canal = $param['usuarios_canal'];
-            TForm::sendData('form_filter', $data, False, False);
+            TForm::sendData('form_TDoubleDashboard', $data, False, False);
         }
         catch (Exception $e)
         {
             new TMessage('error', $e->getMessage());
         }
     }
+
+    // public function show()
+    // {
+    //     if (!$this->loaded AND (!isset($_GET['method']) OR !(in_array($_GET['method'],  array('onReload', 'onSearch')))) )
+    //     {
+    //         if (func_num_args() > 0)
+    //         {
+    //             $this->onReload( func_get_arg(0) );
+    //         }
+    //         else
+    //         {
+    //             $this->onReload();
+    //         }
+    //     }
+    //     parent::show();
+    // }
 }

@@ -34,6 +34,13 @@ class DoubleCanal extends DoubleRecord
         });
     }
 
+    public static function identificarPorChannel($channel_id)
+    {
+        return TUtils::openFakeConnection('double', function() use($channel_id) {
+            return DoubleCanal::where('channel_id', '=', $channel_id)->first();
+        });
+    }
+
     public function set_statusSinais($value)
     {
         TUtils::openConnection('double', function() use ($value) {

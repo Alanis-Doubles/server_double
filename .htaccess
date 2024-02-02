@@ -224,8 +224,10 @@ RewriteRule ^xhr-arbety-param-delete$ engine.php?class=TArbetyParamList&method=D
 #API
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/sinais/registrar$ rest.php?call_method=POST&auth=Bearer&class=TDoubleSinais&method=registrar&plataforma=$1&idioma=$2&%{QUERY_STRING} [NC]
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/sinais/([A-Za-z-_0-9]*)$ rest.php?call_method=GET&auth=Bearer&class=TDoubleSinais&method=$3&plataforma=$1&idioma=$2&%{QUERY_STRING} [NC]
-RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=handle&plataforma=$1&idioma=$2&chat_id=$3&%{QUERY_STRING} [NC]
-RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=$4&plataforma=$1&idioma=$2&chat_id=$3&%{QUERY_STRING} [NC]
+#RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=handle&plataforma=$1&idioma=$2&chat_id=$3&%{QUERY_STRING} [NC]
+#RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=$4&plataforma=$1&idioma=$2&chat_id=$3&%{QUERY_STRING} [NC]
+RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=handle&plataforma=$1&idioma=$2&channel_id=$3&chat_id=$4&%{QUERY_STRING} [NC]
+RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=$5&plataforma=$1&idioma=$2&channel_id=$3&chat_id=$4&%{QUERY_STRING} [NC]
 
 ############################################################################################################################################
 

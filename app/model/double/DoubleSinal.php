@@ -34,7 +34,7 @@ class DoubleSinal extends DoubleRecord
                 // $dataInicio = strtotime($inicio);
                 $list = [];
                 foreach ($sinais as $key => $sinal) {
-                    $data = strtotime($sinal->created_at);
+                    // $data = strtotime($sinal->created_at);
                     // if ($data > $dataInicio) {
                         // $estrategia = $sinal->estrategia;
                         // if ($estrategia)

@@ -58,7 +58,12 @@ class TCustomStandardList extends TStandardList
                         $propWdgt['label'] = $label;
 
                         TUtils::validateProperties("Items($key)->Widget", ['operator'], $propWdgt);
-                        parent::addFilterField($propWdgt['name'], $propWdgt['operator'], "search_{$propWdgt['name']}", isset($propWdgt['filterTransformer']) ? $propWdgt['filterTransformer'] : null); 
+                        parent::addFilterField(
+                            isset($propWdgt['filter_name']) ? $propWdgt['filter_name'] : $propWdgt['name'], 
+                            $propWdgt['operator'], 
+                            "search_{$propWdgt['name']}", 
+                            isset($propWdgt['filterTransformer']) ? $propWdgt['filterTransformer'] : null
+                        ); 
                         $propWdgt['name'] = "search_{$propWdgt['name']}";
                         $widget[] = [$this->createWidget($propWdgt)];
                     }
@@ -69,7 +74,12 @@ class TCustomStandardList extends TStandardList
                     $props['label'] = $label;
 
                     TUtils::validateProperties("Items($key)->Widget", ['operator'], $item->{'widget'});
-                    parent::addFilterField($props['name'], $props['operator'], "search_{$props['name']}", isset($props['filterTransformer']) ? $props['filterTransformer'] : null); 
+                    parent::addFilterField(
+                            isset($props['filter_name']) ? $props['filter_name'] : $props['name'], 
+                            $props['operator'], 
+                            "search_{$props['name']}", 
+                            isset($props['filterTransformer']) ? $props['filterTransformer'] : null
+                        ); 
                     $props['name'] = "search_{$props['name']}";
                     $widget[] =  [$this->createWidget($props)];
 

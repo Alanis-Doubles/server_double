@@ -230,11 +230,12 @@ class TUtils
         }
     }
 
-    public static function renderInfoBox($title, $icon, $backgraound, $value) {
-        $infoBox = new THtmlRenderer('app/resources/info-box.html');
+    public static function renderInfoBox($id, $title, $icon, $backgraound, $value) {
+        $infoBox = new THtmlRenderer('app/resources/double/info-box.html');
         $infoBox->enableSection(
             'main',
             [
+                'id' => $id,
                 'title' => $title,
                 'icon' => $icon,
                 'background' => $backgraound,
