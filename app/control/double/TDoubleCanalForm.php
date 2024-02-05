@@ -1,6 +1,7 @@
 <?php
 
 use Adianti\Base\TStandardForm;
+use Adianti\Widget\Base\TScript;
 use Adianti\Widget\Base\TElement;
 use Adianti\Widget\Form\TFieldList;
 use Adianti\Widget\Form\TFormSeparator;
@@ -47,10 +48,29 @@ class TDoubleCanalForm  extends TStandardForm
             [$label = $this->makeTLabel(['value' => 'Ativo'])],
             [$this->makeTCombo(['name' => 'ativo', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
         );
+
+        $this->form->addContent([new TElement('br')]);
+        $this->form->addContent([new TFormSeparator('Webhooks Suportados')]);
+
+        $this->form->addContent(
+            [$this->makeTButton(['name' => 'kirvano', 'value' => 'Clique aqui para copiar o link do Webhook da Kirvano', 'icon' => 'far:copy', 'action' => [$this, 'urlKirvano']])]
+        );
+
+        $this->form->setFields($this->getWidgets());
     }
 
     protected function getTitle()
     {
         return 'Canal';
+    }
+
+    public static function urlKirvano($param){
+        $plataforma = TUtils::openFakeConnection('double', function() use ($param){
+            return new DoublePlataforma($param['plataforma_id'], false);
+        });
+
+        $kirvano = 'https://' . $_SERVER['HTTP_HOST'] . '/api/webhook/kirvano?plataforma='. $plataforma->nome . '&idioma=' . $plataforma->idioma . '&channel_id=' . $param['channel_id'];
+
+        TScript::create("__adianti_copy_to_clipboard('".$kirvano."');");
     }
 }

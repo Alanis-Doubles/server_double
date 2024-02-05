@@ -26,6 +26,8 @@ class DoublePagamentoHistorico extends DoubleRecord
 
         if ($this->tipo_evento == 'CANCELAMENTO' and $this->valor > 0) 
             $this->valor *= -1;
+        elseif ($this->tipo_evento == 'EXPIRACAO')
+        $this->valor = 0;
 
         parent::store();
 
@@ -55,30 +57,15 @@ class DoublePagamentoHistorico extends DoubleRecord
                     $data = date('Y-m-d', strtotime($meses));
 
                 $usuario->data_expiracao = $data;
-                if (date('Y-m-d') > $data)
+                if (date('Y-m-d') > $data) {
                     $usuario->status = 'INATIVO';
+                    $usuario->logado = 'N';
+                }
                 if ($this->email)
                     $usuario->email = $this->email;
                 $usuario->save();
 
                 $plataforma = $usuario->plataforma;
-
-                if ($usuario->logado == 'N')
-                    $botao = [
-                        "resize_keyboard" => true, 
-                        "keyboard" => [
-                                [["text" => $plataforma->translate->BOTAO_LOGAR],["text" => $plataforma->translate->BOTAO_CADASTRO]], 
-                            ] 
-                        ];
-                else
-                    $botao = [
-                        "resize_keyboard" => true, 
-                        "keyboard" => [
-                                [["text" => $plataforma->translate->BOTAO_CONFIGURAR]],
-                                [["text" => $plataforma->translate->BOTAO_INICIAR], ["text" => $plataforma->translate->BOTAO_INICIAR_LOSS]], 
-                            ] 
-                        ];
-
 
                 if ($usuario->status == 'INATIVO') {
                     $telegram = $plataforma->telegram;
@@ -89,10 +76,45 @@ class DoublePagamentoHistorico extends DoubleRecord
                             [$usuario->nome],
                             $plataforma->translate->MSG_STATUS_INATIVO,
                         ),
+                        [
+                            "resize_keyboard" => true, 
+                            "keyboard" => [
+                                [
+                                    ["text" => $plataforma->translate->BOTAO_JA_ASSINEI, "resize" => true],
+                                    ["text" => $plataforma->translate->BOTAO_QUERO_ASSINAR, "resize" => true]
+                                ], 
+                            ] 
+                        ]                
+                    );
+                } else {
+                    if ($usuario->logado == 'N')
+                        $botao = [
+                            "resize_keyboard" => true, 
+                            "keyboard" => [
+                                    [["text" => $plataforma->translate->BOTAO_LOGAR],["text" => $plataforma->translate->BOTAO_CADASTRO]], 
+                                ] 
+                            ];
+                    else
+                        $botao = [
+                            "resize_keyboard" => true, 
+                            "keyboard" => [
+                                    [["text" => $plataforma->translate->BOTAO_CONFIGURAR]],
+                                    [["text" => $plataforma->translate->BOTAO_INICIAR], ["text" => $plataforma->translate->BOTAO_INICIAR_LOSS]], 
+                                ] 
+                            ];
+
+                    $telegram = $plataforma->telegram;
+                    $telegram->sendMessage(
+                        $usuario->chat_id,
+                        str_replace(
+                            ['{valor}', '{dia_expiracao}'],
+                            [number_format($this->valor * -1, 2, ',', '.'), TDate::convertToMask($data, 'yyyy-mm-dd', 'dd/mm/yyyy')],
+                            $plataforma->translate->MSG_PAGTO_CANCELADO,
+                        ),
                         $botao                
                     );
                 }
-            } elseif ($this->tipo_evento == 'PAGAMENTO') {
+            } elseif ($this->tipo_evento == 'PAGAMENTO' OR $this->tipo_evento == 'RENOVACAO') {
                 switch ($this->tipo) {                  
                     case 'TRIMESTRAL':
                         $meses = "+ 3 month";
@@ -136,7 +158,6 @@ class DoublePagamentoHistorico extends DoubleRecord
                             ] 
                         ];
 
-
                 $telegram = $plataforma->telegram;
                 $telegram->sendMessage(
                     $usuario->chat_id,
@@ -146,6 +167,30 @@ class DoublePagamentoHistorico extends DoubleRecord
                         $plataforma->translate->MSG_CONTA_ATIVADA,
                     ),
                     $botao                
+                );
+            } elseif ($this->tipo_evento == 'EXPIRACAO') {
+                $usuario->status = 'INATIVO';
+                $usuario->logado = 'N';
+                $usuario->save();
+
+                $plataforma = $usuario->plataforma;
+                $telegram = $plataforma->telegram;
+                $telegram->sendMessage(
+                    $usuario->chat_id,
+                    str_replace(
+                        ['{usuario}'],
+                        [$usuario->nome],
+                        $plataforma->translate->MSG_STATUS_INATIVO,
+                    ),
+                    [
+                        "resize_keyboard" => true, 
+                        "keyboard" => [
+                            [
+                                ["text" => $plataforma->translate->BOTAO_JA_ASSINEI],
+                                ["text" => $plataforma->translate->BOTAO_QUERO_ASSINAR]
+                            ], 
+                        ] 
+                    ]                
                 );
             }
         }

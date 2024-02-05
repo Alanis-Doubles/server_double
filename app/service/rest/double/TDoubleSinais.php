@@ -299,6 +299,8 @@ class TDoubleSinais
                         self::registrar($payload);
 
                         $botao = [];
+                        if ($data->plataforma->url_grupo_vip)
+                            $botao[] = [["text" => $data->plataforma->translate->BOTAO_GRUPO_VIP,  "url" => $data->plataforma->url_grupo_vip]];
                         if ($data->plataforma->url_cadastro)
                             $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $data->plataforma->url_cadastro]];
                         if ($data->plataforma->url_tutorial)
@@ -509,6 +511,17 @@ class TDoubleSinais
                     ))->result->message_id;
                 } elseif ($historico['tipo'] == 'ENTRADA') {
                     $cor_retornada = $historico['cor'];
+
+                    $botao = [];
+                        if ($data->plataforma->url_grupo_vip)
+                            $botao[] = [["text" => $data->plataforma->translate->BOTAO_GRUPO_VIP,  "url" => $data->plataforma->url_grupo_vip]];
+                        if ($data->plataforma->url_cadastro)
+                            $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $data->plataforma->url_cadastro]];
+                        if ($data->plataforma->url_tutorial)
+                            $botao[] = [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]];
+                        if ($data->plataforma->url_suporte)
+                            $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]];
+
                     $telegram->sendMessage(
                         $data->canal->channel_id,
                         str_replace(
@@ -518,11 +531,7 @@ class TDoubleSinais
                         ),
                         [
                             "resize_keyboard" => true, 
-                            "inline_keyboard" => [
-                                [["text" => $data->plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $data->plataforma->url_cadastro]], 
-                                [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]], 
-                                [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]], 
-                            ]
+                            "inline_keyboard" => $botao
                         ]
                     );
                 } elseif ($historico['tipo'] == 'WIN') {
@@ -944,8 +953,11 @@ class TDoubleSinais
 
     public static function gerarUsuarioStatus($usuario, $lucro, $cor, $telegram)
     {
-        $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
-        $lucro = number_format($lucro, 2, ',', '.');
+        // $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
+        $saldo = $usuario->plataforma->service->saldo($usuario);
+        $banca = number_format($saldo, 2, ',', '.');
+        // $lucro = number_format($lucro, 2, ',', '.');
+        $lucro = number_format($saldo - $usuario->ultimo_saldo, 2, ',', '.');
         $cor_result = self::getCor($cor, $usuario->plataforma->translate);
 
         $telegram->sendMessage(

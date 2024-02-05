@@ -22,6 +22,7 @@ class TDoubleUsuarioHistoricoForm  extends TStandardForm
         $dataGrid = new stdClass;
         $dataGrid->name = 'datagrid';
         $dataGrid->pagenavigator = false;
+        $dataGrid->style = 'min-width: 600px';
         $dataGrid->columns = [
             ['name' => 'created_at', 'label' => 'Data', 'width' => '20%', 'align' => 'left', 'transformer' => Closure::fromCallable([$this, 'dateTimeTransformer'])],
             ['name' => 'plataforma_pagamento', 'label' => 'Plataforma', 'width' => '15%', 'align' => 'left'],

@@ -105,20 +105,25 @@ trait TUIBuilderTrait
         if (is_array($properties))
             $properties = (object)$properties;
 
-        $this->validateProperties('TButton', ['name', 'icon', 'value', 'action'], $properties);
+        $this->validateProperties('TButton', ['name', 'icon', 'value'], $properties);
 
         $widget = new TButton((string) $properties->{'name'});
         $widget->setImage((string) $properties->{'icon'});
         $widget->setLabel((string) $properties->{'value'});
-        if (is_callable((array) $properties->{'action'}, true))
-        {
-            if (!isset($properties->{'action_params'}))
-                $properties->{'action_params'} = [];
-            $widget->setAction(new TAction((array) $properties->{'action'}, (array) $properties->{'action_params'}), (string) $properties->{'value'});
+        if (isset($properties->{'function'})) {
+            $widget->addFunction($properties->{'function'});
         }
+        if (isset($properties->{'action'})) {
+            if (is_callable((array) $properties->{'action'}, true))
+            {
+                if (!isset($properties->{'action_params'}))
+                    $properties->{'action_params'} = [];
+                $widget->setAction(new TAction((array) $properties->{'action'}, (array) $properties->{'action_params'}), (string) $properties->{'value'});
+            }
         
-        if (is_callable($callback, true))
-            call_user_func($callback, $widget);
+            if (is_callable($callback, true))
+                call_user_func($callback, $widget);
+        }
         
         $this->fields[] = $widget;
         $this->fieldsByName[(string) $properties->{'name'}] = $widget;

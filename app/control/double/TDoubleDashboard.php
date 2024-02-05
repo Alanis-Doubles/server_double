@@ -161,9 +161,9 @@ class TDoubleDashboard extends TPage
             $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');
             $usuariosNovos       = DoubleUsuario::where(1, '=', 1);
             $totalTestes         = DoubleUsuario::where('demo_jogadas', '<', 5);
-            $totalPagamentos     = DoublePagamentoHistorico::where('tipo_evento', '=', 'PAGAMENTO');
+            $totalPagamentos     = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO']);
             $totalCancelamentos  = DoublePagamentoHistorico::where('tipo_evento', '=', 'CANCELAMENTO');
-            $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'CANCELAMENTO']);
+            $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO', 'CANCELAMENTO']);
 
             if (isset($object->plataforma_id) and $object->plataforma_id)
             {

@@ -74,6 +74,11 @@ class TDoublePlataformaForm  extends TStandardForm
             [$label = $this->makeTLabel(['value' => 'Url Suporte'])],
             [$this->makeTEntry(['name' => 'url_suporte', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
         );
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Url Grupo Vip'])],
+            [$this->makeTEntry(['name' => 'url_grupo_vip', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
+        );
     }
 
     protected function getTitle()

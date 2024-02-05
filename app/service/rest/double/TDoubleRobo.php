@@ -255,7 +255,7 @@ class TDoubleRobo
             throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
         $object = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->idioma);
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
 
             $object->robo_status = 'INICIANDO';
             $object->robo_iniciar = 'Y';
@@ -287,7 +287,7 @@ class TDoubleRobo
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
         $object = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal);
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
 
             $object->robo_status = 'PARANDO';
             $object->robo_iniciar = 'N';

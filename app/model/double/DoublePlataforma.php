@@ -84,7 +84,7 @@ class DoublePlataforma extends DoubleRecord
     {
         if (!$this->obj_translate)
         {
-            $classe = 'T'. ucfirst(TSession::getValue('unit_database')) . '_' . $this->nome . '_' . $this->idioma;
+            $classe = DoubleConfiguracao::getConfiguracao('translate_class') . '_' . $this->nome . '_' . $this->idioma;
             $this->obj_translate = new $classe;
         }
 

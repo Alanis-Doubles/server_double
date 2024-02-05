@@ -91,17 +91,16 @@ class TWeplay implements IDoublePlataforma
             $payload = (array)json_decode($payload);
 
             $client = new Client();
-            $response = $client->request(
-                'POST',
-                'https://api.weplay.games/api/v1/auth/login',
-                [
-                    'json' => $payload,
-                    'headers' => [
-                        'Content-Type' => 'application/json',
-                        'Accept' => 'application/json'
-                    ]
-                ]
-            );
+            $headers = [
+            'Accept' => 'application/json, text/plain, */*',
+            'Content-Type' => 'application/json'
+            ];
+            $body = '{
+                "email": "' . $payload['username'] . '",
+                "password": "' . $payload['password'] . '"
+            }';
+            $request = new Request('POST', 'https://api.weplay.games/api/v1/auth/login', $headers, $body);
+            $response = $client->sendAsync($request)->wait();
 
             if ($response->getStatusCode() == 200) {
                 $content = json_decode($response->getBody()->getContents());

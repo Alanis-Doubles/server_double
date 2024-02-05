@@ -101,6 +101,7 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_SINAIS_SUPORTE"] = "🆘 Suporte";
         $this->list["MSG_SINAIS_PARCIAL_DIA"] = "🎰 PARCIAL DO DIA 🎰\n\n✅ Win: {win} | ❌ Loss: {loss}\n🤖 Inteligência do Robô: {percentual}%";
         $this->list["MSG_SINAIS_PROJECAO"] = "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\nBANCA RECOMENDADA: {banca}\n\n'VOCÊ ESTARIA COM LUCRO: {valor}";
+        $this->list["MSG_PAGTO_CANCELADO"] = "Pagamento de {valor} cancelado com sucesso. Conta com data de expiração para {dia_expiracao}.";
         $this->list["BOTAO_LOGAR"] = "🔒 Já possuo cadastro";
         $this->list["BOTAO_CADASTRO"] = "📲 Fazer cadastro";
         $this->list["BOTAO_INICIAR"] = "🚀 Iniciar Robô";
@@ -118,5 +119,6 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["BOTAO_SIM"] = "✔️ Sim";
         $this->list["BOTAO_NAO"] = "❌️ Não";
         $this->list["BOTAO_DEPOSITAR"] = "";
+        $this->list['BOTAO_GRUPO_VIP'] = '';
     }
 }
