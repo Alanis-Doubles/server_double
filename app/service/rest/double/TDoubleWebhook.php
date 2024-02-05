@@ -23,9 +23,14 @@ class TDoubleWebhook
                 TUtils::openConnection('double', function() use ($param, $plataforma, $canal){
                     $evento = ['SALE_APPROVED' => 'PAGAMENTO', 'SUBSCRIPTION_CANCELED' => 'CANCELAMENTO', 'SUBSCRIPTION_RENEWED' => 'RENOVACAO', 'SUBSCRIPTION_EXPIRED' => 'EXPIRACAO'];
 
+                    $pagamento = DoublePlagamentoHistorico::where('plataforma_pagamento_id', '=', $param['sale_id'])->first();
+                    
+                    if ($pagamento)
+                        return $pagamento;
+
                     $pagamento = new DoublePagamentoHistorico;
                     $pagamento->plataforma_pagamento = strtoupper($param['origem']);
-                    $pagamento->tipo = str_replace('PLANO ', '', strtoupper($param['products'][0]['offer_name']));
+                    $pagamento->tipo = str_replace('PLANO ', '', strtoupper($param['plan']['name']));
                     $pagamento->tipo_entrada = 'AUTOMATICA';
                     $pagamento->tipo_evento = $evento[$param['event']];
                     $pagamento->valor = floatval(str_replace(['R$ ', '.',',',' '], ['','','.',''], isset($param['total_price']) ? $param['total_price'] : '0'));
@@ -34,8 +39,11 @@ class TDoubleWebhook
                     $pagamento->plataforma_id = $plataforma->id;
                     $pagamento->canal_id = !$canal ? null : $canal->id;
                     $pagamento->plataforma_pagamento_id = $param['sale_id'];
+                    $pagamento->payload = json_encode($param);
 
-                    $sys_user = SystemUser::where('email', '=', $pagamento->email)->first();
+                    $sys_user = SystemUser::where('email', '=', $pagamento->email)
+                        ->where('custom_code', 'IS NOT', NULL)
+                        ->first();
                     if ($sys_user)
                     {
                         if ($canal)
@@ -56,6 +64,7 @@ class TDoubleWebhook
                     return $pagamento;
                 });    
             } catch (\Throwable $e) {
+                DoubleErros::registrar(1, 'TDoubleWebhook', 'processar', json_encode($param));
                 throw new Exception("Pagamento não suportado.");
             } 
         }
