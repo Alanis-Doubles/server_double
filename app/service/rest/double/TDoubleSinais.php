@@ -664,7 +664,6 @@ class TDoubleSinais
                         $data->plataforma->translate->MSG_OPERACAO_IDENTIFICADO_LOSS,
                         $botao
                     );
-                    return;
                 } elseif ($historico['tipo'] == 'ENTRADA' and $data->usuario->robo_iniciar_apos_loss == 'N') {
                     if ($data->usuario->status != 'ATIVO' and $data->usuario->status != 'DEMO') {
                         $data->usuario->robo_iniciar = 'N';
