@@ -658,6 +658,7 @@ class TDoubleSinais
                 if ($historico['tipo'] == 'LOSS' and $data->usuario->robo_iniciar_apos_loss == 'Y') {
                     $data->usuario->robo_iniciar_apos_loss = 'N';
                     $data->usuario->robo_processando_jogada = 'N';
+                    $data->usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
                     $data->usuario->saveInTransaction();
                     $telegram->sendMessage(
                         $data->usuario->chat_id,
@@ -953,6 +954,7 @@ class TDoubleSinais
     public static function gerarUsuarioStatus($usuario, $lucro, $cor, $telegram)
     {
         // $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
+        sleep(2);
         $saldo = $usuario->plataforma->service->saldo($usuario);
         $banca = number_format($saldo, 2, ',', '.');
         // $lucro = number_format($lucro, 2, ',', '.');

@@ -23,7 +23,7 @@ class TDoubleWebhook
                 TUtils::openConnection('double', function() use ($param, $plataforma, $canal){
                     $evento = ['SALE_APPROVED' => 'PAGAMENTO', 'SUBSCRIPTION_CANCELED' => 'CANCELAMENTO', 'SUBSCRIPTION_RENEWED' => 'RENOVACAO', 'SUBSCRIPTION_EXPIRED' => 'EXPIRACAO'];
 
-                    $pagamento = DoublePlagamentoHistorico::where('plataforma_pagamento_id', '=', $param['sale_id'])->first();
+                    $pagamento = DoublePagamentoHistorico::where('plataforma_pagamento_id', '=', $param['sale_id'])->first();
                     
                     if ($pagamento)
                         return $pagamento;
@@ -64,7 +64,7 @@ class TDoubleWebhook
                     return $pagamento;
                 });    
             } catch (\Throwable $e) {
-                DoubleErros::registrar(1, 'TDoubleWebhook', 'processar', json_encode($param));
+                DoubleErros::registrar(1, 'TDoubleWebhook', 'processar', json_encode($param), $e->getMessage());
                 throw new Exception("Pagamento não suportado.");
             } 
         }
