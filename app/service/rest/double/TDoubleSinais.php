@@ -984,6 +984,7 @@ class TDoubleSinais
 
         $win = 0;
         $loss = 0;
+        $acertos = 0;
         while ($row = $dados-> fetchObject())
         {
             if ($row->tipo == 'WIN')
@@ -1005,19 +1006,35 @@ class TDoubleSinais
             ),
         );
 
-        $protecoes = $data->canal->protecoes;
-        $total_loss = pow(2, $protecoes + 1) - 1;
-        $acertos = $win - ($loss * $total_loss);
+        // $protecoes = $data->canal->protecoes;
+        // $total_loss = pow(2, $protecoes + 1) - 1;
+        // $acertos = $win - ($loss * $total_loss);
+        // $valor = ($acertos * 20);
+        // if ($data->canal->exibir_projecao == 'Y' and $valor > 0)
+        // {
+        //     $valor = number_format($valor, 2, ',', '.');
+        //     $banca = number_format($total_loss * 20 * 1.333, 2, ',', '.');
+        //     $telegram->sendMessage(
+        //         $data->canal->channel_id,
+        //         str_replace(
+        //             ['{banca}', '{valor}'],
+        //             [$banca, $valor],
+        //             $data->plataforma->translate->MSG_SINAIS_PROJECAO,
+        //         ),
+        //     );
+        // }
+
+        $acertos = $win - $loss;
         $valor = ($acertos * 20);
         if ($data->canal->exibir_projecao == 'Y' and $valor > 0)
         {
             $valor = number_format($valor, 2, ',', '.');
-            $banca = number_format($total_loss * 20 * 1.333, 2, ',', '.');
+            
             $telegram->sendMessage(
                 $data->canal->channel_id,
                 str_replace(
-                    ['{banca}', '{valor}'],
-                    [$banca, $valor],
+                    ['{valor}'],
+                    [$valor],
                     $data->plataforma->translate->MSG_SINAIS_PROJECAO,
                 ),
             );

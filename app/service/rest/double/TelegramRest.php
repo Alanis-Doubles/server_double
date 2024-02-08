@@ -78,6 +78,42 @@ class TelegramRest
         return $contents;
     }
 
+    public function sendVideo($chat_id, $urlVideo) {
+        $telegram_host = DoubleConfiguracao::getConfiguracao('telegram_host');
+        $telegram_token = $this->telegram_token;
+            
+
+        $location = str_replace('{token}', $telegram_token, $telegram_host);
+
+        $client = new Client(['http_errors' => false]);
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+        $options = [
+            'multipart' => [
+                ['name' => 'chat_id', 'contents' => $chat_id],
+                [
+                    'name' => 'video',
+                    'contents' => Utils::tryFopen($urlVideo, 'r'),
+                    'filename' => $urlVideo,
+                    'headers'  => [
+                        'Content-Type' => '<Content-type header>'
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $client->request(
+            'POST', 
+            $location.'sendVideo',
+            $options
+        );
+        
+        $contents = json_decode($response->getBody()->getContents());
+        return $contents;
+    }
+
     public function deleteMessage($chat_id, $message_id) {
         $telegram_host = DoubleConfiguracao::getConfiguracao('telegram_host');
         $telegram_token = $this->telegram_token;

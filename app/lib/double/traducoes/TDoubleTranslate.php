@@ -100,7 +100,7 @@ class TDoubleTranslate
         $this->list["MSG_SINAIS_TUTORIAL"] = "👨‍🏫 Tutorial Double {plataforma}";
         $this->list["MSG_SINAIS_SUPORTE"] = "🆘 Suporte";
         $this->list["MSG_SINAIS_PARCIAL_DIA"] = "🎰 PARCIAL DO DIA 🎰\n\n✅ Win: {win} | ❌ Loss: {loss}\n🤖 Inteligência do Robô: {percentual}%";
-        $this->list["MSG_SINAIS_PROJECAO"] = "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\nBANCA RECOMENDADA: {banca}\n\n'VOCÊ ESTARIA COM LUCRO: {valor}";
+        $this->list["MSG_SINAIS_PROJECAO"] = "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\n↪️ CICLO: Habilitado\n\n'VOCÊ ESTARIA COM LUCRO: {valor}";
         $this->list["MSG_PAGTO_CANCELADO"] = "Pagamento de {valor} cancelado com sucesso. Conta com data de expiração para {dia_expiracao}.";
         $this->list["BOTAO_JA_ASSINEI"] = "✔️ Já assinei o Speed Green";
         $this->list["BOTAO_QUERO_ASSINAR"] = "📝 Quero assinar";

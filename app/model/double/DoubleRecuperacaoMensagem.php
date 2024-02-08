@@ -20,6 +20,7 @@ class DoubleRecuperacaoMensagem extends DoubleRecord
     public function store()
     {
         unset($this->imagens);
+        unset($this->videos);
         parent::store();
     }
 }

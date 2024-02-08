@@ -40,14 +40,19 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Botão - Mensagem'])],
-            [$this->makeTEntry(['name' => 'botao_1_mensagem', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [$this->makeTEntry(['name' => 'botao_1_mensagem', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
             [$label = $this->makeTLabel(['value' => 'Botão - Url'])],
-            [$this->makeTEntry(['name' => 'botao_1_url', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],           
+            [$this->makeTEntry(['name' => 'botao_1_url', 'label' => $label, 'editable' => $param['method'] != 'onView'])],           
         );
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Imagens'])],
             [$this->makeTMultiFile(['name' => 'imagens', 'label' => $label, 'enableFileHandling' => true, 'enableImageGallery' => true, 'editable' => $param['method'] != 'onView'])],
+        );
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Videos'])],
+            [$this->makeTMultiFile(['name' => 'videos', 'label' => $label, 'extensions' => ['mp4'], 'enableFileHandling' => true, 'editable' => $param['method'] != 'onView'])],
         );
     }
 
@@ -63,6 +68,7 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
 
         TUtils::openConnection('double', function() use ($object, $data){
             $this->saveFiles($object, $data, 'imagens', 'app/images/recuperacao', 'DoubleRecuperacaoImagem', 'imagem', 'recuperacao_mensagem_id');
+            $this->saveFiles($object, $data, 'videos', 'app/images/recuperacao', 'DoubleRecuperacaoVideo', 'video', 'recuperacao_mensagem_id');
         });
 
         return $object;
@@ -73,6 +79,9 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
         $object = parent::onEdit($param);
         $object->imagens = TUtils::openFakeConnection('double', function() use ($object){
             return DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $object->id)->getIndexedArray('id', 'imagem');
+        });
+        $object->videos = TUtils::openFakeConnection('double', function() use ($object){
+            return DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $object->id)->getIndexedArray('id', 'imagem');
         });
         $this->form->setData($object);
         

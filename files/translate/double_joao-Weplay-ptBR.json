@@ -90,7 +90,7 @@
    "MSG_SINAIS_TUTORIAL" : "👨‍🏫 Tutorial Double {plataforma}",
    "MSG_SINAIS_SUPORTE" : "🆘 Suporte",
    "MSG_SINAIS_PARCIAL_DIA" : "🎰 PARCIAL DO DIA 🎰\n\n✅ Win: {win} | ❌ Loss: {loss}\n🤖 Inteligência do Robô: {percentual}%",
-   "MSG_SINAIS_PROJECAO" : "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\nBANCA RECOMENDADA: {banca}\n\n'VOCÊ ESTARIA COM LUCRO: {valor}",
+   "MSG_SINAIS_PROJECAO" : "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\n↪️ CICLO: Habilitado\n\n'VOCÊ ESTARIA COM LUCRO: {valor}",
    "BOTAO_JA_ASSINEI" : "✔️ Já assinei o Speed Green",
    "BOTAO_QUERO_ASSINAR" : "📝 Quero assinar",
    "BOTAO_TESTE_5_RODADAS" : "🕹️ Teste 5 rodadas automáticas",

@@ -399,8 +399,8 @@ trait TUIBuilderTrait
         $widget = new TMultiFile((string) $properties->{'name'});
         $widget->setAllowedExtensions( ['gif', 'png', 'jpg', 'jpeg'] );
 
-        if (isset($this->{'extensions'}))
-            $widget->setAllowedExtensions($this->{'extensions'});
+        if (isset($properties->{'extensions'}))
+            $widget->setAllowedExtensions($properties->{'extensions'});
         if (isset($properties->{'enableFileHandling'})) 
             $widget->enableFileHandling();
         if (isset($properties->{'enableImageGallery'})) 
@@ -1076,6 +1076,9 @@ trait TUIBuilderTrait
         if (isset($properties->{'value'}))
             $widget->setValue($properties->{'value'});
 
+        $this->fields[] = $widget;
+        $this->fieldsByName[(string) $properties->{'name'}] = $widget;  
+          
         return $widget;
     }
 

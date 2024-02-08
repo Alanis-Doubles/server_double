@@ -49,6 +49,12 @@ class TDoubleCanalForm  extends TStandardForm
             [$this->makeTCombo(['name' => 'ativo', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
         );
 
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Exibe projeção'])],
+            [$this->makeTCombo(['name' => 'exibir_projecao', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
+            [],[]
+        );
+
         $this->form->addContent([new TElement('br')]);
         $this->form->addContent([new TFormSeparator('Webhooks Suportados')]);
 

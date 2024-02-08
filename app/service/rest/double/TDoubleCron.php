@@ -106,10 +106,17 @@ class TDoubleCron
                         $server_root = $_SERVER['DOCUMENT_ROOT'];
                         DoubleConfiguracao::setConfiguracao('server_root', $server_root);
                     }
-                $imagens =  DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
-                foreach ($imagens as $key => $value) {
-                    $imagem = $server_root . '/'. $value;
+                
+                $imagens = DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
+                foreach ($imagens as $key => $img) {
+                    $imagem = $server_root . '/'. $img;
                     $telegram->sendPhoto($usuario->chat_id, $imagem);
+                }
+                
+                $videos = DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'video');
+                foreach ($videos as $key => $vid) {
+                    $video = $server_root . '/'. $vid;
+                    $telegram->sendVideo($usuario->chat_id, $video);
                 }
             });
 
