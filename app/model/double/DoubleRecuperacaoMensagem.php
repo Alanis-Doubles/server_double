@@ -7,6 +7,7 @@ class DoubleRecuperacaoMensagem extends DoubleRecord
     const TABLENAME  = 'double_recuperacao_mensagem';
     const PRIMARYKEY = 'id';
     const IDPOLICY   = 'max';
+    CONST DELETEDAT  = 'deleted_at';
 
     use RecordTrait;
 

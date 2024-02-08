@@ -39,6 +39,13 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
         );
 
         $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Botão - Mensagem'])],
+            [$this->makeTEntry(['name' => 'botao_1_mensagem', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [$label = $this->makeTLabel(['value' => 'Botão - Url'])],
+            [$this->makeTEntry(['name' => 'botao_1_url', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],           
+        );
+
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Imagens'])],
             [$this->makeTMultiFile(['name' => 'imagens', 'label' => $label, 'enableFileHandling' => true, 'enableImageGallery' => true, 'editable' => $param['method'] != 'onView'])],
         );

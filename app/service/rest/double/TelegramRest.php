@@ -1,6 +1,7 @@
 <?php
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Utils;
 
 class TelegramRest
 {
@@ -24,7 +25,7 @@ class TelegramRest
             $payload['reply_markup'] = $reply_markup;
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
-        $client = new Client();
+        $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'POST', 
             $location.'sendMessage',
@@ -45,24 +46,32 @@ class TelegramRest
         $telegram_host = DoubleConfiguracao::getConfiguracao('telegram_host');
         $telegram_token = $this->telegram_token;
             
-        $payload = [
-            "chat_id" => $chat_id,
-            "photo" => $urlPhoto
-        ];
-        
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
-        $client = new Client();
+
+        $client = new Client(['http_errors' => false]);
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        ];
+        $options = [
+            'multipart' => [
+                ['name' => 'chat_id', 'contents' => $chat_id],
+                [
+                    'name' => 'photo',
+                    'contents' => Utils::tryFopen($urlPhoto, 'r'),
+                    'filename' => $urlPhoto,
+                    'headers'  => [
+                        'Content-Type' => '<Content-type header>'
+                    ]
+                ]
+            ]
+        ];
+
         $response = $client->request(
             'POST', 
             $location.'sendPhoto',
-            [
-                'json' => $payload,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
-            ]
+            $options
         );
         
         $contents = json_decode($response->getBody()->getContents());
@@ -79,7 +88,7 @@ class TelegramRest
         ];
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
-        $client = new Client();
+        $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'POST', 
             $location.'deleteMessage',

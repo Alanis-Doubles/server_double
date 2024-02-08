@@ -6,43 +6,46 @@ class TDoubleCron
 {
     public function recuperacao() 
     {
-        $total = TUtils::openConnection('double', function(){
+        $list = TUtils::openConnection('double', function(){
             $query = "SELECT *
-                FROM (SELECT u.id, 
-                                HOUR(
-                                    TIMEDIFF(
-                                        if(u.data_envio_recuperacao IS null, 
-                                        if(u.updated_at IS NULL, u.created_at, u.updated_at), 
-                                            u.data_envio_recuperacao
-                                        ), 
-                                        NOW()
-                                    )
-                                ) horas,
-                                if(u.data_envio_recuperacao IS null, 
-                                if(u.updated_at IS NULL, u.created_at, u.updated_at), 
-                                    u.data_envio_recuperacao
-                                ) data, 
-                                u.data_envio_recuperacao,
-                                u.created_at,
-                                u.updated_at,
-                                u.status,
-                                rm.id recuperacao_mensagem_id,
-                                rm.horas horas_recuperacao,
-					            rm.mensagem, 
-					            ROW_NUMBER() OVER (PARTITION BY u.id ORDER BY u.id, rm.ordem ASC) AS sequencia
-                        FROM double_usuario u
-                        JOIN double_recuperacao_mensagem rm on rm.status = u.status
-                        WHERE NOT EXISTS(SELECT 1 FROM double_recuperacao_usuario ru
-                                            WHERE ru.usuario_id = u.id
-                                            AND ru.recuperacao_mensagem_id = rm.id
-                                            AND ru.created_at >= if(u.data_envio_recuperacao IS null, 
-                                                                                if(u.updated_at IS NULL, u.created_at, u.updated_at), 
-                                                                                    u.data_envio_recuperacao
-                                                                                )
-                                            )
-                    ) c
-               WHERE horas >= horas_recuperacao
-                 AND sequencia = 1";
+            FROM (SELECT u.id, 
+                         u.chat_id,
+                         HOUR(
+                             TIMEDIFF(
+                                 if(u.data_envio_recuperacao IS null, 
+                                 if(u.updated_at IS NULL, u.created_at, u.updated_at), 
+                                     u.data_envio_recuperacao
+                                 ), 
+                                 NOW()
+                             )
+                         ) horas,
+                         if(u.data_envio_recuperacao IS null, 
+                         if(u.updated_at IS NULL, u.created_at, u.updated_at), 
+                             u.data_envio_recuperacao
+                         ) data, 
+                         u.data_envio_recuperacao,
+                         u.created_at,
+                         u.updated_at,
+                         u.status,
+                         rm.id recuperacao_mensagem_id,
+                         rm.horas horas_recuperacao,
+                         rm.mensagem, 
+                         rm.botao_1_mensagem,
+                         rm.botao_1_url,
+                         ROW_NUMBER() OVER (PARTITION BY u.id ORDER BY u.id, rm.ordem ASC) AS sequencia
+                    FROM double_usuario u
+                    JOIN double_recuperacao_mensagem rm on rm.status = u.status AND rm.deleted_at IS null
+                    WHERE NOT EXISTS(SELECT 1 FROM double_recuperacao_usuario ru
+                                        WHERE ru.usuario_id = u.id
+                                        AND ru.recuperacao_mensagem_id = rm.id
+                                        AND ru.created_at >= if(u.data_envio_recuperacao IS null, 
+                                                                            if(u.updated_at IS NULL, u.created_at, u.updated_at), 
+                                                                                u.data_envio_recuperacao
+                                                                            )
+                                        )
+                ) c
+           WHERE horas >= horas_recuperacao
+             AND sequencia = 1";
             $conn = TTransaction::get();
             $list = TDatabase::getData(
                 $conn, 
@@ -54,11 +57,17 @@ class TDoubleCron
                     ['data','data'],
                     ['status','status'],
                     ['mensagem', 'mensagem'],
+                    ['botao_1_mensagem', 'botao_1_mensagem'],
+                    ['botao_1_url', 'botao_1_url']
                 ]
             );
 
-            $total = 0;
-            foreach ($list as $key => $value) {
+            return $list;
+        });
+
+        $total = 0;
+        foreach ($list as $key => $value) {
+            TUtils::openConnection('double', function() use ($value){
                 $usuario = new DoubleUsuario($value['usuario_id'], false);
                 $recuperacao = new DoubleRecuperacaoUsuario();
                 $recuperacao->usuario_id = $value['usuario_id'];
@@ -71,26 +80,43 @@ class TDoubleCron
                     [$usuario->nome], 
                     $value['mensagem']
                 );
-                $telegram->sendMessage($usuario->chat_id, $msg);
+
+                $botao = [];
+                if ($value['botao_1_mensagem'])
+                {
+                    $botao = [
+                        "resize_keyboard" => true, 
+                        "inline_keyboard" => [
+                            [["text" => $value['botao_1_mensagem'],  "url" => $value['botao_1_url']]], 
+                        ]
+                    ];
+                }
+
+                $telegram->sendMessage($usuario->chat_id, $msg, $botao);
+
                 if (!$usuario->data_envio_recuperacao) {
                     $usuario->data_envio_recuperacao = date('Y-m-d H:i:s');
                     $usuario->save();
                 }
 
-                $baseUrl = DoubleConfiguracao::getConfiguracao('base_url');
+                // $baseUrl = DoubleConfiguracao::getConfiguracao('base_url');
+                $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+                if (!$server_root) 
+                    {
+                        $server_root = $_SERVER['DOCUMENT_ROOT'];
+                        DoubleConfiguracao::setConfiguracao('server_root', $server_root);
+                    }
                 $imagens =  DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
                 foreach ($imagens as $key => $value) {
-                    $imagem = $baseUrl . $value;
+                    $imagem = $server_root . '/'. $value;
                     $telegram->sendPhoto($usuario->chat_id, $imagem);
                 }
+            });
 
-                $total += 1;
-            }
-
-            return $total;
-        });
+            $total += 1;
+        }
 
 
-        echo "Total de mensagens enviadas: " . $total;
+        echo date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
     }
 }

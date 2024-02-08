@@ -10,9 +10,12 @@ class TDoubleUsuarioRecuperacaoForm  extends TStandardForm
     const DATABASE = 'double';
 
     private $datagrid;
+    private $status;
 
     protected function onBuild($param)
     {
+        $this->status = ['NOVO' => 'Novo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => 'Aguardando pagamento', 'ATIVO' => 'Ativo', 'INATIVO' => 'Inativo', 'EXPIRADO' => 'Expirado']; 
+        
         $this->form->addFields(
             [$this->makeTHidden(['name' => 'id', 'editable' => false])],
         );
@@ -22,16 +25,19 @@ class TDoubleUsuarioRecuperacaoForm  extends TStandardForm
         $dataGrid->style = 'min-width: 600px';
         $dataGrid->columns = [
             ['name' => 'created_at', 'label' => 'Data', 'width' => '20%', 'align' => 'left', 'transformer' => Closure::fromCallable([$this, 'dateTimeTransformer'])],
-            ['name' => 'recuperacao_mensagem->mensagem', 'label' => 'Plataforma', 'width' => '80%', 'align' => 'left'],
+            ['name' => 'recuperacao_mensagem->status', 'label' => 'Status', 'width' => '15%', 'align' => 'left', 'transformer' => Closure::fromCallable([$this, 'transform_status'])],
+            ['name' => 'recuperacao_mensagem->mensagem', 'label' => 'Mensagem', 'width' => '65%', 'align' => 'left'],
         ];
 
         $panel = $this->makeTDataGrid($dataGrid);
         $this->datagrid = $this->getWidget('datagrid');
 
-        // $columns = $this->datagrid->getColumns();
-        // $columns[5]->enableTotal('sum', null, 2, '.', ',');
-
         $this->form->addContent([$panel]);
+    }
+
+    public function transform_status($value, $object, $row, $cell)
+    {
+        return $this->status[$value];
     }
 
     public function onEdit($param)
