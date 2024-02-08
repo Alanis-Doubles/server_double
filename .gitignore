@@ -2,3 +2,4 @@
 /vendor
 app/config/
 phinx.php
+app/images/recuperacao

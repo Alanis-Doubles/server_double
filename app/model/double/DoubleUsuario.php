@@ -69,6 +69,15 @@ class DoubleUsuario extends DoubleRecord
                 $user->save();
             }
         });
+
+        $pk = $this->getPrimaryKey();
+        $lastState = array();
+        if (isset($this->$pk) and self::exists($this->$pk))
+        {
+            $lastState = parent::load($this->$pk, TRUE)->toArray();
+            if ($lastState['status'] != $this->status)
+                $this->data_envio_recuperacao = null;
+        }
         
         parent::store();
     }

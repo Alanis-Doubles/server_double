@@ -18,6 +18,7 @@ use Adianti\Widget\Form\TSpinner;
 use Adianti\Widget\Form\TPassword;
 use Adianti\Widget\Form\TSortList;
 use Adianti\Widget\Form\TFieldList;
+use Adianti\Widget\Form\TMultiFile;
 use Adianti\Widget\Form\TCheckGroup;
 use Adianti\Widget\Form\TRadioGroup;
 use Adianti\Widget\Form\TSeekButton;
@@ -388,6 +389,36 @@ trait TUIBuilderTrait
         return $widget;
     }
 
+    public function makeTMultiFile($properties, $callback = null)
+    {
+        if (is_array($properties))
+            $properties = (object)$properties;
+
+        $this->validateProperties('TMultiFile', ['name'], $properties);
+
+        $widget = new TMultiFile((string) $properties->{'name'});
+        $widget->setAllowedExtensions( ['gif', 'png', 'jpg', 'jpeg'] );
+
+        if (isset($this->{'extensions'}))
+            $widget->setAllowedExtensions($this->{'extensions'});
+        if (isset($properties->{'enableFileHandling'})) 
+            $widget->enableFileHandling();
+        if (isset($properties->{'enableImageGallery'})) 
+            $widget->enableImageGallery(); 
+        if (isset($properties->{'enablePopover'})) 
+            $widget->enablePopover($properties->{'enablePopover'}); 
+        if (isset($properties->{'editable'}))
+            $widget->setEditable((string) $properties->{'editable'});
+        
+        if (is_callable($callback, true))
+            call_user_func($callback, $widget);
+        
+        $this->fields[] = $widget;
+        $this->fieldsByName[(string) $properties->{'name'}] = $widget;
+        
+        return $widget;
+    }
+
     public function makeTFile($properties, $callback = null)
     {
         if (is_array($properties))
@@ -486,6 +517,8 @@ trait TUIBuilderTrait
         $widget = new TText((string) $properties->{'name'});
         if (isset($properties->{'value'})) 
             $widget->setValue((string) $properties->{'value'});
+        if (isset($properties->{'editable'})) 
+            $widget->setEditable((string) $properties->{'editable'});
         if (isset($properties->{'width'})) 
         {   
             $height = NULL;
@@ -1302,6 +1335,9 @@ trait TUIBuilderTrait
                 break;
             case 'T'.'DateTime':
                 $widget = $this->makeTDateTime($properties, $callback);
+                break;
+            case 'T'.'MultiFile':
+                $widget = $this->makeTMultiFile($properties, $callback);
                 break;
             case 'T'.'File':
                 $widget = $this->makeTFile($properties, $callback);

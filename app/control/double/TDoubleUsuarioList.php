@@ -92,10 +92,11 @@ class TDoubleUsuarioList extends TCustomStandardList
             ],
             'actions' => [
                 // 'actEditar'     => ['visible' => false],
-                'actExcluir'    => ['visible' => false],
-                'actVisualizar' => ['visible' => false],
-                'actPagamento'  => ['label' => 'Registrar pagamento', 'image' => 'fas:money-bill-wave green', 'field' => 'id', 'action' => ['TDoubleUsuarioPagamentoForm', 'onInsert'], 'action_params' =>  ['register_state' => 'false', 'fromClass' => get_class($this)]],
-                'actHistorico'  => ['label' => 'Histórico de pagamentos', 'image' => 'fas:history red', 'field' => 'id', 'action' => ['TDoubleUsuarioHistoricoForm', 'onView'], 'action_params' =>  ['register_state' => 'false', 'fromClass' => get_class($this)]],
+                'actExcluir'        => ['visible' => false],
+                'actVisualizar'     => ['visible' => false],
+                'actPagamento'      => ['label' => 'Registrar pagamento', 'image' => 'fas:money-bill-wave green', 'field' => 'id', 'action' => ['TDoubleUsuarioPagamentoForm', 'onInsert'], 'action_params' =>  ['register_state' => 'false', 'fromClass' => get_class($this)]],
+                'actHistorico'      => ['label' => 'Histórico de pagamentos', 'image' => 'fas:history red', 'field' => 'id', 'action' => ['TDoubleUsuarioHistoricoForm', 'onView'], 'action_params' =>  ['register_state' => 'false', 'fromClass' => get_class($this)]],
+                'actMsgRecuperacao' => ['label' => 'Mensagens de recuperação', 'image' => 'fas:volume-up fa-fw orange', 'field' => 'id', 'action' => ['TDoubleUsuarioRecuperacaoForm', 'onView'], 'action_params' =>  ['register_state' => 'false', 'fromClass' => get_class($this)]],
             ]
         ]);
         

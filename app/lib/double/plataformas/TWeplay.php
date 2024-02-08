@@ -248,12 +248,15 @@ class TWeplay implements IDoublePlataforma
 
         if ($response->getStatusCode() != 200) {
             $content = json_decode($response->getBody()->getContents());
-            if ($content->message == 'Saldo insuficiente para fazer esta aposta.') 
-                return 'saldo_insuficiente';
-            elseif ($content->message == 'Not enough balance to place this bet.') 
-                return 'saldo_insuficiente';
-            else 
-                return $content->message;
+            if (isset($content->message)) {
+                if ($content->message == 'Saldo insuficiente para fazer esta aposta.') 
+                    return 'saldo_insuficiente';
+                elseif ($content->message == 'Not enough balance to place this bet.') 
+                    return 'saldo_insuficiente';
+                else 
+                    return $content->message;
+            } else
+                return '';
         } else {
             return '';
         }

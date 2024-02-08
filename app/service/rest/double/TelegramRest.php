@@ -17,7 +17,7 @@ class TelegramRest
             
         $payload = [
             "chat_id" => $chat_id,
-            "text" => $message
+            "text" => str_replace('\n', "\n", $message)
         ];
 
         if ($reply_markup)
@@ -28,6 +28,34 @@ class TelegramRest
         $response = $client->request(
             'POST', 
             $location.'sendMessage',
+            [
+                'json' => $payload,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
+            ]
+        );
+        
+        $contents = json_decode($response->getBody()->getContents());
+        return $contents;
+    }
+
+    public function sendPhoto($chat_id, $urlPhoto) {
+        $telegram_host = DoubleConfiguracao::getConfiguracao('telegram_host');
+        $telegram_token = $this->telegram_token;
+            
+        $payload = [
+            "chat_id" => $chat_id,
+            "photo" => $urlPhoto
+        ];
+        
+
+        $location = str_replace('{token}', $telegram_token, $telegram_host);
+        $client = new Client();
+        $response = $client->request(
+            'POST', 
+            $location.'sendPhoto',
             [
                 'json' => $payload,
                 'headers' => [

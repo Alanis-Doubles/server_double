@@ -691,7 +691,7 @@ class TDoubleSinais
                             ),
                             $botao
                         );
-                        
+                        $lucro = 0;
                         while ($call_status() == 'EXECUTANDO') {
                             $sinal = DoubleSinal::buscarSinal([], $data->usuario->roboInicio, $data->plataforma->id, $call_status);
                             if (!$service)
@@ -789,7 +789,7 @@ class TDoubleSinais
                                     sleep(1);
                                 }
                             } elseif ($retornoJogada == 'saldo_insuficiente') {
-                                self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+                                // self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
 
                                 $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                                 $data->usuario->robo_iniciar = 'N';
@@ -832,7 +832,7 @@ class TDoubleSinais
                     } finally {
                         $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                         if ($data->usuario->status == 'DEMO' and $data->usuario->demo_jogadas == 0) {
-                            self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+                            // self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
 
                             $data->usuario->status = 'AGUARDANDO_PAGAMENTO';
                             $data->usuario->roboStatus = 'PARANDO';
