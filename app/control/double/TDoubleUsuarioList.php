@@ -21,6 +21,7 @@ class TDoubleUsuarioList extends TCustomStandardList
             'activeRecord'   => 'DoubleUsuario',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoubleUsuarioForm',
+            'dataGrid_style' => 'min-width: 1200px',
             'items'          => [
                 [
                     'name'   => 'plataforma_id',
@@ -53,7 +54,7 @@ class TDoubleUsuarioList extends TCustomStandardList
                     'name'   => 'nome_completo',
                     'label'  => 'Nome',
                     'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT name FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
-                    'column' => ['width' => '25%', 'align' => 'left', 'order' => false]
+                    'column' => ['width' => '20%', 'align' => 'left', 'order' => false]
                 ],
                 [
                     'name'   => 'plataforma->nome',
@@ -70,6 +71,12 @@ class TDoubleUsuarioList extends TCustomStandardList
                     'name'   => 'email',
                     'label'  => 'E-mail',
                     'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT email FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
+                    'column' => ['width' => '10%', 'align' => 'left', 'order' => false]
+                ],
+                [
+                    'name'   => 'telefone',
+                    'label'  => 'Telefone',
+                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT telefone FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
                     'column' => ['width' => '10%', 'align' => 'left', 'order' => false]
                 ],
                 [

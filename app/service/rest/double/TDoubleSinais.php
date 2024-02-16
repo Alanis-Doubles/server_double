@@ -106,28 +106,34 @@ class TDoubleSinais
             {
                 $service = null;
                 $mensagem = $e->getMessage();
-                TUtils::openConnection('double', function() use ($mensagem, $data) {
-                    $error = new DoubleErros();
-                    $error->classe = 'TDoubleSinais';
-                    $error->metodo = 'executar';
-                    $error->erro = $mensagem;
-                    $error->plataforma_id = $data->plataforma->id;
-                    $error->save();
-                });
+                if (!str_contains($mensagem, "Broken frame"))
+                {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
+                        $error = new DoubleErros();
+                        $error->classe = 'TDoubleSinais';
+                        $error->metodo = 'executar';
+                        $error->erro = $mensagem;
+                        $error->plataforma_id = $data->plataforma->id;
+                        $error->save();
+                    });
+                }
             } catch (Exception $e) // in case of exception
             {
                 $service = null;
                 $mensagem = $e->getMessage();
-                TUtils::openConnection('double', function() use ($mensagem, $data) {
-                    $error = new DoubleErros();
-                    $error->classe = 'TDoubleSinais';
-                    $error->metodo = 'executar';
-                    $error->erro = $mensagem;
-                    $error->plataforma_id = $data->plataforma->id;
-                    $error->save();
-                });
+                if (!str_contains($mensagem, "Broken frame"))
+                {
+                    TUtils::openConnection('double', function() use ($mensagem, $data) {
+                        $error = new DoubleErros();
+                        $error->classe = 'TDoubleSinais';
+                        $error->metodo = 'executar';
+                        $error->erro = $mensagem;
+                        $error->plataforma_id = $data->plataforma->id;
+                        $error->save();
+                    });
+                }
             }
-    } finally
+        } finally
         {
             $service = null;
             $status = $data->plataforma->statusSinais;
@@ -764,16 +770,32 @@ class TDoubleSinais
                                 $ocorreu_stop_loss = -$data->usuario->stop_loss >= $lucro;
                                 $ocorreu_stop_win = $data->usuario->stop_win <= $lucro;
                                 if ($ocorreu_stop_loss or $ocorreu_stop_win) {
+                                    $entrada_automatica = false;
                                     if ($ocorreu_stop_loss){
                                         $message = $data->plataforma->translate->MSG_BET_4;
                                         self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
                                     }
-                                    else if ($ocorreu_stop_win)
+                                    else if ($ocorreu_stop_win) {
                                         $message = $data->plataforma->translate->MSG_BET_5;
+                                        if ($data->usuario->entrada_automatica == 'Y')
+                                        {
+                                            $entrada_automatica = true;
+                                            $message = $data->plataforma->translate->MSG_ENTRADA_AUTOMATICA_5;
+                                        }
+                                    }
                                     
                                     $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
-                                    $data->usuario->robo_iniciar = 'N';
-                                    $data->usuario->robo_status = 'PARANDO';
+                                    if ($entrada_automatica)
+                                    {
+                                        $data->usuario->robo_iniciar_apos_loss = 'Y';
+                                        $data->usuario->robo_sequencia += 1;
+                                        $data->usuario->ultimo_saldo = $data->plataforma->service->saldo($data->usuario);
+                                    }
+                                    else
+                                    {
+                                        $data->usuario->robo_iniciar = 'N';
+                                        $data->usuario->robo_status = 'PARANDO';
+                                    }
                                     $data->usuario->saveInTransaction();
                                     $telegram->sendMessage($data->usuario->chat_id, $message, $botao_inicio);
                                     break;
@@ -953,12 +975,16 @@ class TDoubleSinais
 
     public static function gerarUsuarioStatus($usuario, $lucro, $cor, $telegram)
     {
-        // $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
-        sleep(2);
-        $saldo = $usuario->plataforma->service->saldo($usuario);
-        $banca = number_format($saldo, 2, ',', '.');
-        // $lucro = number_format($lucro, 2, ',', '.');
-        $lucro = number_format($saldo - $usuario->ultimo_saldo, 2, ',', '.');
+        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
+            $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
+            $lucro = number_format($lucro, 2, ',', '.');
+        } else {
+            sleep(2);
+            $saldo = $usuario->plataforma->service->saldo($usuario);
+            $banca = number_format($saldo, 2, ',', '.');
+            $lucro = number_format($saldo - $usuario->ultimo_saldo, 2, ',', '.');
+        }
+
         $cor_result = self::getCor($cor, $usuario->plataforma->translate);
 
         $telegram->sendMessage(

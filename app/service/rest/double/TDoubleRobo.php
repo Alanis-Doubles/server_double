@@ -7,8 +7,9 @@ use GuzzleHttp\Psr7\Response;
 class TDoubleRobo
 {
     const ATTRIBUTES = [
-        'chat_id', 'nome', 'nome_usuario', 'email', 'status', 'valor', 'protecao', 'stop_win', 'stop_loss', 'ultimo_saldo',
-        'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada'
+        'chat_id', 'nome', 'nome_usuario', 'email', 'telefone', 'status', 'valor', 'protecao', 'stop_win', 'stop_loss', 'ultimo_saldo',
+        'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
+        'entrada_automatica'
     ];
 
     public function carregar($param)
@@ -45,7 +46,9 @@ class TDoubleRobo
             }
 
             if ($object->logado == 'Y') {
-                $object->ultimo_saldo = $param['plataforma']->service->saldo($object);
+                if (!$object->ultimo_saldo)
+                    $object->ultimo_saldo = 0;
+                $param['plataforma']->service->saldo($object);
                 $object->save();
             }
 
@@ -78,6 +81,9 @@ class TDoubleRobo
             unset($param['data']['channel_id']);
             $object->fromArray((array) $param['data']);
             $object->store();
+
+            if (isset($param['telefone']))
+                $object->telefone = $param['telefone'];
 
             return $object;
         });

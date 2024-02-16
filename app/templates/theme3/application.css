@@ -800,7 +800,7 @@ nav.navbar {
 @media (min-width: 767px) {
     .sidebar-toggle
     {
-        visibility:hidden;
+        visibility:visible;
     }
 }
 

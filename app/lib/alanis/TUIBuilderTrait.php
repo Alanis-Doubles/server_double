@@ -315,7 +315,8 @@ trait TUIBuilderTrait
         $this->validateProperties('TDate', ['name'], $properties);
 
         $widget = new TDate((string) $properties->{'name'});
-        $widget->setLabel('<b>' . $properties->{'label'}->getValue() . '</b>');
+        if (isset($properties->{'label'}))
+            $widget->setLabel('<b>' . $properties->{'label'}->getValue() . '</b>');
         $widget->setSize('100%');
         if (isset($properties->{'value'}))
             $widget->setValue((string) $properties->{'value'});
@@ -334,6 +335,18 @@ trait TUIBuilderTrait
             $widget->setDatabaseMask((string) $properties->{'databaseMask'});
         if (isset($properties->{'tip'})) 
             $widget->setTip((string) $properties->{'tip'});
+
+        if (isset($properties->{'change_action'})){
+            if (is_callable((array) $properties->{'change_action'}, true))
+            {
+                $change_params = [];
+                if (isset($properties->{'change_action_params'}))
+                    $change_params = $properties->{'change_action_params'};
+
+                $widget->setChangeAction(new TAction($properties->{'change_action'}, $change_params));
+            }
+        }
+
         if (isset($properties->{'required'}) AND $properties->{'required'}) 
             if (isset($properties->{'label'}))
                 $widget->addValidation((string) '<b>' . $properties->{'label'}->getValue() . '</b>', new TRequiredValidator);

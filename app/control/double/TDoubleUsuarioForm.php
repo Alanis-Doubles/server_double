@@ -70,6 +70,12 @@ class TDoubleUsuarioForm  extends TStandardForm
             [$this->makeTEntry(['name' => 'email', 'label' => $label, 'required' => true])],
         );
 
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Telefone'])],
+            [$this->makeTEntry(['name' => 'telefone', 'label' => $label, 'required' => true])],
+            [], []
+        );
+
         $status = ['NOVO' => 'Novo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => 'Ag. Pagto.', 'ATIVO' => 'Ativo', 'INATIVO' => 'Inativo', 'EXPIRADO' => 'Expirado']; 
         
         $this->form->addFields(
@@ -108,7 +114,8 @@ class TDoubleUsuarioForm  extends TStandardForm
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Utiliza Recuperação'])],
             [$this->makeTCombo(['name' => 'ciclo', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
-            [], []
+            [$label = $this->makeTLabel(['value' => 'Entrada Automática'])],
+            [$this->makeTCombo(['name' => 'entrada_automatica', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
         );
     }
 

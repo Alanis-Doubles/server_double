@@ -117,6 +117,17 @@ class DoubleUsuario extends DoubleRecord
         return $this->user->name;
     }
 
+    public function get_telefone()
+    {
+        if (!$this->user) {
+            $this->user = TUtils::openFakeConnection('permission', function () {
+                return $this->buscarSystemUser();
+            });
+        }
+
+        return $this->user->phone;
+    }
+
     public function get_nome_completo()
     {
         if (!$this->user) {
@@ -135,6 +146,17 @@ class DoubleUsuario extends DoubleRecord
                 $this->user = $this->buscarSystemUser();
 
             $this->user->name = $value;
+            $this->user->save();
+        });
+    }
+
+    public function set_telefone($value)
+    {
+        TUtils::openConnection('permission', function() use ($value) {
+            if (!$this->user)
+                $this->user = $this->buscarSystemUser();
+
+            $this->user->phone = $value;
             $this->user->save();
         });
     }

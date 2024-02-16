@@ -69,7 +69,7 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_INICIO_ROBO_3"] = "Sua banca deve ser superior a {valor}.";
         $this->list["MSG_INICIO_ROBO_4"] = "➡️ Ligando o robô 🤖\n Sua licença expira no dia {dia_expiracao}";
         $this->list["MSG_INICIO_ROBO_5"] = "➡️ Ligando o robô 🤖.";
-        $this->list["MSG_INICIO_ROBO_6"] = "➡🔸 Olá {usuario} 🔹\n💰A sua banca é de {banca} \n💲 Sua entrada será de {value}\n🐓 Você está utilizado {gales} gale(s)\n✅ Seu Stop Win está programado para {stop_win}\n❌ Seu Stop Loss está programado para {stop_loss}\n↪️ Recuperação: {ciclo}";
+        $this->list["MSG_INICIO_ROBO_6"] = "➡🔸 Olá {usuario} 🔹\n💰A sua banca é de {banca} \n💲 Sua entrada será de {value}\n🐓 Você está utilizado {gales} gale(s)\n✅ Seu Stop Win está programado para {stop_win}\n❌ Seu Stop Loss está programado para {stop_loss}\n↪️ Recuperação: {ciclo}\n🔄 Entrada automática: {entrada_automatica}";
         $this->list["MSG_INICIO_ROBO_7"] = "\n🎮 Você tem {demo_jogadas} jogada(s) gratuita(s).";
         $this->list["MSG_INICIO_ROBO_8"] = "Não foi possível iniciar o seu bot, suas jogadas gratuitas terminaram.";
         $this->list["MSG_INICIO_ROBO_9"] = "O robô iniciará após o primeiro loss.";
@@ -85,7 +85,7 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_BET_9"] = "Suas jogadas gratuitas terminaram, seu bot foi parado";
         $this->list["MSG_BET_10"] = "➡️ RESULTADO: {cor}\n💸 Lucro/Prejuízo: R$ {lucro}\n\nA sua banca é de {banca}";
         $this->list["MSG_CONFIRMADO_AGUARDANDO"] = "⚠️🚨ENTRADA CONFIRMADA🚨⚠️\n\n📊 ENTRAR NA COR: {cor}\n\n⏰ Aguardando para realizar a jogada";
-        $this->list["MSG_CONFIGURAR"] = "➡️Seu robô está com a seguinte configuração:\n\n💸 Valor aposta: {value}\n🐓 Gales: {gales}\n✅ Stop WIN: {stop_win}\n❌ Stop LOSS: {stop_loss}\n↪️ Recuperação: {ciclo}\n\nSe você desejar alterar algum valor, por favor selecione uma das opções.";
+        $this->list["MSG_CONFIGURAR"] = "➡️Seu robô está com a seguinte configuração:\n\n💸 Valor aposta: {value}\n🐓 Gales: {gales}\n✅ Stop WIN: {stop_win}\n❌ Stop LOSS: {stop_loss}\n↪️ Recuperação: {ciclo}\n🔄 Entrada automática: {entrada_automatica}\n\nSe você desejar alterar algum valor, por favor selecione uma das opções.";
         $this->list["BOTAO_JA_ASSINEI"] = "";
         $this->list["BOTAO_QUERO_ASSINAR"] = "";
         $this->list["BOTAO_TESTE_5_RODADAS"] = "️🕹️ Teste 5 rodadas automáticas";
@@ -102,6 +102,11 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_SINAIS_PARCIAL_DIA"] = "🎰 PARCIAL DO DIA 🎰\n\n✅ Win: {win} | ❌ Loss: {loss}\n🤖 Inteligência do Robô: {percentual}%";
         $this->list["MSG_SINAIS_PROJECAO"] = "📈 PROJEÇÃO DE GANHOS:\nVALOR DE ENTRADA: 20\n\nBANCA RECOMENDADA: {banca}\n\n'VOCÊ ESTARIA COM LUCRO: {valor}";
         $this->list["MSG_PAGTO_CANCELADO"] = "Pagamento de {valor} cancelado com sucesso. Conta com data de expiração para {dia_expiracao}.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_1"]  = "Ao ativar a entrada automática a cada Stop WIN atingido o bot irá entrar automaticamente na opção '🚀 Iniciar após LOSS'.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_2"]  = "Você {entrada}está usando a entrada automática.\n\nDeseja habilitar a entrada automática?";
+        $this->list["MSG_ENTRADA_AUTOMATICA_3"]  = "Você habilitou entrada automática.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_4"]  = "Você desabilitou a entrada automática.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_5"]  = "Stop WIN atingido. O robô iniciará após o primeiro loss.";
         $this->list["BOTAO_LOGAR"] = "🔒 Já possuo cadastro";
         $this->list["BOTAO_CADASTRO"] = "📲 Fazer cadastro";
         $this->list["BOTAO_INICIAR"] = "🚀 Iniciar Robô";
@@ -113,6 +118,7 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["BOTAO_VALOR_APOSTA"] = "💸 Valor aposta";
         $this->list["BOTAO_GALES"] = "🐓 Gales";
         $this->list["BOTAO_HISTORICO"] = "📈 Histórico";
+        $this->list["BOTAO_ENTRADA_AUTOMATICA"] = "🔄 Entrada automática";
         $this->list["BOTAO_CICLO"] = "↪️ Recuperação";
         $this->list["BOTAO_VOLTAR"] = "⬅️ Voltar";
         $this->list["BOTAO_DESLOGAR"] = "🔓 Logout";

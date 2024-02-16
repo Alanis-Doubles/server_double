@@ -41,7 +41,7 @@ class TWeplay implements IDoublePlataforma
         $client->send('40/game/roulette');
         while ($client->isConnected())
         {
-            try {
+            // try {
                 $message = $client->receive();
                 
                 if (str_starts_with($message, '42/game/roulette,')){
@@ -69,11 +69,11 @@ class TWeplay implements IDoublePlataforma
                 // $client->send('3');
             // } catch (BadOpcodeException $e) {
                 // $erro = $e->getMessage();
-            } catch (ConnectionException $e) {
-                $erro = $e->getMessage();
+            // } catch (ConnectionException $e) {
+            //     $erro = $e->getMessage();
             // } catch (\Throwable $e) {
             //    $erro = $e->getMessage();   
-            }
+            // }
         }
     }
 
@@ -82,15 +82,15 @@ class TWeplay implements IDoublePlataforma
         return self::$ultimo_sinal->numero;
     }
 
-    public function getToken(DoubleUsuario $usuario)
+    public function getToken(DoubleUsuario $usuario, $count = 1)
     {
         $expiracao = date_create_from_format('Y-m-d H:i:s', $usuario->token_expiracao);
         $now = new DateTime();
-        if ($now > $expiracao) {
+        if (true) {//($now > $expiracao) {
             $payload = TCrypto::decrypt($usuario->token_acesso, $usuario->chat_id);
             $payload = (array)json_decode($payload);
 
-            $client = new Client();
+            $client = new Client(['http_errors' => false]);
             $headers = [
             'Accept' => 'application/json, text/plain, */*',
             'Content-Type' => 'application/json'
@@ -102,13 +102,16 @@ class TWeplay implements IDoublePlataforma
             $request = new Request('POST', 'https://api.weplay.games/api/v1/auth/login', $headers, $body);
             $response = $client->sendAsync($request)->wait();
 
+            $json = $response->getBody()->getContents();
+            $content = json_decode($json);
             if ($response->getStatusCode() == 200) {
-                $content = json_decode($response->getBody()->getContents());
                 $usuario->token_plataforma = $content->accessToken;
                 $usuario->token_expiracao = date_format($now->modify('+3 hours'), 'Y-m-d H:i:s');
                 $usuario->saveInTransaction('double');
                 return $content->accessToken;
-            }
+            } else {
+                DoubleErros::registrar(1, 'TWeply', 'getToken', $json, $usuario->chat_id . ' - ' . $body);
+            } 
         } else {
             return $usuario->token_plataforma;
         }
@@ -134,10 +137,13 @@ class TWeplay implements IDoublePlataforma
                 ]
             );
 
-            $content = json_decode($response->getBody()->getContents());
+            $json = $response->getBody()->getContents();
+            $content = json_decode($json);
             if ($response->getStatusCode() == 200) {
                 return round($content->currentAccount->total, 2);
-            } 
+            } else {
+                DoubleErros::registrar(1, 'TWeply', 'saldo', $json, $usuario->chat_id);
+            }
         }
     }
 

@@ -57,9 +57,11 @@ class DoublePagamentoHistorico extends DoubleRecord
                     $data = date('Y-m-d', strtotime($meses));
 
                 $usuario->data_expiracao = $data;
-                if (date('Y-m-d') > $data) {
+                if (date('Y-m-d') >= $data) {
                     $usuario->status = 'INATIVO';
                     $usuario->logado = 'N';
+                    $usuario->robo_iniciar = 'N';
+                    $usuario->robo_status = 'N';
                 }
                 if ($this->email)
                     $usuario->email = $this->email;
