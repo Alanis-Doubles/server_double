@@ -76,7 +76,7 @@ class TDoubleUsuarioList extends TCustomStandardList
                 [
                     'name'   => 'telefone',
                     'label'  => 'Telefone',
-                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT telefone FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
+                    'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT phone FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
                     'column' => ['width' => '10%', 'align' => 'left', 'order' => false]
                 ],
                 [

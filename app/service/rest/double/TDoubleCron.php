@@ -18,6 +18,15 @@ class TDoubleCron
                                  ), 
                                  NOW()
                              )
+                         )  * 60 +
+                         MINUTE(
+                             TIMEDIFF(
+                                 if(u.data_envio_recuperacao IS null, 
+                                 if(u.updated_at IS NULL, u.created_at, u.updated_at), 
+                                     u.data_envio_recuperacao
+                                 ), 
+                                 NOW()
+                             )
                          ) horas,
                          if(u.data_envio_recuperacao IS null, 
                          if(u.updated_at IS NULL, u.created_at, u.updated_at), 
@@ -28,7 +37,7 @@ class TDoubleCron
                          u.updated_at,
                          u.status,
                          rm.id recuperacao_mensagem_id,
-                         rm.horas horas_recuperacao,
+                         rm.horas * if(rm.tipo_tempo = 'HORA', 60, 1) horas_recuperacao,
                          rm.mensagem, 
                          rm.botao_1_mensagem,
                          rm.botao_1_url,

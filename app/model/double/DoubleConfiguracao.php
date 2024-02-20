@@ -20,7 +20,11 @@ class DoubleConfiguracao extends DoubleRecord
     {
         return TUtils::openFakeConnection('double', function() use ($nome){
             $config = self::where('nome', '=', $nome)->first();
-            return $config->valor;
+
+            if ($config)
+                return $config->valor;
+            else
+                return '';
         });
     }
 

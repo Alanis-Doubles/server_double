@@ -1,5 +1,8 @@
 <?php
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
+
 class TDoubleUtils
 {
     public static function cmd_run($class, $method, $data)
@@ -29,4 +32,31 @@ class TDoubleUtils
             exec($command . " > /dev/null &");
         }
     }
+
+    public static function enviar_flux($urlflux, $nome, $email, $telefone) 
+    {   
+        if ($urlflux)
+        {
+            $client = new Client(['http_errors' => false]);
+            $headers = [
+                'Accept' => 'application/json, text/plain, */*',
+                'Content-Type' => 'application/json'
+            ];
+            $body = '{
+                "nome": "'. $nome . '",
+                "telefone": "'. $telefone . '",
+                "email": "'. $email . '"
+            }';
+            $request = new Request('POST', $urlflux, $headers, $body);
+            $response = $client->sendAsync($request)->wait();
+
+            $json = $response->getBody()->getContents();
+            $content = json_decode($json);
+            if ($response->getStatusCode() == 200) {
+                return $content->id;
+            } else {
+                DoubleErros::registrar(1, 'TDoubleUtils', 'enviar_flux', $json, $body);
+            } 
+        }
+    }   
 }

@@ -21,16 +21,24 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
         );
 
         $status = ['NOVO' => 'Novo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => 'Aguardando pagamento', 'ATIVO' => 'Ativo', 'INATIVO' => 'Inativo', 'EXPIRADO' => 'Expirado']; 
+        $tipo_tempo = ['HORA' => 'Hora', 'MINUTO' => 'minuto'];
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Status'])],
             [$this->makeTCombo(['name' => 'status', 'label' => $label, 'items' => $status, 'defaultOption' => false, 'required' => true, 'editable' => $param['method'] != 'onView'])],           
         );
+
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Ordem'])],
             [$this->makeTEntry(['name' => 'ordem', 'label' => $label, 'mask' => '9!', 'required' => true, 'editable' => $param['method'] != 'onView'])],
-            [$label = $this->makeTLabel(['value' => 'Após qtas. horas disparar'])],
-            [$this->makeTEntry(['name' => 'horas', 'label' => $label, 'mask' => '9!', 'required' => true, 'editable' => $param['method'] != 'onView'])],           
+            [], []
+        );
+        
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Após qto. tempo disparar'])],
+            [$this->makeTEntry(['name' => 'horas', 'label' => $label, 'mask' => '9!', 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [$label = $this->makeTLabel(['value' => 'Tipo tempo'])],
+            [$this->makeTCombo(['name' => 'tipo_tempo', 'label' => $label, 'items' => $tipo_tempo, 'defaultOption' => false, 'required' => true, 'editable' => $param['method'] != 'onView'])],                      
         );
 
         $this->form->addFields(

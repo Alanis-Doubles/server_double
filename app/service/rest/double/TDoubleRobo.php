@@ -52,6 +52,16 @@ class TDoubleRobo
                 $object->save();
             }
 
+            if (!$object->flux_id and $object->telefone) {
+                $object->flux_id = TDoubleUtils::enviar_flux(
+                    $param['plataforma']->url_flux,
+                    $object->nome,
+                    $object->email,
+                    $object->telefone
+                );
+                $object->save();
+            }
+
             return $object;
         });
         return $object->toArray(static::ATTRIBUTES);
@@ -82,8 +92,15 @@ class TDoubleRobo
             $object->fromArray((array) $param['data']);
             $object->store();
 
-            if (isset($param['telefone']))
+            if (isset($param['telefone'])) {
                 $object->telefone = $param['telefone'];
+                $object->flux_id = TDoubleUtils::enviar_flux(
+                    $param['plataforma']->url_flux,
+                    $object->nome,
+                    $object->email,
+                    $object->telefone
+                );
+            }
 
             return $object;
         });

@@ -41,8 +41,8 @@ class TDoubleRecuperacaoMenagemList extends TCustomStandardList
                 ],
                 [
                     'name'    => 'horas',
-                    'label'   => 'Horas',
-                    'column'  => ['width' => '10%', 'align' => 'center', 'order' => true]
+                    'label'   => 'Tempo',
+                    'column'  => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_tempo'])]
                 ],
             ],
         ]);
@@ -51,5 +51,11 @@ class TDoubleRecuperacaoMenagemList extends TCustomStandardList
     public function transform_status($value, $object, $row, $cell)
     {
         return $this->status[$value];
+    }
+
+
+    public function transform_tempo($value, $object, $row, $cell)
+    {
+        return $value . ($object->tipo_tempo == 'HORA' ? 'h' : 'm');
     }
 }
