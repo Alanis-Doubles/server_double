@@ -86,7 +86,8 @@ class TWeplay implements IDoublePlataforma
     {
         $expiracao = date_create_from_format('Y-m-d H:i:s', $usuario->token_expiracao);
         $now = new DateTime();
-        if (true) {//($now > $expiracao) {
+        // if (true) {//($now > $expiracao) {
+        if (TDoubleUtils::verificar_expiracao($usuario->token_plataforma)) {
             $payload = TCrypto::decrypt($usuario->token_acesso, $usuario->chat_id);
             $payload = (array)json_decode($payload);
 
@@ -259,8 +260,10 @@ class TWeplay implements IDoublePlataforma
                     return 'saldo_insuficiente';
                 elseif ($content->message == 'Not enough balance to place this bet.') 
                     return 'saldo_insuficiente';
+                // elseif ($content->message == 'ThrottlerException: Too Many Requests') 
+                //     return 'abortar';    
                 else 
-                    return $content->message;
+                    return $usuario->plataforma->translate->translate($content->message);
             } else
                 return '';
         } else {

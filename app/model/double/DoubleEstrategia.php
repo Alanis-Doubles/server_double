@@ -69,11 +69,11 @@ class DoubleEstrategia extends DoubleRecord
             }
 
             $sum_value = ($sinais[2]['numero'] + $sinais[1]['numero']) - $sinais[0]['numero'];
-            if ($sum_value > count($plataforma->cores()) or $sum_value <= 0)
+            if ($sum_value > count($plataforma->cores())-1 or $sum_value <= 0)
                 return false;
 
             $this->resultado = $plataforma->cores()[$sum_value];
-            $resultado = true;
+            $resultado = $this->resultado <> null;
         }
         return $resultado;
     }
@@ -100,5 +100,28 @@ class DoubleEstrategia extends DoubleRecord
     public function processarRetorno($sinais)
     {
         return $sinais[0]['cor'] == $this->resultado;
+    }
+
+    public function get_canal()
+    {
+        if (!$this->obj_canal) {
+            $this->obj_canal =  TUtils::openConnection('double', function () {
+                $result = new DoubleCanal($this->canal_id, false);
+                if (!$result)
+                    $result = new DoubleCanal();
+                return $result;
+            });
+        }
+        
+        return $this->obj_canal;
+    }
+
+    public function get_agrupamento()
+    {
+        $result = $this->canal->plataforma->render('[{idioma}] {nome}');
+        if ($this->canal->plataforma->usuarios_canal == 'Y')
+            $result .= ' / ' . $this->canal->nome;
+
+        return $result;
     }
 }

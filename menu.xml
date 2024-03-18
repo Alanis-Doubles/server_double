@@ -19,6 +19,10 @@
         <action>TDoubleCanalList</action>
         <icon>fab:telegram-plane</icon>
       </menuitem>
+      <menuitem label="Estratégias">
+        <action>TDoubleEstrategiaList</action>
+        <icon>far:bell</icon>
+      </menuitem>
       <menuitem label="Mensagens de recuperação">
         <action>TDoubleRecuperacaoMenagemList</action>
         <icon>fas:volume-up fa-fw</icon>

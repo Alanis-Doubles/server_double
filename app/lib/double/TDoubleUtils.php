@@ -1,5 +1,6 @@
 <?php
 
+use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 
@@ -29,7 +30,20 @@ class TDoubleUtils
         if (substr(php_uname(), 0, 7) == "Windows") {
             pclose(popen("start /B " . $command, "r"));
         } else {
-            exec($command . " > /dev/null &");
+            $tentativa = 1;
+            while ($tentativa <= 5)
+            {
+                try {
+                    exec($command . " > /dev/null &");
+                    break;
+                } catch (\Throwable $e) {
+                    $tentativa += 1;
+                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                } catch (Exception $e){
+                    $tentativa += 1;
+                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                }
+            }
         }
     }
 
@@ -59,4 +73,16 @@ class TDoubleUtils
             } 
         }
     }   
+
+    public static function verificar_expiracao($token)
+    {
+        $timestamp = \time();
+        $tks = \explode('.', $token);
+        list($headb64, $bodyb64, $cryptob64) = $tks;
+
+        $payloadRaw = JWT::urlsafeB64Decode($bodyb64);
+        $dadosToken = JWT::jsonDecode($payloadRaw);
+
+        return (isset($dadosToken->exp) && $timestamp >= $dadosToken->exp);
+    }
 }

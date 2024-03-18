@@ -36,6 +36,9 @@ class TCustomStandardList extends TStandardList
 
         parent::setAfterSearchCallback( [$this, 'onAfterSearch' ] );
 
+        if (isset($this->properties->{'criteria'}))
+            parent::setCriteria($this->properties->{'criteria'});
+
         $this->form = new BootstrapFormBuilder('form_search_' . get_class($this));
         $this->form->setFormTitle((string) isset($this->properties->{'titleFilters'}) ? $this->properties->{'titleFilters'} : 'Pesquisar');
         foreach ($this->properties->{'items'} as $key => $item) {
@@ -112,8 +115,14 @@ class TCustomStandardList extends TStandardList
         $dataGrid->pagenavigator = property_exists($this->properties, 'pagenavigator') ? $this->properties->{'pagenavigator'} : true;
         $dataGrid->columns =[];
 
-        if (property_exists($this->properties, 'dataGrid_style'))
-            $dataGrid->style = $this->properties->{'dataGrid_style'};
+        // if (property_exists($this->properties, 'dataGrid_style'))
+        //     $dataGrid->style = $this->properties->{'dataGrid_style'};
+        if (property_exists($this->properties, 'dataGrid'))
+        {
+            foreach ($this->properties->{'dataGrid'} as $key => $value) {
+                $dataGrid->{$key} = $value;
+            }
+        }
         
         foreach ($this->properties->{'items'} as $key => $item) {
             if (is_array($item))
@@ -141,7 +150,7 @@ class TCustomStandardList extends TStandardList
             $visAction = [$this->properties->{'formEdit'}, 'onView'];
         }
 
-        $field  = isset($this->properties->{'defaultOrder'}) ? $this->properties->{'defaultOrder'} : 'id';
+        $field  = 'id'; // isset($this->properties->{'defaultOrder'}) ? $this->properties->{'defaultOrder'} : 'id';
         $fields = isset($this->properties->{'fields'}) ? $this->properties->{'fields'} : null;
         if ($fields)
             $field = null;

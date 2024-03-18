@@ -1,8 +1,9 @@
 <?php
 
+use Adianti\Widget\Base\TScript;
 use Adianti\Database\TConnection;
 use Adianti\Database\TTransaction;
-use Adianti\Widget\Base\TScript;
+use Google\Cloud\Translate\V2\TranslateClient;
 
 /**
  * TUtils
@@ -244,6 +245,16 @@ class TUtils
         );
 
         return $infoBox;
+    }
+
+    public static function google_translator($text)
+    {
+        $translate = new TranslateClient([
+            'key' => 'AIzaSyCFPwGw72Umgk-8P2vJV4XkGg7jgQyVCuA'
+        ]);
+        
+        $result = $translate->translate($text, ['target' => 'pt']);
+        return $result['text'];
     }
 
 }

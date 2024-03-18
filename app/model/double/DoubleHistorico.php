@@ -18,15 +18,16 @@ class DoubleHistorico extends DoubleRecord
         $this->loadAttributes('double');
     }
 
-    public static function buscarHistorico($ant, $inicio, $plataforma_id, $call_status){
+    public static function buscarHistorico($ant, $inicio, $plataforma_id, $canal_id, $call_status){
         $list = [];
         $status = '';
         do {
             sleep(1);
             try {
-                $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $inicio){
+                $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $canal_id, $inicio){
                     return self::select()
                         ->where('plataforma_id', '=', $plataforma_id)
+                        // ->where('canal_id', '=', $canal_id)
                         ->where('created_at', '>=', $inicio)
                         ->last();
                 });

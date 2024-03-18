@@ -59,6 +59,8 @@ class TDoubleSinais
     {
         $data = (object) $param['data'];
 
+        // DoubleErros::registrar(1, 'TDoubleSinais', 'executr', json_encode($data));
+
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
 
@@ -83,6 +85,8 @@ class TDoubleSinais
             $data->ultimo_sinal = [];
         }
 
+        if (!isset($data->ultimo_sinal))
+            $data->ultimo_sinal = [];
         $ultimo_sinal = $data->ultimo_sinal;
         $service = null;
         try
@@ -186,6 +190,8 @@ class TDoubleSinais
             }
             if (isset($param['informacao']))
                 $historico->informacao = $param['informacao'];
+            if (isset($param['entrada_id']))
+                $historico->entrada_id = $param['entrada_id'];
             $historico->save();
 
             return [
@@ -193,11 +199,13 @@ class TDoubleSinais
                 'estrategia' => $historico->estrategia,
                 'cor' => $historico->cor, 
                 'informacao' => $historico->informacao,
-                'created_at' => $historico->created_at
+                'created_at' => $historico->created_at,
+                'id' => $historico->id
             ];
         });
 
         self::$ultimo_historico = $historico;
+        return $historico;
     }
 
     public static function finalizar_canal($param)
@@ -253,10 +261,11 @@ class TDoubleSinais
             $data->canal->statusSinais = 'INICIANDO';
             $data->canal->statusSinais = 'EXECUTANDO';
             $data->canal->inicioSinais = (new DateTime())->format('Y-m-d H:i:s');
-            // $data->canal->inicioSinais = date('Y-m-d H:i:s', strtotime('+50 minutes'));
-
             $data->sinal = [];
         }
+
+        if (isset($data->sinal))
+            $data->sinal = [];
         
         $service = null;
         try
@@ -270,6 +279,7 @@ class TDoubleSinais
                     return DoubleEstrategia::where('canal_id', '=', $data->canal->id)
                         ->where('ativo', '=', 'Y')
                         ->where('usuario_id', 'is', null)
+                        ->orderBy('ordem, id')
                         ->load();
                 });
 
@@ -303,6 +313,7 @@ class TDoubleSinais
                         ];
 
                         self::registrar($payload);
+                        $entrada_id = self::$ultimo_historico['id'];
 
                         $botao = [];
                         if ($data->plataforma->url_grupo_vip)
@@ -352,7 +363,8 @@ class TDoubleSinais
                                     'cor' => $cor_retornada,
                                     'tipo' => 'WIN',
                                     'channel_id' => $data->canal->channel_id,
-                                    'estrategia_id' => $estrategia->id
+                                    'estrategia_id' => $estrategia->id,
+                                    'entrada_id' => $entrada_id
                                 ];
                                 self::registrar($payload);
                                 $data->canal = DoubleCanal::identificar($data->canal->id);
@@ -372,7 +384,8 @@ class TDoubleSinais
                                         'cor' => $cor_retornada,
                                         'tipo' => 'LOSS',
                                         'channel_id' => $data->canal->channel_id,
-                                        'estrategia_id' => $estrategia->id
+                                        'estrategia_id' => $estrategia->id,
+                                        'entrada_id' => $entrada_id
                                     ];
                                     self::registrar($payload);
                                     $data->canal = DoubleCanal::identificar($data->canal->id);
@@ -394,7 +407,8 @@ class TDoubleSinais
                                         'cor' => $cor_retornada,
                                         'tipo' => 'GALE',
                                         'channel_id' => $data->canal->channel_id,
-                                        'estrategia_id' => $estrategia->id
+                                        'estrategia_id' => $estrategia->id,
+                                        'entrada_id' => $entrada_id
                                     ];
                                     self::registrar($payload);
                                 }
@@ -500,7 +514,7 @@ class TDoubleSinais
             $message = isset($data->message_id) ? $data->message_id : null;
             $historico = isset($data->historico) ? $data->historico : [];
             try {
-                $historico = DoubleHistorico::buscarHistorico($historico, $data->canal->inicioSinais, $data->plataforma->id, $call_status);
+                $historico = DoubleHistorico::buscarHistorico($historico, $data->canal->inicioSinais, $data->plataforma->id, $data->canal->id, $call_status);
                 if ($historico == []) {
                     return;
                 }
@@ -606,6 +620,32 @@ class TDoubleSinais
         }
     }
 
+    public static function incrementar_entrada_automatica($usuario, $botao, $telegram) {
+        if ($usuario->robo_iniciar_apos_loss == 'N')
+            return;
+
+        $usuario->entrada_automatica_qtd_loss += 1;
+        $usuario->saveInTransaction();
+
+        if ($usuario->entrada_automatica_qtd_loss == $usuario->entrada_automatica_total_loss) {
+            $usuario->entrada_automatica_qtd_loss = 0;
+            $usuario->robo_iniciar_apos_loss = 'N';
+            $usuario->robo_processando_jogada = 'N';
+            $usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+            $usuario->saveInTransaction();
+            $telegram->sendMessage(
+                $usuario->chat_id,
+                $usuario->plataforma->translate->MSG_OPERACAO_IDENTIFICADO_LOSS,
+                $botao
+            );
+        }
+    }
+
+    public static function zerar_entrada_automatica($usuario){
+        $usuario->entrada_automatica_qtd_loss = 0;
+        $usuario->saveInTransaction();
+    }
+
     public static function executar_usuario($param)
     {
         $data = (object) $param['data'];
@@ -648,29 +688,31 @@ class TDoubleSinais
                 $data->usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
                 $data->historico = [];
             }
-            
+
             $call_status = function() use ($data) {
                 return $data->usuario->roboStatus;
             };
 
             $historico = isset($data->historico) ? $data->historico : [];
             try {
-                $historico = DoubleHistorico::buscarHistorico($historico, $data->usuario->roboInicio, $data->plataforma->id, $call_status);
+                $historico = DoubleHistorico::buscarHistorico($historico, $data->usuario->roboInicio, $data->plataforma->id, $data->usuario->canal_id, $call_status);
                 if ($historico == []) {
                     return;
                 }
                 
                 $data->usuario = DoubleUsuario::identificar($data->usuario->chat_id, $data->plataforma->id, $data->usuario->canal_id);
                 if ($historico['tipo'] == 'LOSS' and $data->usuario->robo_iniciar_apos_loss == 'Y') {
-                    $data->usuario->robo_iniciar_apos_loss = 'N';
-                    $data->usuario->robo_processando_jogada = 'N';
-                    $data->usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
-                    $data->usuario->saveInTransaction();
-                    $telegram->sendMessage(
-                        $data->usuario->chat_id,
-                        $data->plataforma->translate->MSG_OPERACAO_IDENTIFICADO_LOSS,
-                        $botao
-                    );
+                    if ($data->usuario->entrada_automatica_tipo == 'LOSS') {
+                        self::incrementar_entrada_automatica($data->usuario, $botao, $telegram);
+                    } else {
+                        self::zerar_entrada_automatica($data->usuario);
+                    }
+                } elseif ($historico['tipo'] == 'WIN') {
+                    if ($data->usuario->entrada_automatica_tipo == 'LOSS') {
+                        self::zerar_entrada_automatica($data->usuario);
+                    } else {
+                        self::incrementar_entrada_automatica($data->usuario, $botao, $telegram);
+                    }
                 } elseif ($historico['tipo'] == 'ENTRADA' and $data->usuario->robo_iniciar_apos_loss == 'N') {
                     if ($data->usuario->status != 'ATIVO' and $data->usuario->status != 'DEMO') {
                         $data->usuario->robo_iniciar = 'N';
@@ -697,14 +739,19 @@ class TDoubleSinais
                             ),
                             $botao
                         );
+
                         $lucro = 0;
+                        $sinal = DoubleSinal::buscarSinal([], $data->usuario->roboInicio, $data->plataforma->id, $call_status);
+                        // $sinal = [];
                         while ($call_status() == 'EXECUTANDO') {
-                            $sinal = DoubleSinal::buscarSinal([], $data->usuario->roboInicio, $data->plataforma->id, $call_status);
                             if (!$service)
                                 $service = $data->plataforma->service;
 
                             $retornoJogada = $service->jogar($data->usuario, $cor, $valor);
-                            if ($retornoJogada == '') {
+                            // DoubleErros::registrar(1, 'TDobleSinais', 'executar_usuario', -1, $retornoJogada);
+                            if ($retornoJogada == '') 
+                            {
+                                // DoubleErros::registrar(1, 'TDobleSinais', 'executar_usuario', -2, json_encode($sinal));
                                 if ($protecao == 0) {
                                     $telegram->sendMessage(
                                         $data->usuario->chat_id,
@@ -744,43 +791,81 @@ class TDoubleSinais
                                     );
 
                                 $telegram->sendMessage($data->usuario->chat_id, $message, $botao);
+                                // DoubleErros::registrar(1, 'TDobleSinais', 'executar_usuario', -3, $message);
 
                                 $sinal = DoubleSinal::buscarSinal($sinal, $data->usuario->roboInicio, $data->plataforma->id, $call_status);
                                 $numero_retornado = $sinal[0]['numero'];
                                 $cor_retornada = $sinal[0]['cor'];
 
-                                if (isset($historico['estrategia'])) {
-                                    $estrategia = TUtils::openFakeConnection('double', function() use($historico){
-                                        return new DoubleEstrategia($historico['estrategia'], false);
-                                    });
-                                    $win = $estrategia->processarRetorno($sinal);
-                                } else 
-                                    $win = $cor == $cor_retornada;
+                                // DoubleErros::registrar(1, 'TDobleSinais', 'executar_usuario', -4, json_encode($sinal));
+
+
+                                // if (isset($historico['estrategia'])) {
+                                //     $estrategia = TUtils::openFakeConnection('double', function() use($historico){
+                                //         return new DoubleEstrategia($historico['estrategia'], false);
+                                //     });
+                                //     $win = $estrategia->processarRetorno($sinal);
+                                // } else 
+                                // DoubleErros::registrar(1, 'TDobleSinais', 'executar_usuario', -5, "cor: $cor | cor retornada: $cor_retornada");
+                                $win = $cor == $cor_retornada;
 
                                 if ($win) {
                                     $telegram->sendMessage($data->usuario->chat_id, $data->plataforma->translate->MSG_BET_3, $botao);
                                     if ($cor_retornada == 'white')
                                         $valor *= 14;
                                     $lucro = self::criarUsuarioHistorico($data->usuario, $valor);
+                                    $data->usuario->quantidade_loss = 0;
+                                    $data->usuario->saveInTransaction();
                                     self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
                                 } else {
+                                    $data->usuario->quantidade_loss += 1;
+                                    $data->usuario->saveInTransaction();
                                     $lucro = self::criarUsuarioHistorico($data->usuario, -1 * $valor);
                                 }
 
-                                $ocorreu_stop_loss = -$data->usuario->stop_loss >= $lucro;
-                                $ocorreu_stop_win = $data->usuario->stop_win <= $lucro;
+                                if ($data->usuario->tipo_stop_loss == 'QUANTIDADE')
+                                    $ocorreu_stop_loss = $data->usuario->quantidade_loss >= $data->usuario->stop_loss;
+                                else
+                                    $ocorreu_stop_loss = -$data->usuario->stop_loss >= $lucro;
+
+                                $ocorreu_stop_win = round($data->usuario->stop_win, 1) <= round($lucro, 1);
+                                // DoubleErros::registrar(
+                                //     1, 
+                                //     'TDoubleSinais', 
+                                //     'executar_usuario', 
+                                //     'Ocorreu stop win ? ' . ($ocorreu_stop_win ? 'sim' : 'não'),
+                                //     "{$lucro} {$data->usuario->stop_win}"
+                                // );
+
                                 if ($ocorreu_stop_loss or $ocorreu_stop_win) {
                                     $entrada_automatica = false;
                                     if ($ocorreu_stop_loss){
                                         $message = $data->plataforma->translate->MSG_BET_4;
                                         self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+                                        if ($data->usuario->entrada_automatica == 'A')
+                                        {
+                                            $entrada_automatica = true;
+                                            $message = str_replace(
+                                                ['{quantidade}', '{tipo}'],
+                                                [$data->usuario->entrada_automatica_total_loss, $data->usuario->entrada_automatica_tipo],
+                                                $data->plataforma->translate->MSG_STOP_LOSS_4
+                                            );
+                                            $botao_inicio = $botao;
+                                            $historico = DoubleHistorico::buscarHistorico($historico, $data->usuario->roboInicio, $data->plataforma->id, $data->usuario->canal_id, $call_status);
+                                        }
                                     }
                                     else if ($ocorreu_stop_win) {
                                         $message = $data->plataforma->translate->MSG_BET_5;
-                                        if ($data->usuario->entrada_automatica == 'Y')
+                                        if ($data->usuario->entrada_automatica != 'N')
                                         {
                                             $entrada_automatica = true;
-                                            $message = $data->plataforma->translate->MSG_ENTRADA_AUTOMATICA_5;
+                                            $message = str_replace(
+                                                ['{quantidade}', '{tipo}'],
+                                                [$data->usuario->entrada_automatica_total_loss, $data->usuario->entrada_automatica_tipo],
+                                                $data->plataforma->translate->MSG_STOP_WIN_4
+                                            );
+                                            $botao_inicio = $botao;
+                                            $historico = DoubleHistorico::buscarHistorico($historico, $data->usuario->roboInicio, $data->plataforma->id, $data->usuario->canal_id, $call_status);
                                         }
                                     }
                                     
@@ -788,7 +873,11 @@ class TDoubleSinais
                                     if ($entrada_automatica)
                                     {
                                         $data->usuario->robo_iniciar_apos_loss = 'Y';
-                                        $data->usuario->robo_sequencia += 1;
+                                        $data->usuario->quantidade_loss = 0;
+                                        if ($data->usuario->ciclo != 'A')
+                                            $data->usuario->robo_sequencia += 1;
+                                        if ($ocorreu_stop_win) 
+                                            $data->usuario->robo_sequencia += 1;
                                         $data->usuario->ultimo_saldo = $data->plataforma->service->saldo($data->usuario);
                                     }
                                     else
@@ -823,6 +912,24 @@ class TDoubleSinais
                                     $botao_inicio
                                 );
                                 break;
+                            // } elseif ($retornoJogada == 'abortar') {
+                            //     TUtils::openConnection('double', function() use ($retornoJogada, $data) {
+                            //         $error = new DoubleErros();
+                            //         $error->classe = 'TDoubleSinais';
+                            //         $error->metodo = 'executar_usuario';
+                            //         $error->erro = $retornoJogada;
+                            //         $error->detalhe = "Usuário: " . $data->usuario->nome_usuario . '[' . $data->usuario->chat_id . ']';
+                            //         $error->plataforma_id = $data->plataforma->id;
+                            //         $error->save();
+                            //     });
+
+                            //     $telegram->sendMessage(
+                            //         $data->usuario->chat_id, 
+                            //         'Entrada abortada, aguardando próximo sinal...', 
+                            //         $botao
+                            //     );
+                            //     // self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+                            //     break;
                             } else {
                                 TUtils::openConnection('double', function() use ($retornoJogada, $data) {
                                     $error = new DoubleErros();
@@ -833,6 +940,16 @@ class TDoubleSinais
                                     $error->plataforma_id = $data->plataforma->id;
                                     $error->save();
                                 });
+
+                                // if ($protecao == $data->usuario->protecao){
+                                $telegram->sendMessage(
+                                    $data->usuario->chat_id, 
+                                    'Entrada abortada, aguardando próximo sinal...\n\nMensagem retornada pela plataforma:\n' . $retornoJogada, 
+                                    $botao
+                                );
+                                // self::gerarUsuarioStatus($data->usuario, $lucro, $cor_retornada, $telegram);
+                                break;
+                                // }
                             }
 
                             if ($data->usuario->ultimo_saldo + $lucro <= $data->plataforma->valor_minimo) {
@@ -976,13 +1093,20 @@ class TDoubleSinais
     public static function gerarUsuarioStatus($usuario, $lucro, $cor, $telegram)
     {
         if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
+            $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                    ->where('created_at', '>=', $usuario->robo_inicio)
+                    ->sumBy('valor', 'total');
+            });
+
             $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
             $lucro = number_format($lucro, 2, ',', '.');
         } else {
             sleep(2);
             $saldo = $usuario->plataforma->service->saldo($usuario);
             $banca = number_format($saldo, 2, ',', '.');
-            $lucro = number_format($saldo - $usuario->ultimo_saldo, 2, ',', '.');
+            // $lucro = number_format($saldo - $usuario->ultimo_saldo, 2, ',', '.');
+            $lucro = number_format($lucro, 2, ',', '.');
         }
 
         $cor_result = self::getCor($cor, $usuario->plataforma->translate);

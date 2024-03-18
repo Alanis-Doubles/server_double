@@ -130,7 +130,7 @@ class TDoubleUsuarioForm  extends TStandardForm
         $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'POST',
-            'http://24.152.38.215:8080/telegram/getUserInfo',
+            'https://alanis.discloud.app/telegram/getUserInfo',
             [
                 'json' => $payload,
                 'headers' => [
@@ -183,7 +183,7 @@ class TDoubleUsuarioForm  extends TStandardForm
             }
             else
             {
-                TCombo::clearField('form_DoubleUsuarioForm', 'plataforma_id');
+                TCombo::clearField('form_TDoubleUsuarioForm', 'plataforma_id');
             }
 
             $data = new stdClass;

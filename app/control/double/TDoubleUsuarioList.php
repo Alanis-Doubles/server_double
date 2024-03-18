@@ -21,7 +21,13 @@ class TDoubleUsuarioList extends TCustomStandardList
             'activeRecord'   => 'DoubleUsuario',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoubleUsuarioForm',
-            'dataGrid_style' => 'min-width: 1200px',
+            'dataGrid'       => [
+                // 'style' => 'min-width: 1200px',
+                'groupColumn' => [
+                    'name' => 'agrupamento',
+                    'mask' => '<b>Plataforma:</b>: <i>{agrupamento}</i>'
+                ],
+            ],
             'items'          => [
                 [
                     'name'   => 'plataforma_id',
@@ -54,13 +60,13 @@ class TDoubleUsuarioList extends TCustomStandardList
                     'name'   => 'nome_completo',
                     'label'  => 'Nome',
                     'widget' => ['class' => 'TEntry', 'operator' => 'like', 'filter_name' => '(SELECT name FROM system_users u WHERE u.custom_code = double_usuario.chat_id)'],
-                    'column' => ['width' => '20%', 'align' => 'left', 'order' => false]
+                    'column' => ['width' => '40%', 'align' => 'left', 'order' => false]
                 ],
-                [
-                    'name'   => 'plataforma->nome',
-                    'label'  => 'Plataforma/Canal',
-                    'column' => ['width' => '20%', 'align' => 'left', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'nomePlataformaTransformer'])]
-                ],
+                // [
+                //     'name'   => 'plataforma->nome',
+                //     'label'  => 'Plataforma/Canal',
+                //     'column' => ['width' => '20%', 'align' => 'left', 'order' => false, 'transformer' => Closure::fromCallable([$this, 'nomePlataformaTransformer'])]
+                // ],
                 [
                     'name'   => 'nome_usuario',
                     'label'  => 'Usuário',

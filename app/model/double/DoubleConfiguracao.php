@@ -32,6 +32,10 @@ class DoubleConfiguracao extends DoubleRecord
     {
         TUtils::openConnection('double', function() use ($nome, $valor){
             $config = self::where('nome', '=', $nome)->first();
+            if (!$config) {
+                $config = new DoubleConfiguracao;
+                $config->nome = $nome;
+            }
             $config->valor = $valor;
             $config->save();
         });

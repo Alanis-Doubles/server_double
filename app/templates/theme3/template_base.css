@@ -47,3 +47,126 @@ div[form=form_login] .panel-heading{
   .table-striped tbody tr:nth-of-type(odd) {
 	background-color: rgba(0, 0, 0, 0.02) !important;
   }
+
+
+/* --------------------------------------------------------------- */
+/* DOUBLE                                                          */
+/* --------------------------------------------------------------- */
+
+.bg-double-zinc-100 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(244 244 245);
+}
+
+.h-\[38px\] {
+    height: 38px;
+}
+
+.w-\[38px\] {
+    width: 38px;
+}
+
+.h-4 {
+    height: 1rem;
+}
+
+.w-4 {
+    width: 1rem;
+}
+
+.h-10 {
+    height: 2.5rem;
+}
+
+.w-10 {
+    width: 2.5rem;
+}
+
+.flex{
+	display: flex;
+}
+
+.flex-row{
+    flex-flow: row wrap;
+}
+
+.botao_acao {
+    margin-right: 3px;
+    border: 1px solid #dee2e6!important;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.botao_vermelho {
+    border-width: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: calc(0.5rem - 2px);
+    border: 2px solid #ff1d46;
+    background-color: #ff1d46;
+    display: inline-block;
+    text-align: center;
+    padding-inline: 1px;
+    padding-block: 6px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.botao_preto {
+    border-width: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: calc(0.5rem - 2px);
+    border: 2px solid #000000;
+    background-color: #000000;
+    display: inline-block;
+    text-align: center;
+    padding-inline: 1px;
+    padding-block: 6px;
+    margin-right: 3px;
+    margin-bottom: 5px;
+}
+
+.botao_vermelho > div, .botao_preto > div{
+	width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    margin-left: 2px;
+    margin-top: -3px;
+    display: flex;
+    border: 2px solid white;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+}
+
+.botao_branco {
+    border-width: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: calc(0.5rem - 2px);
+    border: 2px solid #000000;
+    background-color: #ffffff;
+    display: inline-block;
+    text-align: center;
+    padding-inline: 1px;
+    padding-block: 6px;
+    margin-right: 3px;
+    margin-bottom: 5px;
+}
+
+.botao_branco > div{
+	width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    margin-left: 3px;
+    margin-top: -2px;
+    display: flex;
+    color: black;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+}

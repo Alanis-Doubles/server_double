@@ -9,7 +9,7 @@ class TDoubleRobo
     const ATTRIBUTES = [
         'chat_id', 'nome', 'nome_usuario', 'email', 'telefone', 'status', 'valor', 'protecao', 'stop_win', 'stop_loss', 'ultimo_saldo',
         'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
-        'entrada_automatica'
+        'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo'
     ];
 
     public function carregar($param)
@@ -48,7 +48,10 @@ class TDoubleRobo
             if ($object->logado == 'Y') {
                 if (!$object->ultimo_saldo)
                     $object->ultimo_saldo = 0;
-                $param['plataforma']->service->saldo($object);
+                
+                if (isset($param['chat_id']) and $param['buscar_saldo'] == 'Y')
+                    $object->ultimo_saldo = $param['plataforma']->service->saldo($object);
+               
                 $object->save();
             }
 
@@ -239,6 +242,7 @@ class TDoubleRobo
 
     public static function iniciar($param)
     {
+        // DoubleErros::registrar(1, 'TDoubleRobo', 'iniciar', 'erro', json_encode($param));
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
@@ -253,6 +257,8 @@ class TDoubleRobo
             $object->robo_iniciar_apos_loss = 'N';
             $object->robo_processando_jogada = 'N';
             $object->robo_sequencia += 1;
+            $object->entrada_automatica_qtd_loss = 0;
+            $object->quantidade_loss = 0;
             $object->ultimo_saldo = $plataforma->service->saldo($object);
             $object->save();
 
@@ -271,6 +277,8 @@ class TDoubleRobo
 
     public static function iniciar_apos_loss($param)
     {
+        // DoubleErros::registrar(1, 'TDoubleRobo', 'iniciar_apos_loss', 'erro', json_encode($param));
+
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
@@ -285,6 +293,8 @@ class TDoubleRobo
             $object->robo_iniciar_apos_loss = 'Y';
             $object->robo_processando_jogada = 'N';
             $object->robo_sequencia += 1;
+            $object->entrada_automatica_qtd_loss = 0;
+            $object->quantidade_loss = 0;
             $object->ultimo_saldo = $plataforma->service->saldo($object);
             $object->save();
 
@@ -303,6 +313,7 @@ class TDoubleRobo
 
     public function parar($param)
     {
+        // DoubleErros::registrar(1, 'TDoubleRobo', 'parar', 'erro', json_encode($param));
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         

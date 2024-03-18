@@ -24,22 +24,28 @@ class TRanking
         $dataGrid = new stdClass;
         $dataGrid->name = 'dataraking';
         $dataGrid->pagenavigator = false;
-        // $dataGrid->style = 'min-width: 600px';
         $dataGrid->title = '<i class="fas fa-trophy green"></i>  Ranking das Estratégias ';
         $dataGrid->columns = [
             ['name' => 'nome', 'label' => 'Nome', 'width' => '20%', 'align' => 'left'],
-            ['name' => 'regra', 'label' => 'Regra', 'width' => '35%', 'align' => 'left', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_resultado'])],
+            ['name' => 'regra', 'label' => 'Regra', 'width' => '35%', 'align' => 'left', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_regra'])],
             ['name' => 'resultado', 'label' => 'Resultado', 'width' => '10%', 'align' => 'center', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_resultado'])],
             ['name' => 'win', 'label' => 'Win', 'width' => '5%', 'align' => 'center'],
             ['name' => 'loss', 'label' => 'Loss', 'width' => '5%', 'align' => 'center'],
             ['name' => 'percentual', 'label' => '%', 'width' => '5%', 'align' => 'center'],
             ['name' => 'gale_0', 'label' => 'G0', 'width' => '5%', 'align' => 'center'],
             ['name' => 'gale_1', 'label' => 'G1', 'width' => '5%', 'align' => 'center'],
-            ['name' => 'gale_3', 'label' => 'G2', 'width' => '5%', 'align' => 'center'],
-            ['name' => 'gale_4', 'label' => 'G3', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'gale_2', 'label' => 'G2', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'gale_3', 'label' => 'G3', 'width' => '5%', 'align' => 'center'],
         ];
 
+        // $dataGrid->actions = [
+        //     'actEditar' => ['label' => 'Editar' , 'image' => 'far:edit blue', 'field' => 'estrategia_id', 'action' => ['TDoubleEstrategiaForm', 'onEdit'], 'action_params' => ['register_state' => 'false', 'fromClass' => 'TDoubleDashboard']],
+        //     'actAtivar' => ['label' => 'Ativar/Inativar' , 'image' => 'fa:power-off orange', 'field' => 'estrategia_id', 'action' => ['TDoubleDashboard', 'onAtivarInativarEstrategia'], 'action_params' => ['register_state' => 'false']],
+        // ];
+
         $this->panel = $this->makeTDataGrid($dataGrid);
+        // $this->panel->addHeaderActionLink('', new TAction(['TDoubleEstrategiaForm', 'onInsert'], ['register_state' => 'false']), 'fa:plus');
+
         $this->datagrid = $this->getWidget('dataraking');
     }
 }
@@ -65,33 +71,31 @@ class TDoubleDashboard extends TPage
             [$this->makeTHidden(['name' => 'data_ranking', 'value' => date('Y-m-d')])],
         );
 
+        $criteria = new TCriteria;
+        $criteria->add(
+            new TFilter(
+                '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
+                '=',
+                'GERA'
+            )
+        );
+        
+        $criteria->add(  new TFilter( 'ativo', '=', 'Y') );
+
         $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => 'Plataforma'])],
-            [$this->makeTDBCombo(
-                [
-                    'name' => 'plataforma_id',
-                    'label' => $label,
-                    'database' => 'double',
-                    'model' => 'DoublePlataforma',
-                    'key' => 'id',
-                    'display' => '[{idioma}] {nome}',
-                ],
-                function ($object) {
-                    $object->setChangeAction(new TAction(array($this, 'onPlataformaChange')));
-                }
-            )],
             [$label = $this->makeTLabel(['value' => 'Canal'])],
             [$this->makeTDBCombo(
                 [
                     'name' => 'canal_id', 
                     'label' => $label, 
                     'database' => 'double', 
-                    'required' => !isset($param['usuarios_canal']) ? false : $param['usuarios_canal'] == 'Y',
+                    'required' => True,
                     'model' => 'DoubleCanal', 
                     'key' => 'id', 
-                    'display' => '{nome}',
-                    'editable' => !isset($param['usuarios_canal']) ? false : $param['usuarios_canal'] == 'Y',
-                    'width' => '100%'
+                    'display' => '[{plataforma->idioma}] {plataforma->nome} - {nome}',
+                    'defaultOption' => false,
+                    'width' => '100%',
+                    'criteria' => $criteria
                 ]
             )],
         );
@@ -224,13 +228,26 @@ class TDoubleDashboard extends TPage
         ');
     }
 
+    public function onReload($param) {}
+
+    public function onAtivarInativarEstrategia($param) 
+    {
+        TUtils::openConnection('double', function() use ($param){
+            $estrategia = new DoubleEstrategia($param['estrategia_id'], false);
+            if ($estrategia)
+            {
+                $estrategia->ativo = $estrategia->ativo == 'Y' ? 'N' : 'Y';
+                $estrategia->save();
+            }
+        });
+    }
+
     public static function onChangeRanking($param) 
     {
         $session = TSession::getValue('form_TDoubleDashboard_filter_data');
         if (!$session)
         {
             $session = new stdClass;
-            $session->plataforma_id = '';
             $session->canal_id = '';
             $session->usuarios_canal = '';
             $session->data_inicio = date('Y-m-0');
@@ -241,17 +258,79 @@ class TDoubleDashboard extends TPage
         TSession::setValue('form_TDoubleDashboard_filter_data', $session);
     }
 
+    // public static function transform_resultado($value, $object, $row, $cell)
+    // {
+    //     $list["RED"] = "🔴";
+    //     $list["BLACK"] = "⚫";
+    //     $list["WHITE"] = "⚪️";
+
+    //     if ($object->ativo == 'N')
+    //         $row->style = 'text-decoration: line-through;';
+
+    //     return str_replace(
+    //         ['red', 'black', 'white', ' - '],
+    //         [$list["RED"], $list["BLACK"], $list["WHITE"], ' '],
+    //         $value
+    //     );
+    // }
+
     public static function transform_resultado($value, $object, $row, $cell)
     {
-        $list["RED"] = "🔴";
-        $list["BLACK"] = "⚫";
-        $list["WHITE"] = "⚪️";
+        if ($object->ativo == 'N')
+            $row->style = 'text-decoration: line-through;';
 
-        return str_replace(
-            ['red', 'black', 'white', ' - '],
-            [$list["RED"], $list["BLACK"], $list["WHITE"], ' '],
-            $value
-        );
+        if ($value <> '') {
+            if ($value == 'white') {
+                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
+                $botao->enableSection( 'main', [] );
+            } else {
+                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
+                $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$value], 'value' => ''] );
+            }
+
+            return $botao;
+        }
+    }
+
+    public static function transform_regra($value, $object, $row, $cell)
+    {
+        if ($value <> '') {
+            if ($object->tipo == 'NUMERO') {
+                if ($value == 0) {
+                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
+                    $botao->enableSection( 'main', [] );
+                } elseif ($value < 8) {
+                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
+                    $botao->enableSection( 'main', ['cor' => 'vermelho', 'value' => $value] );
+                } else {
+                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
+                    $botao->enableSection( 'main', ['cor' => 'preto', 'value' => $value] );
+                }
+            } else {
+                $cores = explode(' - ', $value);
+                foreach ($cores as $key => $cor) {
+                    if ($cor == 'white') {
+                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
+                        $botao->enableSection( 'main', [] );
+                    } else {
+                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
+                        $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$cor], 'value' => ''] );
+                    }
+                    $cores[$key] = ['botao' => $botao];
+                }
+
+                $lista = new THtmlRenderer('app/resources/double/estrategia/retorno_lista.html');
+                $lista->enableSection(
+                    'main',
+                    [
+                        'botoes' => $cores,
+                    ]
+                );
+                return $lista;
+            }
+
+            return $botao;
+        }
     }
 
     public function onSearch($param)
@@ -264,97 +343,104 @@ class TDoubleDashboard extends TPage
 
     public static function doConsultarRanking($paraam)
     {
-        // TScript::create('$("#datagrid tbody").remove();');
         $raking = new TRanking;
         $datagrid = $raking->datagrid;
 
         $session = TSession::getValue('form_TDoubleDashboard_filter_data');
-        if ($session and $session->plataforma_id)
+        if ($session and $session->canal_id)
         {
-            $lista = TUtils::openFakeConnection('double',  function() use ($session){
-                $filtro1 = 'dh.plataforma_id = ' . $session->plataforma_id;
-                $filtro2 = 'c.plataforma_id = ' . $session->plataforma_id;
-                if (isset($session->{'canal_id'}) and $session->{'canal_id'}) {
-                    $filtro1 .= ' and dh.canal_id = ' . $session->{'canal_id'};
-                    $filtro2 .= ' and c.id = ' . $session->{'canal_id'};
+            try {
+                $lista = TUtils::openFakeConnection('double',  function() use ($session){
+                    $filtro1 = 'dh.canal_id = ' . $session->{'canal_id'};
+                    $filtro2 = 'c.id = ' . $session->{'canal_id'};
+
+                    if (!isset($session->data_ranking))
+                        $session->data_ranking = date('Y-m-d');
+                    if ((isset($session->data_ranking) and !$session->data_ranking))
+                        $session->data_ranking = date('Y-m-d');
+                    $data = $session->data_ranking;
+
+                    $query = "SELECT tipo,
+                                    plataforma_id,
+                                    canal_id,
+                                    nome,
+                                    regra,
+                                    resultado,
+                                    ativo,
+                                    win,
+                                    loss,
+                                    percentual,
+                                    gale_0,
+                                    gale_1,
+                                    gale_2,
+                                    gale_3,
+                                    gale_4
+                            FROM ( SELECT e.tipo,
+                                        c.plataforma_id,
+                                        e.canal_id,
+                                        e.nome,
+                                        e.regra,
+                                        e.resultado,
+                                        e.ativo,
+                                        sum(win) win,
+                                        sum(loss) loss,
+                                        ROUND((sum(win)/(sum(win)+sum(loss)))*100, 2) percentual,
+                                        sum(gale_0) gale_0,
+                                        sum(gale_1) gale_1,
+                                        sum(gale_2) gale_2,
+                                        sum(gale_3) gale_3,
+                                        sum(gale_4) gale_4
+                                    FROM double_estrategia e
+                                    JOIN double_canal c ON c.id = e.canal_id
+                                    LEFT JOIN ( SELECT estrategia_id,
+                                                        win,
+                                                        loss,
+                                                        if(gale = 0, 1, 0) gale_0,
+                                                        if(gale = 1, 1, 0) gale_1,
+                                                        if(gale = 2, 1, 0) gale_2,
+                                                        if(gale = 3, 1, 0) gale_3,
+                                                        if(gale = 4, 1, 0) gale_4
+                                                    FROM ( SELECT if(dh.tipo = 'WIN', 1, 0) win,
+                                                                        if(dh.tipo = 'LOSS', 1, 0) loss,
+                                                                    dh.estrategia_id,
+                                                                    (SELECT COUNT(1)
+                                                                        FROM double_historico h
+                                                                        JOIN double_canal c ON c.id = h.canal_id
+                                                                        WHERE h.canal_id = dh.canal_id
+                                                                        AND h.tipo = 'GALE'
+                                                                        AND h.entrada_id = dh.entrada_id) gale
+                                                                        --  AND h.estrategia_id = dh.estrategia_id
+                                                                        --  AND h.id between dh.id - c.protecoes - 1 AND dh.id) gale
+                                                                FROM double_historico dh
+                                                                WHERE $filtro1
+                                                                AND dh.tipo IN ('WIN', 'LOSS')
+                                                                AND dh.entrada_id IS NOT null
+                                                                AND DATE(dh.created_at) = '$data'
+                                                        ) a
+                                                ) b ON b.estrategia_id = e.id 
+                                    WHERE $filtro2
+                                    and e.usuario_id is NULL
+                                    GROUP BY e.tipo, c.plataforma_id, e.canal_id, e.nome, e.regra, e.resultado, e.ativo, e.ordem 
+                                    ORDER BY 10 DESC, 8 DESC, 9 ASC, 11 DESC, 12 DESC, 14 DESC, 15 DESC, e.ordem ASC
+                                ) c
+                            ";
+
+                    $conn = TTransaction::get();
+                    $list = TDatabase::getData(
+                        $conn, 
+                        $query
+                    );
+
+                    return $list;
+                });
+
+                foreach ($lista as $key => $value) {
+                    $datagrid->addItem( (object) $value);
                 }
-
-                if (!isset($session->data_ranking) or (isset($session->data_ranking) and !$session->data_ranking))
-                    $session->data_ranking = date('Y-m-d');
-                $data = $session->data_ranking;
-
-                $query = "SELECT estrategia_id,
-                                 plataforma_id,
-                                 canal_id,
-                                 nome,
-                                 regra,
-                                 resultado,
-                                 win,
-                                 loss,
-                                 percentual,
-                                 gale_0,
-                                 gale_1,
-                                 gale_2,
-                                 gale_3,
-                                 gale_4
-                         FROM ( SELECT e.id estrategia_id,
-                                       c.plataforma_id,
-                                       e.canal_id,
-                                       e.nome,
-                                       e.regra,
-                                       e.resultado,
-                                       sum(win) win,
-                                       sum(loss) loss,
-                                       ROUND((sum(win)/(sum(win)+sum(loss)))*100, 2) percentual,
-                                       sum(gale_0) gale_0,
-                                       sum(gale_1) gale_1,
-                                       sum(gale_2) gale_2,
-                                       sum(gale_3) gale_3,
-                                       sum(gale_4) gale_4
-                                  FROM double_estrategia e
-                                  JOIN double_canal c ON c.id = e.canal_id
-                                  LEFT JOIN ( SELECT estrategia_id,
-                                                     win,
-                                                     loss,
-                                                     if(gale = 0, 1, 0) gale_0,
-                                                     if(gale = 1, 1, 0) gale_1,
-                                                     if(gale = 2, 1, 0) gale_2,
-                                                     if(gale = 3, 1, 0) gale_3,
-                                                     if(gale = 4, 1, 0) gale_4
-                                                 FROM ( SELECT if(dh.tipo = 'WIN', 1, 0) win,
-                                                                     if(dh.tipo = 'LOSS', 1, 0) loss,
-                                                                 dh.estrategia_id,
-                                                                 (SELECT COUNT(1)
-                                                                     FROM double_historico h
-                                                                     JOIN double_canal c ON c.id = h.canal_id
-                                                                     WHERE h.canal_id = dh.canal_id
-                                                                     AND h.tipo = 'GALE'
-                                                                     AND h.estrategia_id = dh.estrategia_id
-                                                                     AND h.id between dh.id - c.protecoes - 1 AND dh.id) gale
-                                                             FROM double_historico dh
-                                                             WHERE $filtro1
-                                                             AND dh.tipo IN ('WIN', 'LOSS')
-                                                             AND DATE(dh.created_at) = '$data'
-                                                     ) a
-                                             ) b ON b.estrategia_id = e.id 
-                                 WHERE $filtro2
-                                 GROUP BY e.id, c.plataforma_id, e.canal_id, e.nome, e.regra, e.resultado 
-                              ) c
-                         ORDER BY percentual DESC, win DESC, loss ASC, estrategia_id ASC";
-
-                $conn = TTransaction::get();
-                $list = TDatabase::getData(
-                    $conn, 
-                    $query
-                );
-
-                return $list;
-            });
-
-            foreach ($lista as $key => $value) {
-                $datagrid->addItem( (object) $value);
+                echo $datagrid->getBody();
+            } catch (\Throwable $e) {
+                DoubleErros::registrar(1, 'TDoubleDashboard', doConsultarRanking, e->getMessage());
             }
-            echo $datagrid->getBody();
         } 
         else 
         {
@@ -370,12 +456,11 @@ class TDoubleDashboard extends TPage
         if (!$object)
         {
             $object = new stdClass;
-            $object->plataforma_id = '';
             $object->canal_id = '';
             $object->usuarios_canal = '';
             $object->data_inicio = date('Y-m-0');
             $object->data_fim = date('Y-m-t');
-            $session->data_ranking = date('Y-m-d');
+            $object->data_ranking = date('Y-m-d');
         }    
 
         if ($object->data_inicio)
@@ -391,17 +476,6 @@ class TDoubleDashboard extends TPage
             $totalPagamentos     = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO']);
             $totalCancelamentos  = DoublePagamentoHistorico::where('tipo_evento', '=', 'CANCELAMENTO');
             $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO', 'CANCELAMENTO']);
-
-            if (isset($object->plataforma_id) and $object->plataforma_id)
-            {
-                $usuariosTotal       = $usuariosTotal->where('plataforma_id', '=', $object->plataforma_id);
-                $usuariosAtivos      = $usuariosAtivos->where('plataforma_id', '=', $object->plataforma_id);
-                $usuariosNovos       = $usuariosNovos->where('plataforma_id', '=', $object->plataforma_id);
-                $totalTestes         = $totalTestes->where('plataforma_id', '=', $object->plataforma_id);
-                $totalPagamentos     = $totalPagamentos->where('plataforma_id', '=', $object->plataforma_id);
-                $totalCancelamentos  = $totalCancelamentos->where('plataforma_id', '=', $object->plataforma_id);
-                $totalAssinaturas    = $totalAssinaturas->where('plataforma_id', '=', $object->plataforma_id);
-            }
 
             if (isset($param['canal_id']) and $param['canal_id'])
             {
@@ -445,58 +519,4 @@ class TDoubleDashboard extends TPage
 
         echo $dados;
     }
-
-    public static function onPlataformaChange($param)
-    {
-        try
-        {
-            if (!empty($param['plataforma_id']))
-            {
-                $plataforma = TUtils::openFakeConnection('double', function() use ($param){
-                    return new DoublePlataforma($param['plataforma_id'], false);
-                });
-                $param['usuarios_canal'] = $plataforma->usuarios_canal;
-                if ($plataforma->usuarios_canal == 'Y') {
-                    TCombo::enableField('form_TDoubleDashboard', 'canal_id');
-                    $criteria = TCriteria::create( ['plataforma_id' => $param['plataforma_id'] ] );
-                    TDBCombo::reloadFromModel('form_TDoubleDashboard', 'canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
-                } else
-                {
-                    TCombo::clearField('form_DoubleUsuarioForm', 'plataforma_id');
-                    TDBCombo::disableField('form_TDoubleDashboard', 'canal_id');
-                }
-            }
-            else
-            {
-                TCombo::clearField('form_DoubleUsuarioForm', 'plataforma_id');
-                TDBCombo::disableField('form_TDoubleDashboard', 'canal_id');
-            }
-
-            $data = new stdClass;
-            $data->plataforma_id = $param['plataforma_id'];
-            $data->canal_id = $param['canal_id'];
-            $data->data_inicio = $param['data_inicio'];
-            TForm::sendData('form_TDoubleDashboard', $data, False, False);
-        }
-        catch (Exception $e)
-        {
-            new TMessage('error', $e->getMessage());
-        }
-    }
-
-    // public function show()
-    // {
-    //     if (!$this->loaded AND (!isset($_GET['method']) OR !(in_array($_GET['method'],  array('onReload', 'onSearch')))) )
-    //     {
-    //         if (func_num_args() > 0)
-    //         {
-    //             $this->onReload( func_get_arg(0) );
-    //         }
-    //         else
-    //         {
-    //             $this->onReload();
-    //         }
-    //     }
-    //     parent::show();
-    // }
 }

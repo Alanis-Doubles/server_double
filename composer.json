@@ -18,7 +18,8 @@
     "guzzlehttp/guzzle": "^7.8",
     "php-webdriver/webdriver": "^1.15",
     "arthurkushman/php-wss": "^2.0",
-    "pear/http_request2": "^2.6"
+    "pear/http_request2": "^2.6",
+    "google/cloud-translate": "^1.17"
   },
   "config": {
     "preferred-install": {

@@ -12,7 +12,7 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_OPERACAO_METODO_NAO_SUPORTADO"] = "Método não suportado.";
         $this->list["MSG_PLATAFORMA_NAO_SUPORTADA"] = "Plataforma não suportada.";
         $this->list["MSG_OPERACAO_CANAL_NAO_SUPORTADO"] = "Canal '{channel_id}' não suportado.";
-        $this->list["MSG_OPERACAO_IDENTIFICADO_LOSS"] = "Identificado um LOSS, robô irá iniciar as jogadas agora.";
+        $this->list["MSG_OPERACAO_IDENTIFICADO_LOSS"] = "Identificada entrada automática, robô irá iniciar as jogadas agora.";
         $this->list["MSG_OPERACAO_ENTRADA_CONFIRMADA"] = "✅ Entrada Confirmada\n‼️ APOSTAR NO {cor}";
         $this->list["MSG_OPERACAO_ENTRADA_REALIZADA"] = "✅ Entrada Realizada\n💸 Valor: R$ {valor}.\n🎯 Cor: {cor}\n";
         $this->list["MSG_OPERACAO_ENTRADA_CICLO"] = "\n↪️ Recuperação utilizada";
@@ -106,7 +106,8 @@ class TDoubleTranslateGabriel extends TDoubleTranslate
         $this->list["MSG_ENTRADA_AUTOMATICA_2"]  = "Você {entrada}está usando a entrada automática.\n\nDeseja habilitar a entrada automática?";
         $this->list["MSG_ENTRADA_AUTOMATICA_3"]  = "Você habilitou entrada automática.";
         $this->list["MSG_ENTRADA_AUTOMATICA_4"]  = "Você desabilitou a entrada automática.";
-        $this->list["MSG_ENTRADA_AUTOMATICA_5"]  = "Stop WIN atingido. O robô iniciará após o primeiro loss.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_5"]  = "Stop WIN atingido. O robô iniciará após {quantidade} {tipo}.";
+        $this->list["MSG_ENTRADA_AUTOMATICA_6"]  = "Stop LOSS atingido. O robô iniciará após {quantidade} {tipo}.";
         $this->list["BOTAO_LOGAR"] = "🔒 Já possuo cadastro";
         $this->list["BOTAO_CADASTRO"] = "📲 Fazer cadastro";
         $this->list["BOTAO_INICIAR"] = "🚀 Iniciar Robô";

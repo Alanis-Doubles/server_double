@@ -62,12 +62,16 @@ class DoublePlataforma extends DoubleRecord
     {
         if (TBrazabet::nome() == $this->nome)
             return new TBrazabet;
+        else if (TBlaze::validate($this->nome))
+            return new TBlaze;
         else if (TBlaze::nome() == $this->nome)
             return new TBlaze;
         else if (TArbety::nome() == $this->nome)
             return new TArbety;
         else if (TWeplay::nome() == $this->nome)
             return new TWeplay;
+        else if (TBrabet::nome() == $this->nome)
+            return new TBrabet;
         else
             throw new Exception("Plataforma '{$this->nome}' não suportada.");
     }
@@ -84,8 +88,8 @@ class DoublePlataforma extends DoubleRecord
     {
         if (!$this->obj_translate)
         {
-            $classe = DoubleConfiguracao::getConfiguracao('translate_class') . '_' . $this->nome . '_' . $this->idioma;
-            $this->obj_translate = new $classe;
+            // $classe = DoubleConfiguracao::getConfiguracao('translate_class') . '_' . $this->nome . '_' . $this->idioma;
+            $this->obj_translate = new TDoubleTranslate($this->id);
         }
 
         return $this->obj_translate;

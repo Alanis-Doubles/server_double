@@ -257,7 +257,7 @@ class DoubleUsuario extends DoubleRecord
 
     public function get_valorJogada()
     {
-        if ($this->ciclo == 'Y') {
+        if ($this->ciclo != 'N') {
             $result = TUtils::openFakeConnection('double', function () {
                 return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                     ->where('sequencia', '=', $this->robo_sequencia)
@@ -299,6 +299,15 @@ class DoubleUsuario extends DoubleRecord
         }
         
         return $this->obj_plataforma;
+    }
+
+    public function get_agrupamento()
+    {
+        $result = $this->plataforma->render('[{idioma}] {nome}');
+        if ($this->plataforma->usuarios_canal == 'Y')
+            $result .= ' / ' . $this->canal->nome;
+
+        return $result;
     }
 
     public function get_canal()

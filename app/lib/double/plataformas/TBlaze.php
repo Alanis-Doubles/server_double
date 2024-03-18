@@ -6,6 +6,11 @@ class TBlaze implements IDoublePlataforma
 {
     private static $ultimo_sinal;
 
+    public static function validate(string $nome)
+    {
+        return substr($nome, 0, 5) == 'Blaze';
+    }
+
     public static function nome()
     {
         return 'Blaze';
@@ -29,8 +34,11 @@ class TBlaze implements IDoublePlataforma
                 ]
             );
 
+            $json = $response->getBody()->getContents();
+            // DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', $response->getStatusCode(), $json);
+
             if ($response->getStatusCode() == 200) {
-                $content = json_decode($response->getBody()->getContents());
+                $content = json_decode($json);
                 if ($content->status == 'rolling') {
                     $sinal = new stdClass;
                     $sinal->id = $content->id;
@@ -44,6 +52,10 @@ class TBlaze implements IDoublePlataforma
                 } else {
                     sleep(1);
                 }
+            } else {
+                DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
+                $client = new Client(['http_errors' => false]);
+                sleep(1);
             }
 
         }
@@ -163,7 +175,7 @@ class TBlaze implements IDoublePlataforma
     {
         // aguardar status watting para jogar
         $client = new Client(['http_errors' => false]);
-        while (true)
+        while ($usuario->canal->espera_entrada == 'Y')
         {
             $response = $client->request(
                 'GET',
