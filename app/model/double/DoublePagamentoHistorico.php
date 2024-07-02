@@ -7,7 +7,7 @@ class DoublePagamentoHistorico extends DoubleRecord
 {
     const TABLENAME  = 'double_pagamento_historico';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 
@@ -44,6 +44,9 @@ class DoublePagamentoHistorico extends DoubleRecord
                         break;
                     case 'ANUAL':
                         $meses = "- 1 month";
+                        break;
+                    case 'VITALICIO':
+                        $meses = "- 10 year";
                         break;
 
                     default:
@@ -126,6 +129,9 @@ class DoublePagamentoHistorico extends DoubleRecord
                         break;
                     case 'ANUAL':
                         $meses = "+ 1 month";
+                        break;
+                    case 'VITALICIO':
+                        $meses = "+ 10 year";
                         break;
 
                     default:

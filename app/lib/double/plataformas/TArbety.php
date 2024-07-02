@@ -430,4 +430,8 @@ class TArbety implements IDoublePlataforma
     {
         return '';
     }
+
+    public function sinalCorrente() {
+        return '';
+    }
 }

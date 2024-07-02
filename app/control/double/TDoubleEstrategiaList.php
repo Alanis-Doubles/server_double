@@ -8,6 +8,8 @@ class TDoubleEstrategiaList extends TCustomStandardList
     private $status;
     private $tipo_sinais;
 
+    const BOTOES = ['white' => 'branco', 'red' => 'vermelho', 'black' => 'preto', 'other' => 'azul', 'break' => 'parar'];
+
     use TTransformationTrait;
 
     public function __construct($param)
@@ -18,17 +20,19 @@ class TDoubleEstrategiaList extends TCustomStandardList
         $criteria->add(
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = (SELECT c.plataforma_id FROM double_canal c where c.id = double_estrategia.canal_id))',
-                '=',
-                'GERA'
+                'IN',
+                ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
+
+        $criteria->add( new TFilter('usuario_id', 'is', null) );
 
         $criteria_canal = new TCriteria;
         $criteria_canal->add(
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
-                '=',
-                'GERA'
+                'IN',
+                ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
         
@@ -38,7 +42,7 @@ class TDoubleEstrategiaList extends TCustomStandardList
             'title'          => 'Estratégias',
             'database'       => 'double',
             'activeRecord'   => 'DoubleEstrategia',
-            'defaultOrder'   => 'ordem, id',
+            'defaultOrder'   => 'canal_id, ativo, ordem, id',
             'formEdit'       => 'TDoubleEstrategiaForm',
             'criteria'       => $criteria,
             'dataGrid'       => [
@@ -90,66 +94,57 @@ class TDoubleEstrategiaList extends TCustomStandardList
                     'column' => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_ativo'])]
                 ],
             ],
-            'actions' => [
-                'actExcluir'        => ['visible' => false],
-                // 'actVisualizar'     => ['visible' => false],
-            ]
         ]);
+    }
+
+    public function criarBotaoInserir($param, $panel) {
+        unset($param['class']);
+        unset($param['method']);
+        $param['register_state'] = 'false';
+        $param['fromClass'] = get_class($this);
+        
+        $dropdown = new TDropDown('Inserir', 'fa:pluss');
+        $dropdown->style = 'height:37px';
+        $dropdown->setPullSide('right');
+        $dropdown->setButtonClass('btn btn-default waves-effect dropdown-toggle');
+        $dropdown->addAction( 'Regra de COR', new TAction([$this, 'doIncluir'], array_merge($param, ['tipo' => 'COR'])) );
+        $dropdown->addAction( 'Regra de NÚMERO', new TAction([$this, 'doIncluir'], array_merge($param, ['tipo' => 'NUMERO'])) );
+        $dropdown->addAction( 'Regra de SOMA', new TAction([$this, 'doIncluir'], array_merge($param, ['tipo' => 'SOMA'])) );
+        $panel->addHeaderWidget( $dropdown );
+    }
+
+    public function doIncluir($param){
+        if ($search_canal = TSession::getValue($this->activeRecord.'_filter_search_canal_id')) {
+            $string = $search_canal->dump();
+            preg_match("/'(\d+)'/", $string, $matches);
+            $param['canal_id'] = $matches[1];
+            TApplication::loadPage($param['formEdit'], 'onInsert', $param);
+        } else {
+            new TMessage('error', 'Primeiro realize o filtro para o canal desejado.');
+            return;
+        }
     }
 
     public function transform_resultado($value, $object, $row, $cell)
     {
         if ($value <> '') {
-            if ($value == 'white') {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                $botao->enableSection( 'main', [] );
-            } else {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$value], 'value' => ''] );
-            }
-
-            return $botao;
+            return self::addOption($value, $object->canal->plataforma->nome);
         }
     }
 
     public function transform_regra($value, $object, $row, $cell)
     {
         if ($value <> '') {
-            if ($object->tipo == 'NUMERO') {
-                if ($value == 0) {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                    $botao->enableSection( 'main', [] );
-                } elseif ($value < 8) {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $botao->enableSection( 'main', ['cor' => 'vermelho', 'value' => $value] );
-                } else {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $botao->enableSection( 'main', ['cor' => 'preto', 'value' => $value] );
-                }
-            } else {
-                $cores = explode(' - ', $value);
-                foreach ($cores as $key => $cor) {
-                    if ($cor == 'white') {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                        $botao->enableSection( 'main', [] );
-                    } else {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                        $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$cor], 'value' => ''] );
-                    }
-                    $cores[$key] = ['botao' => $botao];
-                }
+            $opcoes = explode(' - ', $value);
+            
+            $div = new TElement('div');
+            $div->class = 'class="flex flex-row space-x-1"';
 
-                $lista = new THtmlRenderer('app/resources/double/estrategia/retorno_lista.html');
-                $lista->enableSection(
-                    'main',
-                    [
-                        'botoes' => $cores,
-                    ]
-                );
-                return $lista;
-            }
-
-            return $botao;
+            foreach ($opcoes as $key => $opcao) {
+                $div->add(self::addOption($opcao, $object->canal->plataforma->nome));
+            }   
+            
+            return $div;
         }
     }
 
@@ -205,5 +200,55 @@ class TDoubleEstrategiaList extends TCustomStandardList
         );
 
         $this->onReload($param);
+    }
+
+    public static function addOption($option, $bet_name)
+    {
+        $path = 'app/images/regras/';
+        $path_bet = "app/images/regras/{$bet_name}/";
+
+        $imageMap = [
+            'red'   => ['image' => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'), 'title' => ''],
+            'black' => ['image' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'), 'title' => ''],
+            'white' => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => ''],
+            'other' => ['image' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'), 'title' => 'Qualquer cor'],
+            'break' => ['image' => (file_exists($path_bet . 'break.png') ? $path_bet . 'break.png' : $path . 'break.png'), 'title' => 'Ignorar entrada'],
+            '1'     => ['image' => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'), 'title' => ''],
+            '2'     => ['image' => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'), 'title' => ''],
+            '3'     => ['image' => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'), 'title' => ''],
+            '4'     => ['image' => (file_exists($path_bet . '4.png') ? $path_bet . '4.png' : $path . '4.png'), 'title' => ''],
+            '5'     => ['image' => (file_exists($path_bet . '5.png') ? $path_bet . '5.png' : $path . '5.png'), 'title' => ''],
+            '6'     => ['image' => (file_exists($path_bet . '6.png') ? $path_bet . '6.png' : $path . '6.png'), 'title' => ''],
+            '7'     => ['image' => (file_exists($path_bet . '7.png') ? $path_bet . '7.png' : $path . '7.png'), 'title' => ''],
+            '8'     => ['image' => (file_exists($path_bet . '8.png') ? $path_bet . '8.png' : $path . '8.png'), 'title' => ''],
+            '9'     => ['image' => (file_exists($path_bet . '9.png') ? $path_bet . '9.png' : $path . '9.png'), 'title' => ''],
+            '10'    => ['image' => (file_exists($path_bet . '10.png') ? $path_bet . '10.png' : $path . '10.png'), 'title' => ''],
+            '11'    => ['image' => (file_exists($path_bet . '11.png') ? $path_bet . '11.png' : $path . '11.png'), 'title' => ''],
+            '12'    => ['image' => (file_exists($path_bet . '12.png') ? $path_bet . '12.png' : $path . '12.png'), 'title' => ''],
+            '13'    => ['image' => (file_exists($path_bet . '13.png') ? $path_bet . '13.png' : $path . '13.png'), 'title' => ''],
+            '14'    => ['image' => (file_exists($path_bet . '14.png') ? $path_bet . '14.png' : $path . '14.png'), 'title' => ''],
+            'ia'    => ['image' => (file_exists($path_bet . 'ia.png') ? $path_bet . '14.png' : $path . 'ia.png'), 'title' => ''],
+        ];
+
+        if (isset($imageMap[$option])) {
+            $imgTag = new TElement('img');
+            $imgTag->src = $imageMap[$option]['image'];
+            $imgTag->title = $imageMap[$option]['title'];
+            $imgTag->style = 'width: 30px; height: 30px; margin: 2px;';
+
+            return $imgTag;
+        }
+    }
+
+    public function exibeEdit($object) {
+        return $object->tipo != 'IA';
+    }
+
+    public function exibeDelete($object) {
+        return $object->tipo != 'IA';
+    }
+
+    public function exibeView($object) {
+        return $object->tipo != 'IA';
     }
 }

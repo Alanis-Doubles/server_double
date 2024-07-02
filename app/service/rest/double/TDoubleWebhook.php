@@ -30,7 +30,7 @@ class TDoubleWebhook
 
                     $pagamento = new DoublePagamentoHistorico;
                     $pagamento->plataforma_pagamento = strtoupper($param['origem']);
-                    $pagamento->tipo = str_replace('PLANO ', '', strtoupper($param['plan']['name']));
+                    $pagamento->tipo = 'VITALICIO'; // str_replace('PLANO ', '', strtoupper($param['plan']['name']));
                     $pagamento->tipo_entrada = 'AUTOMATICA';
                     $pagamento->tipo_evento = $evento[$param['event']];
                     $pagamento->valor = floatval(str_replace(['R$ ', '.',',',' '], ['','','.',''], isset($param['total_price']) ? $param['total_price'] : '0'));

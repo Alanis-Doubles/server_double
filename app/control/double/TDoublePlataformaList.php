@@ -14,7 +14,7 @@ class TDoublePlataformaList extends TCustomStandardList
     {
         $this->idiomas = ['ptBR' => 'Português', 'en' => 'Inglês', 'es' => 'Espanhol'];
         $this->status  = ['PARADO' => 'Parado', 'INICIANDO' => 'Iniciando', 'EXECUTANDO' => 'Executando', 'PARANDO' => 'Parando'];
-        $this->tipo_sinais = ['GERA' => 'Gera Sinais', 'NAO_GERA' => 'Não Gera Sinais', 'PROPAGA_OUTRO' => 'Propaga de Outro Canal'];
+        $this->tipo_sinais = ['GERA' => 'Gera Sinais', 'NAO_GERA' => 'Não Gera Sinais', 'PROPAGA_OUTRO' => 'Propaga de Outro Canal', 'PROPAGA_VALIDA_SINAL' => 'Propaga e Valida Sinal'];
 
         parent::__construct([
             'title'          => 'Plataformas',

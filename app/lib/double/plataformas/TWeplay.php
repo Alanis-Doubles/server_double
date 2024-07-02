@@ -32,48 +32,69 @@ class TWeplay implements IDoublePlataforma
         echo $this->saldo($object);
     }
 
+    public function sinalCorrente() {
+        $client = new Client(['http_errors' => false]);
+        $response = $client->request(
+            'GET',
+            'https://api.weplay.games/api/v1/rounds/last?gameId=2&limit=1&page=1',            
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
+            ]
+        );
+
+        if ($response->getStatusCode() == 200)
+            return [
+                "status_code" => 200,
+                "data" => json_decode($response->getBody()->getContents())->data[0]
+            ];
+        else
+           return [
+                "status_code" => $response->getStatusCode(),
+                "data" => []
+            ];
+    }
+
+
     public function aguardarSinal($ultimo_sinal)
     {
         self::$ultimo_sinal = $ultimo_sinal;
-        $url = 'wss://api.weplay.games/socket.io/?EIO=4&transport=websocket';
-        $config = new ClientConfig();
-        $client = new WebSocketClient($url, $config);
-        $client->send('40/game/roulette');
-        while ($client->isConnected())
+        $client = new Client(['http_errors' => false]);
+        while (true)
         {
-            // try {
-                $message = $client->receive();
+            $response = $client->request(
+                'GET',
+                'https://api.weplay.games/api/v1/rounds/last?gameId=2&limit=1&page=1',
                 
-                if (str_starts_with($message, '42/game/roulette,')){
-                    $message = str_replace('42/game/roulette,', '', $message);
-                    $content = json_decode($message);
-                    if (!$content)
-                      continue;
-                    if ($content[1]->status == 'Closed') {
-                        $sinal = new stdClass;
-                        $sinal->id = $content[1]->slug;
-                        $sinal->cor = $content[1]->betColor;
-                        $sinal->numero = $content[1]->betNumber;
-                        if (self::$ultimo_sinal != (array) $sinal)
-                        {
-                            self::$ultimo_sinal = $sinal;
-                            return self::$ultimo_sinal;              
-                        } else {
-                            // usleep(1000);
-                        }
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json'
+                    ]
+                ]
+            );
+
+            $json = $response->getBody()->getContents();
+            if ($response->getStatusCode() == 200) {
+                $content = json_decode($json);
+                    $sinal = new stdClass;
+                    $sinal->id = $content->data[0]->slug;
+                    $sinal->cor = $content->data[0]->betColor;
+                    $sinal->numero = $content->data[0]->betNumber;
+                    if (self::$ultimo_sinal != (array) $sinal)
+                    {
+                        self::$ultimo_sinal = $sinal;
+                        return self::$ultimo_sinal;              
                     } else {
-                        // usleep(100);
+                        sleep(1);
                     }
-                }
-                // $client->send('40/game/roulette');
-                // $client->send('3');
-            // } catch (BadOpcodeException $e) {
-                // $erro = $e->getMessage();
-            // } catch (ConnectionException $e) {
-            //     $erro = $e->getMessage();
-            // } catch (\Throwable $e) {
-            //    $erro = $e->getMessage();   
-            // }
+            } else {
+                DoubleErros::registrar(1, 'TWeplay', 'aguardarSinal', 'Tentando reiniciar', $json);
+                $client = new Client(['http_errors' => false]);
+                sleep(1);
+            }
         }
     }
 
@@ -120,8 +141,10 @@ class TWeplay implements IDoublePlataforma
 
     public function saldo(DoubleUsuario $usuario)
     {
-        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
-            return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
+        // if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
+        if ($usuario->modo_treinamento == 'Y') {
+            // return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
+            return $usuario->banca_treinamento;
         } else {
             $token_plataforma = self::getToken($usuario);
             $client = new Client(['http_errors' => false]);
@@ -227,7 +250,8 @@ class TWeplay implements IDoublePlataforma
             }
         }
 
-        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
+        // if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
+        if ($usuario->modo_treinamento == 'Y') 
             return '';
 
         $payload = [

@@ -6,7 +6,7 @@ class DoubleHistorico extends DoubleRecord
 {
     const TABLENAME  = 'double_historico';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 
@@ -27,7 +27,7 @@ class DoubleHistorico extends DoubleRecord
                 $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $canal_id, $inicio){
                     return self::select()
                         ->where('plataforma_id', '=', $plataforma_id)
-                        // ->where('canal_id', '=', $canal_id)
+                        ->where('canal_id', '=', $canal_id)
                         ->where('created_at', '>=', $inicio)
                         ->last();
                 });

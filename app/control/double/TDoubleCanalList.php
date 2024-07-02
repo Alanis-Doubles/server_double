@@ -97,7 +97,7 @@ class TDoubleCanalList extends TCustomStandardList
         TUtils::openConnection(
             'double',
             function () use ($param) {
-                $plataforma = new DoubleUsuario($param['id'], false);
+                $plataforma = new DoubleCanal($param['id'], false);
                 $plataforma->{$param['campo']} = $param['valor'];
                 $plataforma->save();
             }
@@ -204,6 +204,8 @@ class TDoubleCanalList extends TCustomStandardList
 
         if ($param['tipo_sinais'] == 'GERA')
             TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);
+        elseif ($param['tipo_sinais'] == 'PROPAGA_VALIDA_SINAL')
+            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_validar_sinal', $data);
         else    
             TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_sinal', $data);
 

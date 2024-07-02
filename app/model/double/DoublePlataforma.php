@@ -7,7 +7,7 @@ class DoublePlataforma extends DoubleRecord
 {
     const TABLENAME  = 'double_plataforma';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 
@@ -64,6 +64,8 @@ class DoublePlataforma extends DoubleRecord
             return new TBrazabet;
         else if (TBlaze::validate($this->nome))
             return new TBlaze;
+        else if (TJonbet::validate($this->nome))
+            return new TJonbet;
         else if (TBlaze::nome() == $this->nome)
             return new TBlaze;
         else if (TArbety::nome() == $this->nome)
@@ -78,9 +80,10 @@ class DoublePlataforma extends DoubleRecord
 
     public function get_telegram()
     {
-        if (!$this->obj_telegram)
-            $this->obj_telegram = new TelegramRest($this->telegram_token);
-        
+        if ($this->telegram_token)
+            if (!$this->obj_telegram)
+                $this->obj_telegram = new TelegramRest($this->telegram_token);
+            
         return $this->obj_telegram;
     }
 

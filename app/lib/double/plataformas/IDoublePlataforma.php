@@ -19,4 +19,6 @@ interface IDoublePlataforma
     public function cores();
 
     public function jogar(DoubleUsuario $usuario, string $cor, float $valor);
+
+    public function sinalCorrente();
 }

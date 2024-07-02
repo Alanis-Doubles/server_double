@@ -9,7 +9,8 @@ class TDoubleRobo
     const ATTRIBUTES = [
         'chat_id', 'nome', 'nome_usuario', 'email', 'telefone', 'status', 'valor', 'protecao', 'stop_win', 'stop_loss', 'ultimo_saldo',
         'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
-        'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo'
+        'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo', 'metas',
+        'usuario_meta', 'valor_max_ciclo', 'protecao_branco', 'modo_treinamento', 'banca_treinamento'
     ];
 
     public function carregar($param)
@@ -49,7 +50,7 @@ class TDoubleRobo
                 if (!$object->ultimo_saldo)
                     $object->ultimo_saldo = 0;
                 
-                if (isset($param['chat_id']) and $param['buscar_saldo'] == 'Y')
+                if (isset($param['buscar_saldo']) and $param['buscar_saldo'] == 'Y') 
                     $object->ultimo_saldo = $param['plataforma']->service->saldo($object);
                
                 $object->save();
@@ -67,7 +68,15 @@ class TDoubleRobo
 
             return $object;
         });
-        return $object->toArray(static::ATTRIBUTES);
+
+        $arrData = $object->toArray(static::ATTRIBUTES);
+
+        if ($object->metas == 'Y' and $object->usuario_meta) {
+            $object->usuario_meta->atualizar($object);
+            $arrData['valor'] = $object->usuario_meta->valor_real_entrada;
+        }
+
+        return $arrData;
     }
 
     public function atualizar($param)
@@ -90,10 +99,31 @@ class TDoubleRobo
                 $param['data']['demo_inicio'] = date('Y-m-d h:i:s');
             }
 
+            $usuario_meta = [];
+            if (isset($param['data']['usuario_meta']))
+                $usuario_meta = $param['data']['usuario_meta'];
+
             unset($param['data']['idioma']);
             unset($param['data']['channel_id']);
+            unset($param['data']['usuario_meta']);
+            
             $object->fromArray((array) $param['data']);
             $object->store();
+
+            if (isset($param['email']))
+                $object->email = $param['email'];
+    
+            if ($usuario_meta)
+            {
+                $meta = $object->usuario_meta;
+                if (!$meta)
+                {
+                    $meta = new DoubleUsuarioMeta;
+                    $meta->usuario_id = $object->id;
+                }
+                $meta->fromArray((array) $usuario_meta);
+                $meta->store();
+            }
 
             if (isset($param['telefone'])) {
                 $object->telefone = $param['telefone'];
@@ -262,6 +292,17 @@ class TDoubleRobo
             $object->ultimo_saldo = $plataforma->service->saldo($object);
             $object->save();
 
+            if ($object->metas == 'Y' and $object->usuario_meta)
+            {
+                $object->usuario_meta->inicio_execucao = (new DateTime())->format('Y-m-d H:i:s');
+                $object->usuario_meta->proxima_execucao = null;
+                $object->usuario_meta->atualizar($object);
+                // $object->usuario_meta->ultimo_saldo = $plataforma->service->saldo($object);
+                // $object->usuario_meta->inicio_execucao = (new DateTime())->format('Y-m-d H:i:s');
+                // $object->usuario_meta->proxima_execucao = null;
+                // $object->usuario_meta->save();
+            }
+
             return $object;
         });
 
@@ -298,6 +339,17 @@ class TDoubleRobo
             $object->ultimo_saldo = $plataforma->service->saldo($object);
             $object->save();
 
+            if ($object->metas == 'Y' and $object->usuario_meta)
+            {
+                $object->usuario_meta->inicio_execucao = (new DateTime())->format('Y-m-d H:i:s');
+                $object->usuario_meta->proxima_execucao = null;
+                $object->usuario_meta->atualizar($object);
+                // $object->usuario_meta->ultimo_saldo = $plataforma->service->saldo($object);
+                // $object->usuario_meta->inicio_execucao = (new DateTime())->format('Y-m-d H:i:s');
+                // $object->usuario_meta->proxima_execucao = null;
+                // $object->usuario_meta->save();
+            }
+
             return $object;
         });
         
@@ -329,6 +381,14 @@ class TDoubleRobo
             $object->robo_processando_jogada = 'N';
             $object->ultimo_saldo = $plataforma->service->saldo($object);
             $object->save();
+
+            if ($object->metas == 'Y' and $object->usuario_meta)
+            {
+                $object->usuario_meta->ultimo_saldo = 0;
+                $object->usuario_meta->inicio_execucao = null;
+                $object->usuario_meta->proxima_execucao = null;
+                $object->usuario_meta->save();
+            }
 
             return $object;
         });

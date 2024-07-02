@@ -9,7 +9,7 @@ class DoubleUsuario extends DoubleRecord
 {
     const TABLENAME  = 'double_usuario';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 
@@ -17,6 +17,7 @@ class DoubleUsuario extends DoubleRecord
     private $obj_plataforma;
     private $obj_canal;
     private $obj_ultimo_pagamento;
+    private $obj_usuario_meta;
 
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
@@ -255,25 +256,58 @@ class DoubleUsuario extends DoubleRecord
         });
     }
 
-    public function get_valorJogada()
+    public function valorJogada($estrategia_id)
     {
+        $valor = $this->valor;
+        if ($this->metas == 'Y' and $this->usuario_meta)
+            $valor = $this->usuario_meta->valor_real_entrada;
+
+
         if ($this->ciclo != 'N') {
             $result = TUtils::openFakeConnection('double', function () {
                 return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                     ->where('sequencia', '=', $this->robo_sequencia)
-                    ->select(['valor'])
+                    ->select(['valor', 'created_at'])
                     ->last();
             });
 
             if ($result)
-                if ($result->valor < 0)
-                    return $result->valor * -2;
+                if ($result->valor < 0) {
+                    if ($this->protecao_branco == 'N')
+                        $fator_multiplicador = $this->fator_multiplicador;
+                    else 
+                        $fator_multiplicador = 2.5 * 0.83333;
+
+                    if ($estrategia_id) {
+                        $estrategia = TUtils::openFakeConnection('double', function() use ($estrategia_id){
+                            return new DoubleEstrategia($estrategia_id, false);
+                        });
+
+                        if ($estrategia and $estrategia->resetar_valor_entrada == 'A_CADA_HORA') {
+                            $date = date_create_from_format('Y-m-d H:i:s', $result->created_at);
+                            $now = new DateTime();
+
+                            if ($now->format('H') > $date->format('H'))
+                                $valor_novo = $valor;
+                            else
+                                $valor_novo = round($result->valor * -$fator_multiplicador, 2);
+                        }
+                        elseif ($estrategia and $estrategia->resetar_valor_entrada == 'SEMPRE')
+                            $valor_novo = $valor;
+                        else
+                            $valor_novo = round($result->valor * -$fator_multiplicador, 2);
+                    }    
+                    else
+                        $valor_novo = round($result->valor * -$fator_multiplicador, 2);
+
+                    return $valor_novo;
+                }
                 else
-                    return $this->valor;
+                    return $valor;
             else
-                return $this->valor;
+                return $valor;
         } else
-            return $this->valor;
+            return $valor;
     }
 
     public function get_lucro()
@@ -284,7 +318,7 @@ class DoubleUsuario extends DoubleRecord
                 ->sumBy('valor', 'total');
         });
         
-        if ($result)
+        if ($result != null)
             return $result;
         else
             return 0;
@@ -324,8 +358,35 @@ class DoubleUsuario extends DoubleRecord
         return $this->obj_canal;
     }
 
+    public function get_canal_id_ref()
+    {
+        $canal = $this->get_canal();
+        if ($canal->ativo == 'N') {
+            $canal = TUtils::openConnection('double', function () {
+                $result = DoubleCanal::where('plataforma_id', '=', $this->plataforma_id)
+                    ->where('ativo', '=', 'Y')
+                    ->first();
+                return $result;
+            });
+        }
+
+        return $canal->id;
+    }
+
     public function get_ultimo_pagamento()
     {
         return $this->obj_ultimo_pagamento;
+    }
+
+    public function get_usuario_meta()
+    {
+        if (!$this->obj_usuario_meta) {
+            $this->obj_usuario_meta =  TUtils::openConnection('double', function () {
+                return DoubleUsuarioMeta::where('usuario_id', '=', $this->id)
+                    ->first();
+            });
+        }
+        
+        return $this->obj_usuario_meta;
     }
 }

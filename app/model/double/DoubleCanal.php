@@ -6,11 +6,12 @@ class DoubleCanal extends DoubleRecord
 {
     const TABLENAME  = 'double_canal';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 
     private $obj_plataforma;
+    private $obj_telegram;
 
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
@@ -77,5 +78,14 @@ class DoubleCanal extends DoubleRecord
         }
         
         return $this->obj_plataforma;
+    }
+
+    public function get_telegram()
+    {
+        if ($this->telegram_token)
+            if (!$this->obj_telegram)
+                $this->obj_telegram = new TelegramRest($this->telegram_token);
+            
+        return $this->obj_telegram;
     }
 }

@@ -126,8 +126,10 @@ class TReals implements IDoublePlataforma
 
     public function saldo(DoubleUsuario $usuario)
     {
-        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
-            return 100;
+        // if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
+        if ($usuario->modo_treinamento == 'Y') {
+            // return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
+            return $usuario->banca_treinamento;
         } else {
             $token_plataforma = self::getToken($usuario);
             $client = new Client();
@@ -208,6 +210,10 @@ class TReals implements IDoublePlataforma
 
     public function jogar(DoubleUsuario $usuario, string $cor, float $valor)
     {
+        return '';
+    }
+
+    public function sinalCorrente() {
         return '';
     }
 }

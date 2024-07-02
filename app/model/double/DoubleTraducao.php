@@ -6,7 +6,7 @@ class DoubleTraducao extends DoubleRecord
 {
     const TABLENAME  = 'double_traducao';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

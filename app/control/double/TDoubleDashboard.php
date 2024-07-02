@@ -57,6 +57,9 @@ class TDoubleDashboard extends TPage
     private $form;
     private $filterRanking;
     private $datagrid;
+    private $botoes;
+
+    const BOTOES = ['white' => 'branco', 'red' => 'vermelho', 'black' => 'preto', 'other' => 'azul', 'break' => 'parar'];
 
     public function __construct($param = null)
     {
@@ -75,8 +78,8 @@ class TDoubleDashboard extends TPage
         $criteria->add(
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
-                '=',
-                'GERA'
+                'IN',
+                ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
         
@@ -190,7 +193,13 @@ class TDoubleDashboard extends TPage
         $this->form->setData( $session );
         $this->filterRanking->setData( $session );
 
-        TScript::create('
+        TScript::create($this->getJavaScript());
+
+    }
+
+    private function getJavaScript()
+    {
+        return <<<JAVASCRIPT
             function atualiza_contadores() {
                 $.get("engine.php?class=TDoubleDashboard&method=doConsultar&static=1", function(data) {
                     const options = { 
@@ -225,7 +234,7 @@ class TDoubleDashboard extends TPage
 
             setInterval( atualiza_contadores, 5000);
             setInterval( atualiza_ranking, 7000 );
-        ');
+JAVASCRIPT;
     }
 
     public function onReload($param) {}
@@ -258,78 +267,72 @@ class TDoubleDashboard extends TPage
         TSession::setValue('form_TDoubleDashboard_filter_data', $session);
     }
 
-    // public static function transform_resultado($value, $object, $row, $cell)
-    // {
-    //     $list["RED"] = "🔴";
-    //     $list["BLACK"] = "⚫";
-    //     $list["WHITE"] = "⚪️";
-
-    //     if ($object->ativo == 'N')
-    //         $row->style = 'text-decoration: line-through;';
-
-    //     return str_replace(
-    //         ['red', 'black', 'white', ' - '],
-    //         [$list["RED"], $list["BLACK"], $list["WHITE"], ' '],
-    //         $value
-    //     );
-    // }
-
     public static function transform_resultado($value, $object, $row, $cell)
     {
-        if ($object->ativo == 'N')
-            $row->style = 'text-decoration: line-through;';
-
         if ($value <> '') {
-            if ($value == 'white') {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                $botao->enableSection( 'main', [] );
-            } else {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$value], 'value' => ''] );
-            }
-
-            return $botao;
+            return self::addOption($value, $object->plataforma_id);
         }
     }
 
     public static function transform_regra($value, $object, $row, $cell)
     {
         if ($value <> '') {
-            if ($object->tipo == 'NUMERO') {
-                if ($value == 0) {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                    $botao->enableSection( 'main', [] );
-                } elseif ($value < 8) {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $botao->enableSection( 'main', ['cor' => 'vermelho', 'value' => $value] );
-                } else {
-                    $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $botao->enableSection( 'main', ['cor' => 'preto', 'value' => $value] );
-                }
-            } else {
-                $cores = explode(' - ', $value);
-                foreach ($cores as $key => $cor) {
-                    if ($cor == 'white') {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                        $botao->enableSection( 'main', [] );
-                    } else {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                        $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$cor], 'value' => ''] );
-                    }
-                    $cores[$key] = ['botao' => $botao];
-                }
+            $opcoes = explode(' - ', $value);
+            
+            $div = new TElement('div');
+            $div->class = 'class="flex flex-row space-x-1"';
 
-                $lista = new THtmlRenderer('app/resources/double/estrategia/retorno_lista.html');
-                $lista->enableSection(
-                    'main',
-                    [
-                        'botoes' => $cores,
-                    ]
-                );
-                return $lista;
-            }
+            foreach ($opcoes as $key => $opcao) {
+                $div->add(self::addOption($opcao, $object->plataforma_id));
+            }   
+            
+            return $div;
+        }
+    }
 
-            return $botao;
+    public static function addOption($option, $plataforma_id)
+    {
+        $bet_name = TUtils::openFakeConnection('double', function () use ($plataforma_id){
+            $obj = new DoublePlataforma($plataforma_id, false);
+            if ($obj)
+                return $obj->nome;
+            else
+                return '--';
+        });
+
+        $path = 'app/images/regras/';
+        $path_bet = "app/images/regras/{$bet_name}/";
+
+        $imageMap = [
+            'red'   => ['image' => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'), 'title' => ''],
+            'black' => ['image' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'), 'title' => ''],
+            'white' => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => ''],
+            'other' => ['image' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'), 'title' => 'Qualquer cor'],
+            'break' => ['image' => (file_exists($path_bet . 'break.png') ? $path_bet . 'break.png' : $path . 'break.png'), 'title' => 'Ignorar entrada'],
+            '1'     => ['image' => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'), 'title' => ''],
+            '2'     => ['image' => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'), 'title' => ''],
+            '3'     => ['image' => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'), 'title' => ''],
+            '4'     => ['image' => (file_exists($path_bet . '4.png') ? $path_bet . '4.png' : $path . '4.png'), 'title' => ''],
+            '5'     => ['image' => (file_exists($path_bet . '5.png') ? $path_bet . '5.png' : $path . '5.png'), 'title' => ''],
+            '6'     => ['image' => (file_exists($path_bet . '6.png') ? $path_bet . '6.png' : $path . '6.png'), 'title' => ''],
+            '7'     => ['image' => (file_exists($path_bet . '7.png') ? $path_bet . '7.png' : $path . '7.png'), 'title' => ''],
+            '8'     => ['image' => (file_exists($path_bet . '8.png') ? $path_bet . '8.png' : $path . '8.png'), 'title' => ''],
+            '9'     => ['image' => (file_exists($path_bet . '9.png') ? $path_bet . '9.png' : $path . '9.png'), 'title' => ''],
+            '10'    => ['image' => (file_exists($path_bet . '10.png') ? $path_bet . '10.png' : $path . '10.png'), 'title' => ''],
+            '11'    => ['image' => (file_exists($path_bet . '11.png') ? $path_bet . '11.png' : $path . '11.png'), 'title' => ''],
+            '12'    => ['image' => (file_exists($path_bet . '12.png') ? $path_bet . '12.png' : $path . '12.png'), 'title' => ''],
+            '13'    => ['image' => (file_exists($path_bet . '13.png') ? $path_bet . '13.png' : $path . '13.png'), 'title' => ''],
+            '14'    => ['image' => (file_exists($path_bet . '14.png') ? $path_bet . '14.png' : $path . '14.png'), 'title' => ''],
+            'ia'    => ['image' => (file_exists($path_bet . 'ia.png') ? $path_bet . '14.png' : $path . 'ia.png'), 'title' => ''],
+        ];
+
+        if (isset($imageMap[$option])) {
+            $imgTag = new TElement('img');
+            $imgTag->src = $imageMap[$option]['image'];
+            $imgTag->title = $imageMap[$option]['title'];
+            $imgTag->style = 'width: 30px; height: 30px; margin: 2px;';
+
+            return $imgTag;
         }
     }
 
@@ -420,6 +423,9 @@ class TDoubleDashboard extends TPage
                                                 ) b ON b.estrategia_id = e.id 
                                     WHERE $filtro2
                                     and e.usuario_id is NULL
+                                    and e.deleted_at is NULL
+                                    and e.resultado <> 'break'
+                                    and e.ativo = 'Y'
                                     GROUP BY e.tipo, c.plataforma_id, e.canal_id, e.nome, e.regra, e.resultado, e.ativo, e.ordem 
                                     ORDER BY 10 DESC, 8 DESC, 9 ASC, 11 DESC, 12 DESC, 14 DESC, 15 DESC, e.ordem ASC
                                 ) c

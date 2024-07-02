@@ -6,7 +6,7 @@ class DoubleRecuperacaoImagem extends DoubleRecord
 {
     const TABLENAME  = 'double_recuperacao_imagem';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

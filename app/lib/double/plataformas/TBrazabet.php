@@ -29,4 +29,9 @@ class TBrazabet extends TWebDriverPlataforma
     {
         return 'brazabet';
     }
+
+    public function sinalCorrente()
+    {
+        return '';
+    }
 }

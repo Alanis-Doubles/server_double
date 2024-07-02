@@ -127,12 +127,27 @@ div[form=form_login] .panel-heading{
     margin-bottom: 5px;
 }
 
-.botao_vermelho > div, .botao_preto > div{
+.botao_azul {
+    border-width: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: calc(0.5rem - 2px);
+    border: 2px solid #0285C7;
+    background-color: #0285C7;
+    display: inline-block;
+    text-align: center;
+    padding-inline: 1px;
+    padding-block: 6px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.botao_vermelho > div, .botao_preto > div, .botao_azul > div{
 	width: 21px;
     height: 21px;
     border-radius: 50%;
-    margin-left: 2px;
-    margin-top: -3px;
+    margin-left: 1.4px;
+    margin-top: -3.4px;
     display: flex;
     border: 2px solid white;
     color: white;
@@ -157,16 +172,62 @@ div[form=form_login] .panel-heading{
     margin-bottom: 5px;
 }
 
-.botao_branco > div{
-	width: 21px;
+.botao_branco > div{  
+    width: 21px;
     height: 21px;
     border-radius: 50%;
-    margin-left: 3px;
-    margin-top: -2px;
+    margin-left: 1.4px;
+    margin-top: -3.4px;
     display: flex;
+    border: 2px solid black;
     color: black;
     font-size: 10px;
     font-weight: 700;
     justify-content: center;
     align-items: center;
+}
+
+.botao_parar {
+    border-width: 1px;
+    width: 30px;
+    height: 30px;
+    border-radius: calc(0.5rem - 2px);
+    border: 2px solid #000000;
+    background-color: #b6ff00;
+    display: inline-block;
+    text-align: center;
+    padding-inline: 1px;
+    padding-block: 6px;
+    margin-right: 3px;
+    margin-bottom: 5px;
+}
+
+.botao_parar > div{  
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    margin-left: 1.4px;
+    margin-top: -3.4px;
+    display: flex;
+    border: 2px solid black;
+    color: black;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: center;
+    align-items: center;
+}
+
+.regras button:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.regras button {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    border: unset;
+    background: transparent;
+    padding: 0px 30px 20px 0px;
+    color: #555;
 }

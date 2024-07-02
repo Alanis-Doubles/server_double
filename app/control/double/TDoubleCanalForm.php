@@ -52,9 +52,15 @@ class TDoubleCanalForm  extends TStandardForm
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Exibe projeção'])],
             [$this->makeTCombo(['name' => 'exibir_projecao', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
-            [],[]
+            [$label = $this->makeTLabel(['value' => 'Proteção no branco'])],
+            [$this->makeTCombo(['name' => 'protecao_branco', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
         );
 
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Telegram Token - Robô'])],
+            [$this->makeTEntry(['name' => 'telegram_token', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],
+        );
+        
         $this->form->addContent([new TElement('br')]);
         $this->form->addContent([new TFormSeparator('Webhooks Suportados')]);
 

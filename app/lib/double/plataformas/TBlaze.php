@@ -16,6 +16,32 @@ class TBlaze implements IDoublePlataforma
         return 'Blaze';
     }
 
+    public function sinalCorrente() {
+        $client = new Client(['http_errors' => false]);
+        $response = $client->request(
+            'GET',
+            'https://blaze.com/api/roulette_games/current',
+            
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
+            ]
+        );
+
+        if ($response->getStatusCode() == 200)
+            return [
+                "status_code" => 200,
+                "data" => json_decode($response->getBody()->getContents())
+            ];
+        else
+           return [
+                "status_code" => $response->getStatusCode(),
+                "data" => []
+            ];
+    }
+
     public function aguardarSinal($ultimo_sinal)
     {
         self::$ultimo_sinal = $ultimo_sinal;
@@ -50,7 +76,7 @@ class TBlaze implements IDoublePlataforma
                         return self::$ultimo_sinal;              
                     }
                 } else {
-                    sleep(1);
+                    // sleep(1);
                 }
             } else {
                 DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
@@ -101,8 +127,10 @@ class TBlaze implements IDoublePlataforma
 
     public function saldo(DoubleUsuario $usuario)
     {
-        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
-            return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
+        // if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') {
+        if ($usuario->modo_treinamento == 'Y') {
+            // return DoubleConfiguracao::getConfiguracao('homologacao_saldo');
+            return $usuario->banca_treinamento;
         } else {
             $token_plataforma = self::getToken($usuario);
             $client = new Client();
@@ -199,7 +227,8 @@ class TBlaze implements IDoublePlataforma
 
         }
 
-        if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
+        // if ($usuario->plataforma->ambiente == 'HOMOLOGACAO') 
+        if ($usuario->modo_treinamento == 'Y') 
             return '';
 
 

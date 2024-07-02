@@ -6,7 +6,7 @@ class DoubleUsuarioHistorico extends DoubleRecord
 {
     const TABLENAME  = 'double_usuario_historico';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

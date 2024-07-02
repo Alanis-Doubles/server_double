@@ -54,6 +54,8 @@ use Adianti\Database\TTransaction;
                 foreach ($attributes as $key => $value)
                 {
                     $data[$value] = $this->$value;
+                    if (is_object($data[$value]))
+                        $data[$value] = $data[$value]->toArray();
                 }
             }
         }

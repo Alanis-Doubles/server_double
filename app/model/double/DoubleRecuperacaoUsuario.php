@@ -6,7 +6,7 @@ class DoubleRecuperacaoUsuario extends DoubleRecord
 {
     const TABLENAME  = 'double_recuperacao_usuario';
     const PRIMARYKEY = 'id';
-    const IDPOLICY   = 'max';
+        const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

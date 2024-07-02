@@ -156,9 +156,9 @@ class TCustomStandardList extends TStandardList
             $field = null;
 
         $dataGrid->actions = [
-            'actEditar'     => ['label' => 'Editar' , 'image' => 'far:edit blue', 'field' => $field, 'fields' => $fields, 'action' => $edtAction, 'action_params' => ['register_state' => 'false', 'fromClass' => get_class($this)]],
-            'actExcluir'    => ['label' => 'Excluir', 'image' => 'far:trash-alt red', 'field' => $field, 'fields' => $fields, 'action' => $delAction],
-            'actVisualizar' => ['label' => 'Visualizar', 'image' => 'fa:search', 'field' => $field, 'fields' => $fields, 'action' => $visAction, 'action_params' =>  ['register_state' => 'false']],
+            'actEditar'     => ['label' => 'Editar' , 'image' => 'far:edit blue', 'field' => $field, 'fields' => $fields, 'action' => $edtAction, 'action_params' => ['register_state' => 'false', 'fromClass' => get_class($this)], 'display_condition' => [$this, 'exibeEdit']],
+            'actExcluir'    => ['label' => 'Excluir', 'image' => 'far:trash-alt red', 'field' => $field, 'fields' => $fields, 'action' => $delAction, 'display_condition' => [$this, 'exibeDelete']],
+            'actVisualizar' => ['label' => 'Visualizar', 'image' => 'fa:search', 'field' => $field, 'fields' => $fields, 'action' => $visAction, 'action_params' =>  ['register_state' => 'false'], 'display_condition' => [$this, 'exibeView']],
         ];    
                 
         if (isset($this->properties->{'actions'}))
@@ -199,11 +199,7 @@ class TCustomStandardList extends TStandardList
 
         $hasInsert = isset($this->properties->{'hasInsert'}) ? $this->properties->{'hasInsert'} : true;
         if ($hasInsert) {
-            unset($param['class']);
-            unset($param['method']);
-            $param['register_state'] = 'false';
-            $param['fromClass'] = get_class($this);
-            $panel->addHeaderActionLink('', new TAction([$this->properties->{'formEdit'}, 'onInsert'], $param), 'fa:plus');
+            $this->criarBotaoInserir($param, $panel);
         }
 
         $this->filter_label = $panel->addHeaderActionLink('Filtros', new TAction([$this, 'onShowCurtainFilters'], $param), 'fa:filter');
@@ -241,6 +237,26 @@ class TCustomStandardList extends TStandardList
         $container->add($panel);
         
         parent::add($container);
+    }
+
+    public function exibeEdit($object) {
+        return true;
+    }
+
+    public function exibeDelete($object) {
+        return true;
+    }
+
+    public function exibeView($object) {
+        return true;
+    }
+
+    public function criarBotaoInserir($param, $panel) {
+        unset($param['class']);
+        unset($param['method']);
+        $param['register_state'] = 'false';
+        $param['fromClass'] = get_class($this);
+        $panel->addHeaderActionLink('', new TAction([$this->properties->{'formEdit'}, 'onInsert'], $param), 'fa:plus');
     }
 
     public function onAfterSearch($datagrid, $options)

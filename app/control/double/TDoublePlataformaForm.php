@@ -43,7 +43,7 @@ class TDoublePlataformaForm  extends TStandardForm
             [$this->makeTCombo(['name' => 'usuarios_canal', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%', 'required' => true, 'editable' => $param['method'] != 'onView'])],
         );
 
-        $tipo_sinais = ['GERA' => 'Gera Sinais', 'NAO_GERA' => 'Não Gera Sinais', 'PROPAGA_OUTRO' => 'Propaga Outro Canal'];
+        $tipo_sinais = ['GERA' => 'Gera Sinais', 'NAO_GERA' => 'Não Gera Sinais', 'PROPAGA_OUTRO' => 'Propaga Outro Canal', 'PROPAGA_VALIDA_SINAL' => 'Propaga e Valida Sinal'];
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Tipo Sinais'])],
             [$this->makeTCombo(['name' => 'tipo_sinais', 'label' => $label, 'items' => $tipo_sinais, 'width' => '100%', 'required' => true, 'editable' => $param['method'] != 'onView'])],
@@ -52,7 +52,7 @@ class TDoublePlataformaForm  extends TStandardForm
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Telegram Token - Robô'])],
-            [$this->makeTEntry(['name' => 'telegram_token', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [$this->makeTEntry(['name' => 'telegram_token', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
         );
 
         $this->form->addFields(
@@ -79,6 +79,17 @@ class TDoublePlataformaForm  extends TStandardForm
             [$label = $this->makeTLabel(['value' => 'Url Grupo Vip'])],
             [$this->makeTEntry(['name' => 'url_grupo_vip', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
         );
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Url Sala de  Sinais'])],
+            [$this->makeTEntry(['name' => 'url_sala_sinais', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
+        );
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Url Comunidade'])],
+            [$this->makeTEntry(['name' => 'url_comunidade', 'label' => $label, 'editable' => $param['method'] != 'onView'])],
+        );
+        
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Url Flux'])],

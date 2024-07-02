@@ -1,6 +1,7 @@
 <?php
 
 use Adianti\Database\TFilter;
+use Adianti\Widget\Form\TForm;
 use Adianti\Base\TStandardForm;
 use Adianti\Database\TCriteria;
 use Adianti\Database\TExpression;
@@ -16,25 +17,50 @@ class TDoubleEstrategiaForm  extends TStandardForm
 
     const ACTIVERECORD = 'DoubleEstrategia';
     const DATABASE = 'double';
+    const RESULTADOS = [
+        '-' => ['red' => 'Vermelho', 'black' => 'Preto', 'white' => 'Branco', 'break' => 'Ignorar entrada'],
+        'Jonbet' => ['red' => 'Verde', 'black' => 'Preto', 'white' => 'Branco', 'break' => 'Ignorar entrada']
+    ];
 
     protected function onBuild($param)
     {
         $this->form->addFields(
             [$this->makeTHidden(['name' => 'id'])],
             [$this->makeTHidden(['name' => 'regra'])],
-            [$this->makeTHidden(['name' => 'resultado'])],
         );
 
         $criteria = new TCriteria;
         $criteria->add(
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
-                '=',
-                'GERA'
+                'IN',
+                ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
         
         $criteria->add(  new TFilter( 'ativo', '=', 'Y') );
+
+        $object = TUtils::openFakeConnection('double', function() use ($param){
+            if (!isset($param['id']) or (isset($param['id']) and empty($param['id'])))
+                return ;
+            
+            $object = new DoubleEstrategia($param['id'], false);
+            if ($object)
+                return $object;
+        });
+
+        $canal = null;
+
+        if ($object) {
+            $param['tipo'] = $object->tipo;
+            $canal = $object->canal;
+        }
+
+        if (!$canal and isset($param['canal_id'])) {
+            $canal = TUtils::openFakeConnection('double', function () use ($param){
+                return new DoubleCanal($param['canal_id'], false);
+            });
+        }
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Canal'])],
@@ -50,7 +76,8 @@ class TDoubleEstrategiaForm  extends TStandardForm
                     'editable' => $param['method'] != 'onView',
                     'defaultOption' => false,
                     'width' => '100%',
-                    'criteria' => $criteria
+                    'criteria' => $criteria,
+                    'editable' => false
                 ]
             )],
         );
@@ -68,164 +95,131 @@ class TDoubleEstrategiaForm  extends TStandardForm
                 'width' => '100%',
                 'items' => ['COR' => 'Cor', 'NUMERO' => 'Número', 'SOMA' => 'Soma'],
                 'defaultOption' => false,
-                'editable' => $param['method'] != 'onView',
+                'editable' => False,
                 'required' => true
-            ], 
-            function ($object) {
-                $object->setChangeAction( new TAction(array($this, 'onTipoChange')) );
-            })],
+            ])],
             [$label = $this->makeTLabel(['value' => 'Ordem'])],
             [$this->makeTEntry(['name' => 'ordem', 'label' => $label, 'required' => true, 'mask' => '9!', 'editable' => $param['method'] != 'onView'])],
         );
 
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-        $botoes[0]['botao']->enableSection( 'main', ['cor' => 'vermelho', 'value' => ''] );
-
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-        $botoes[1]['botao']->enableSection( 'main', ['cor' => 'preto', 'value' => ''] );
-
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html')];
-        $botoes[2]['botao']->enableSection( 'main', [] );
-
-        $numeros[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html')];
-        $numeros[0]['botao']->enableSection( 'main', [] );
-
-        for ($i=1; $i < 8; $i++) { 
-            $numeros[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-            $numeros[$i]['botao']->enableSection( 'main', ['cor' => 'vermelho', 'value' => $i] );
-        }
-        
-        for ($i=8; $i < 15; $i++) { 
-            $numeros[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-            $numeros[$i]['botao']->enableSection( 'main', ['cor' => 'preto', 'value' => $i] );
-        }
-        
-        $regra = new THtmlRenderer('app/resources/double/estrategia/regra.html');
-        $regra->enableSection(
-            'main',
-            [
-                'botoes' => $botoes,
-                'numeros' => $numeros,
-            ]
-        );
-        
-        $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => 'Regra'])],
-            [$regra],
-        );
-
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-        $botoes[0]['botao']->enableSection( 'main', ['cor' => 'vermelho', 'value' => ''] );
-
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao.html')];
-        $botoes[1]['botao']->enableSection( 'main', ['cor' => 'preto', 'value' => ''] );
-
-        $botoes[] = ['botao' => new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html')];
-        $botoes[2]['botao']->enableSection( 'main', [] );
-
-        $retorno = new THtmlRenderer('app/resources/double/estrategia/retorno.html');
-        $retorno->enableSection(
-            'main',
-            [
-                'botoes' => $botoes,
-            ]
-        );
-        
-        $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => 'Resultado'])],
-            [$retorno],
-        );
-
-        TScript::create('
-            function atualiza_regra_selecao() {
-                const campo = document.getElementsByName("regra")[0];
-                if (campo) {
-                    const regra = campo.value;
-                    const tipo = document.getElementsByName("tipo")[0].value;
-                    $.get("engine.php?class=TDoubleEstrategiaForm&method=doConsultarRegra&static=1&regra="+regra+"&tipo="+tipo, function(data) {
-                        $("#regra_selecao div").remove();
-                        $("#regra_selecao").append(data);
-                    });
-                }
+        if ($param['tipo'] != 'SOMA') {
+            // Campos de regra
+            $this->ruleField = new TElement('div');
+            $this->ruleField->id = 'rule_field';
+            $this->ruleField->style = 'border: 1px solid #ccc; padding: 10px; min-height: 62px;';
+            if ($param['method'] == 'onView') {
+                $this->ruleField->style .= ' background: #eee;';
             }
 
-            function atualiza_resultado_selecao() {
-                const regra = document.getElementsByName("resultado")[0].value;
-                $.get("engine.php?class=TDoubleEstrategiaForm&method=doConsultarResultado&static=1&regra="+regra, function(data) {
-                    $("#retorno_selecao div").remove();
-                    $("#retorno_selecao").append(data);
-                });
+            if ($param['method'] != 'onView') {        
+                $div    = new TElement('div');
+                $button = new TElement('button');
+                $icon   = new TElement('i');
+
+                $div->{'id'} = $this->id;
+                $icon->{'class'} = 'fa fa-times';
+                $div->{'class'} = 'regras';
+                
+                $button->{'type'} = 'button';
+                $button->onclick = "clearOptions()";
+
+                $button->add($icon);
+                $div->add($this->innerIcon);
+                $div->add($this->tag);
+                $div->add($button);
+                $this->ruleField->add($div);
             }
 
-            atualiza_regra_selecao();
-            atualiza_resultado_selecao();
+            $ruleContainer = new TElement('div');
+            $ruleContainer->add($this->ruleField);
 
-            setInterval( atualiza_regra_selecao, 5000);
-            setInterval( atualiza_resultado_selecao, 5000);
-        ');
-    }
+            $this->form->addFields([new TLabel('Regra')], [$ruleContainer]);
 
-    public static function doConsultarResultado($param)
-    {
-        if (!isset($param['regra']) or (isset($param['regra']) and !$param['regra']))
-            echo '<div>Clique nas cores para informar o resultado</div>';
-        else {
-            $value = $param['regra'];
-            if ($value == 'white') {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                $botao->enableSection( 'main', [] );
-            } else {
-                $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$value], 'value' => ''] );
+            // Divs de opções com imagens
+            $optionsContainer = new TElement('div');
+
+            $path = 'app/images/regras/';
+            $path_bet = "app/images/regras/{$canal->plataforma->nome}/";
+
+            $options = [
+                'red'   => ['image' => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'), 'title' => ''],
+                'black' => ['image' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'), 'title' => ''],
+                'white' => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => ''],
+                'other' => ['image' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'), 'title' => 'Qualquer cor'],
+            ];
+
+            if ($param['tipo'] == 'NUMERO') {
+                $options = [
+                    '1'  => ['image' => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'), 'title' => ''],
+                    '2'  => ['image' => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'), 'title' => ''],
+                    '3'  => ['image' => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'), 'title' => ''],
+                    '4'  => ['image' => (file_exists($path_bet . '4.png') ? $path_bet . '4.png' : $path . '4.png'), 'title' => ''],
+                    '5'  => ['image' => (file_exists($path_bet . '5.png') ? $path_bet . '5.png' : $path . '5.png'), 'title' => ''],
+                    '6'  => ['image' => (file_exists($path_bet . '6.png') ? $path_bet . '6.png' : $path . '6.png'), 'title' => ''],
+                    '7'  => ['image' => (file_exists($path_bet . '7.png') ? $path_bet . '7.png' : $path . '7.png'), 'title' => ''],
+                    '8'  => ['image' => (file_exists($path_bet . '8.png') ? $path_bet . '8.png' : $path . '8.png'), 'title' => ''],
+                    '9'  => ['image' => (file_exists($path_bet . '9.png') ? $path_bet . '9.png' : $path . '9.png'), 'title' => ''],
+                    '10' => ['image' => (file_exists($path_bet . '10.png') ? $path_bet . '10.png' : $path . '10.png'), 'title' => ''],
+                    '11' => ['image' => (file_exists($path_bet . '11.png') ? $path_bet . '11.png' : $path . '11.png'), 'title' => ''],
+                    '12' => ['image' => (file_exists($path_bet . '12.png') ? $path_bet . '12.png' : $path . '12.png'), 'title' => ''],
+                    '13' => ['image' => (file_exists($path_bet . '13.png') ? $path_bet . '13.png' : $path . '13.png'), 'title' => ''],
+                    '14' => ['image' => (file_exists($path_bet . '14.png') ? $path_bet . '14.png' : $path . '14.png'), 'title' => '']
+                ];
             }
 
-            echo $botao->getContents();
-        }
-    }
+            if ($param['method'] != 'onView') {
+                foreach ($options as $key => $option) {
+                    $div = new TElement('div');
+                    $div->style = 'display: inline-block; margin: 2px; cursor: pointer;';
+                    $div->onclick = "addOption('$key')";
+                    $div->title = $option['title'];
+                    
+                    $img = new TElement('img');
+                    $img->src = $option['image'];
+                    $img->style = 'width: 35px; height: 35px;';
 
-    public static function doConsultarRegra($param)
-    {
-        if (!isset($param['regra']) or (isset($param['regra']) and !$param['regra']))
-            echo '<div>Clique nas cores ou números para definir uma regra</div>';
-        else {
-            $value = $param['regra'];
-            $tipo = $param['tipo'];
-            if ($tipo == 'NUMERO') {
-                if ($value == 0) {
-                    $selecao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                    $selecao->enableSection( 'main', [] );
-                } elseif ($value < 8) {
-                    $selecao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $selecao->enableSection( 'main', ['cor' => 'vermelho', 'value' => $value] );
-                } else {
-                    $selecao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                    $selecao->enableSection( 'main', ['cor' => 'preto', 'value' => $value] );
-                }
-            } else {
-                $cores = explode(' - ', $value);
-                foreach ($cores as $key => $cor) {
-                    if ($cor == 'white') {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao_branco.html');
-                        $botao->enableSection( 'main', [] );
-                    } else {
-                        $botao = new THtmlRenderer('app/resources/double/estrategia/double_botao.html');
-                        $botao->enableSection( 'main', ['cor' => ['red' => 'vermelho', 'black' => 'preto'][$cor], 'value' => ''] );
-                    }
-                    $cores[$key] = ['botao' => $botao];
+                    $div->add($img);
+                    $optionsContainer->add($div);
                 }
 
-                $selecao = new THtmlRenderer('app/resources/double/estrategia/retorno_lista.html');
-                $selecao->enableSection(
-                    'main',
-                    [
-                        'botoes' => $cores,
-                    ]
-                );
-                $selecao;
+                $this->form->addFields([], [$optionsContainer]);
             }
+        }
 
-            echo $selecao->getContents();
-        }      
+        if ($param['tipo'] != 'SOMA') 
+            $this->form->addFields(
+                [$label = $this->makeTLabel(['value' => 'Resultado'])],
+                [$this->makeTCombo([
+                    'name' => 'resultado',
+                    'label' => $label,
+                    'width' => '100%',
+                    'items' => isset(self::RESULTADOS[$canal->plataforma->nome]) ? self::RESULTADOS[$canal->plataforma->nome] : self::RESULTADOS['-'],
+                    'defaultOption' => false,
+                    'editable' => $param['method'] != 'onView',
+                    'required' => true
+                ])],
+            );
+
+        // carregar as regras
+        if ($object and $object->regra) {
+            $regras = explode(' - ', $object->regra);
+            foreach ($regras as $key => $value) {
+                $obj = self::onAddOption(['option' => $value], $canal->plataforma->nome);
+                $this->ruleField->add($obj);
+            }
+        }
+
+        // Adiciona o script de JavaScript para a ação de clique
+        TScript::create($this->getJavaScript());
+
+        // Verifica se recebeu o tipo por parâmetro
+        if (isset($param['tipo'])) {
+            $data = new stdClass;
+            $data->tipo = $param['tipo'];
+            $data->canal_id = $canal->id;
+
+            TForm::sendData('form_TDoubleEstrategiaForm', $data);
+        }
     }
 
     protected function getTitle()
@@ -233,29 +227,120 @@ class TDoubleEstrategiaForm  extends TStandardForm
         return 'Estrategia';
     }
 
-    public static function onTipoChange($param)
+    public function onSave($param = null)
     {
-        if ($param['tipo'] == 'COR') {
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regras', true);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_cor', true);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_acoes', true);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_numero', false);
-        } elseif ($param['tipo'] == 'NUMERO') {
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regras', true);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_cor', false);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_acoes', false);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regra_numero', true);
-        } else {
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'regras', false);
-            TUtils::showHideField('form_TDoubleEstrategiaForm', 'retorno', false);
+        if ($param['tipo'] != 'SOMA' and $param['regra'] == '')
+            new TMessage('error', 'É obrigatório informar uma regra');
+
+        parent::onSave();
+    }
+
+    public static function onAddOption($param, $bet_name)
+    {
+        $path = 'app/images/regras/';
+        $path_bet = "app/images/regras/{$bet_name}/";
+
+        $imageMap = [
+            'red'   => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'),
+            'black' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'),
+            'white' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'),
+            'other' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'),
+            'break' => (file_exists($path_bet . 'break.png') ? $path_bet . 'break.png' : $path . 'break.png'),
+            '1'     => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'),
+            '2'     => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'),
+            '3'     => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'),
+            '4'     => (file_exists($path_bet . '4.png') ? $path_bet . '4.png' : $path . '4.png'),
+            '5'     => (file_exists($path_bet . '5.png') ? $path_bet . '5.png' : $path . '5.png'),
+            '6'     => (file_exists($path_bet . '6.png') ? $path_bet . '6.png' : $path . '6.png'),
+            '7'     => (file_exists($path_bet . '7.png') ? $path_bet . '7.png' : $path . '7.png'),
+            '8'     => (file_exists($path_bet . '8.png') ? $path_bet . '8.png' : $path . '8.png'),
+            '9'     => (file_exists($path_bet . '9.png') ? $path_bet . '9.png' : $path . '9.png'),
+            '10'    => (file_exists($path_bet . '10.png') ? $path_bet . '10.png' : $path . '10.png'),
+            '11'    => (file_exists($path_bet . '11.png') ? $path_bet . '11.png' : $path . '11.png'),
+            '12'    => (file_exists($path_bet . '12.png') ? $path_bet . '12.png' : $path . '12.png'),
+            '13'    => (file_exists($path_bet . '13.png') ? $path_bet . '13.png' : $path . '13.png'),
+            '14'    => (file_exists($path_bet . '14.png') ? $path_bet . '14.png' : $path . '14.png'),
+        ];
+
+        if (isset($imageMap[$param['option']])) {
+            $imgTag = new TElement('img');
+            $imgTag->src = $imageMap[$param['option']];
+            $imgTag->style = 'width: 35px; height: 35px; margin: 2px;';
+
+            return $imgTag;
         }
     }
 
-    public function onEdit($param)
+    public static function onAddOptionJs($param)
     {
-        $object = parent::onEdit($param);
+        $bet_name = TUtils::openFakeConnection('double', function () use ($param){
+            $obj = new DoubleCanal($param['canal_id'], false);
+            if ($obj)
+                return $obj->plataforma->nome;
+            else
+                return '--';
+        });
 
-        self::onTipoChange($object->toArray());
-        return $object;
+        $option = self::onAddOption($param, $bet_name);
+        if ($option) {
+            echo $option->getContents();
+        }
+    }
+
+    private function getJavaScript()
+    {
+        return <<<JAVASCRIPT
+            function addOption(option) {
+                regra = document.getElementsByName('regra')[0].value;
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                if (regra == '')
+                    regras = [];
+                else
+                    regras = regra.split(' - ');
+
+                try
+                {
+                    if (regras.length == 15) {
+                        const e = new Error("Você pode selecionar no máximo 15 opções. ");
+                        throw e;
+                    }
+
+                    regras.push(option);
+                    regra = regras.join(' - ');
+                    document.getElementsByName('regra')[0].value = regra;
+
+                    if (!isNaN(option)) {
+                        clearOptions();
+                        document.getElementsByName('regra')[0].value = option;
+                    }
+
+                    __adianti_ajax_exec('class=TDoubleEstrategiaForm&method=onAddOptionJs&option=' + option + '&canal_id=' + canal_id, function(data) {
+                        document.getElementById('rule_field').insertAdjacentHTML('beforeend', data);
+                    }, false);
+                } catch (e) {
+                    if (e instanceof Error) {
+                        __adianti_error('error', e.message);
+                    }
+                }
+            }
+
+            function clearOptions(){
+                regra = document.getElementsByName('regra')[0].value;
+                regras = regra.split(' - ');
+                
+                regras.forEach(option => {
+                    let rules = document.getElementById("rule_field");
+                    for (const child of rules.children) {
+                        if (child.tagName == 'IMG') {
+                            child.remove();
+                        }
+                    }
+                });
+
+                document.getElementsByName('regra')[0].value = '';
+            }
+
+            
+JAVASCRIPT;
     }
 }

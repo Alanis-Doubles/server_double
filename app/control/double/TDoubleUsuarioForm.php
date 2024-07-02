@@ -92,31 +92,31 @@ class TDoubleUsuarioForm  extends TStandardForm
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Valor'])],
-            [$this->makeTNumeric(['name' => 'valor', 'label' => $label, 'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
+            [$this->makeTNumeric(['name' => 'valor', 'label' => $label, 'editable' => false,  'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
             [$label = $this->makeTLabel(['value' => 'Proteção'])],
-            [$this->makeTEntry(['name' => 'protecao', 'label' => $label, 'mask' => '9!'])],
+            [$this->makeTEntry(['name' => 'protecao', 'label' => $label, 'editable' => false,  'mask' => '9!'])],
         );
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Stop WIN'])],
-            [$this->makeTNumeric(['name' => 'stop_win', 'label' => $label, 'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
+            [$this->makeTNumeric(['name' => 'stop_win', 'label' => $label, 'editable' => false,  'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
             [$label = $this->makeTLabel(['value' => 'Stop LOSS'])],
-            [$this->makeTNumeric(['name' => 'stop_loss', 'label' => $label, 'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
+            [$this->makeTNumeric(['name' => 'stop_loss', 'label' => $label, 'editable' => false,  'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.'])],
         );
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Jogadas Gratuitas'])],
             [$this->makeTEntry(['name' => 'demo_jogadas', 'label' => $label, 'mask' => '9!'])],
             [$label = $this->makeTLabel(['value' => 'Início Jogadas Gratuitas'])],
-            [$this->makeTDateTime(['name' => 'demo_inicio', 'label' => $label, 'width' => '100%', 'mask' => 'dd/mm/yyyy hh:ii:ss', 'databaseMask' => 'yyyy-mm-dd hh:ii:ss'])]
+            [$this->makeTDateTime(['name' => 'demo_inicio', 'label' => $label, 'editable' => false, 'width' => '100%', 'mask' => 'dd/mm/yyyy hh:ii:ss', 'databaseMask' => 'yyyy-mm-dd hh:ii:ss'])]
         );
 
-        $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => 'Utiliza Recuperação'])],
-            [$this->makeTCombo(['name' => 'ciclo', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
-            [$label = $this->makeTLabel(['value' => 'Entrada Automática'])],
-            [$this->makeTCombo(['name' => 'entrada_automatica', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
-        );
+        // $this->form->addFields(
+        //     [$label = $this->makeTLabel(['value' => 'Utiliza Recuperação'])],
+        //     [$this->makeTCombo(['name' => 'ciclo', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
+        //     [$label = $this->makeTLabel(['value' => 'Entrada Automática'])],
+        //     [$this->makeTCombo(['name' => 'entrada_automatica', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
+        // );
     }
 
     protected function getTitle()
@@ -179,11 +179,11 @@ class TDoubleUsuarioForm  extends TStandardForm
                 if ($plataforma->usuarios_canal == 'Y')
                     TCombo::enableField('form_TDoubleUsuarioForm', 'canal_id');
                 $criteria = TCriteria::create( ['plataforma_id' => $param['plataforma_id'] ] );
-                TDBCombo::reloadFromModel('form_TDoubleUsuarioForm', 'canal_id', 'double', 'DoubleCanal', 'plataforma_id', '{nome}', 'id', $criteria, TRUE);
+                TDBCombo::reloadFromModel('form_TDoubleUsuarioForm', 'canal_id', 'double', 'DoubleCanal', 'id', '{nome}', 'id', $criteria, TRUE);
             }
             else
             {
-                TCombo::clearField('form_TDoubleUsuarioForm', 'plataforma_id');
+                TCombo::clearField('form_TDoubleUsuarioForm', 'canal_id');
             }
 
             $data = new stdClass;
@@ -191,8 +191,10 @@ class TDoubleUsuarioForm  extends TStandardForm
             $data->nome_usuario = $param['nome_usuario'];
             $data->email = $param['email'];
             $data->chat_id = $param['chat_id'];
-            $data->plataforma_id = $param['plataforma_id'];
-            $data->canal_id = $param['canal_id'];
+            if (!empty($param['plataforma_id']))
+                $data->plataforma_id = $param['plataforma_id'];
+            if (!empty($param['canal_id']))
+                $data->canal_id = $param['canal_id'];
             $data->usuarios_canal = $param['usuarios_canal'];
             TForm::sendData('form_TDoubleUsuarioForm', $data, False, False);
         }

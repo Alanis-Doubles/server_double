@@ -2,6 +2,7 @@
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Utils;
+use Ramsey\Uuid\Rfc4122\NilUuid;
 
 class TelegramRest
 {
@@ -25,20 +26,60 @@ class TelegramRest
             $payload['reply_markup'] = $reply_markup;
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
-        $client = new Client(['http_errors' => false]);
-        $response = $client->request(
-            'POST', 
-            $location.'sendMessage',
-            [
-                'json' => $payload,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
-            ]
+        // $client = new Client(['http_errors' => false]);
+        // $response = $client->request(
+        //     'POST', 
+        //     $location.'sendMessage',
+        //     [
+        //         'json' => $payload,
+        //         'headers' => [
+        //             'Content-Type' => 'application/json',
+        //             'Accept' => 'application/json'
+        //         ]
+        //     ]
+        // );
+
+        $ch = curl_init();
+    
+        $defaults = array(
+            CURLOPT_URL => $location . 'sendMessage', 
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'Content-Type: application/json'
+              ),
         );
         
-        $contents = json_decode($response->getBody()->getContents());
+        // if (!empty($authorization))
+        // {
+        //     $defaults[CURLOPT_HTTPHEADER] = ['Authorization: '. $authorization];
+        // }
+        
+        curl_setopt_array($ch, $defaults);
+        $output = curl_exec ($ch);
+        
+        curl_close ($ch);
+        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($chat_id < 0) {
+            $canal = DoubleCanal::identificarPorChannel($chat_id);
+            $canal->updated_at = (new DateTime())->format('Y-m-d H:i:s');
+            $canal->saveInTransaction();
+        }
+        
+        // if ($response->getStatusCode() == 200)
+        $contents = null;
+        if ($http_status == 200)
+            $contents = json_decode($output);
+        else
+            DoubleErros::registrar('3', 'DoubleErros', 'sendMessage', $location . 'sendMessage', $http_status);
         return $contents;
     }
 

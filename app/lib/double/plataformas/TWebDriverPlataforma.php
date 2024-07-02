@@ -39,4 +39,5 @@ class TWebDriverPlataforma implements IDoublePlataforma
     public function logar(string $usuario, string $senha){}
     public function cores(){}
     public function jogar(DoubleUsuario $usuario, string $cor, float $valor){}
+    public function sinalCorrente(){}
 }
