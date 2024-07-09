@@ -9,7 +9,7 @@ class DoubleEstrategia extends DoubleRecord
 {
     const TABLENAME  = 'double_estrategia';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
     const DELETEDAT  = 'deleted_at';
 
     use RecordTrait;

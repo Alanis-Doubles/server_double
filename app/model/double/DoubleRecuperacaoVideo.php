@@ -6,7 +6,7 @@ class DoubleRecuperacaoVideo extends DoubleRecord
 {
     const TABLENAME  = 'double_recuperacao_video';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

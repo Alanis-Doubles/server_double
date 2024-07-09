@@ -9,7 +9,8 @@ class DoubleUsuario extends DoubleRecord
 {
     const TABLENAME  = 'double_usuario';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
+    const DELETEDAT  = 'deleted_at';
 
     use RecordTrait;
 
@@ -53,6 +54,7 @@ class DoubleUsuario extends DoubleRecord
         $plataforma = new DoublePlataforma($this->plataforma_id, false);
         $system_group = $plataforma->system_group;
         $system_role = $plataforma->system_role;
+
         TUtils::openConnection('permission', function () use ($plataforma, $system_group, $system_role){
             $user = $this->buscarSystemUser();
             if (!$this->user->checkInGroup($system_group)) {
@@ -69,6 +71,11 @@ class DoubleUsuario extends DoubleRecord
                 $user->addSystemUserRole($system_role);
                 $user->save();
             }
+
+            $dashboard = SystemProgram::where('controller', '=', 'TDoubleDashboardUsuario')->first();
+            if ($dashboard)
+                $user->frontpage_id = $dashboard->id;
+                $user->save();
         });
 
         $pk = $this->getPrimaryKey();
@@ -176,22 +183,22 @@ class DoubleUsuario extends DoubleRecord
     public function set_nome_usuario($value)
     {
         TUtils::openConnection('permission', function() use ($value) {
-            if (!$this->user)
+        if (!$this->user)
             $this->user = $this->buscarSystemUser();
 
-            if (!$this->login)
-            {
-                $old = SystemUserOldPassword::register($this->user->id, $value);
-                if ($old)
-                    $conn = TTransaction::get();
-                    TDatabase::updateData(
-                        $conn, 
-                        'system_user_old_password',
-                        ['created_at' => date('Y-m-d H:i:s', strtotime('-91 days'))],
-                        TCriteria::create(['id' => $old->id])
-                    );
-                $this->user->password = SystemUser::passwordHash($value);
-            }
+            // if (!$this->login)
+            // {
+            //     $old = SystemUserOldPassword::register($this->user->id, $value);
+            //     if ($old)
+            //         $conn = TTransaction::get();
+            //         TDatabase::updateData(
+            //             $conn, 
+            //             'system_user_old_password',
+            //             ['created_at' => date('Y-m-d H:i:s', strtotime('-91 days'))],
+            //             TCriteria::create(['id' => $old->id])
+            //         );
+            //     $this->user->password = SystemUser::passwordHash($value);
+            // }
 
             $this->user->login = $value;
             $this->user->save();
@@ -388,5 +395,30 @@ class DoubleUsuario extends DoubleRecord
         }
         
         return $this->obj_usuario_meta;
+    }
+    
+    public function generate_access($email) {
+        $value = TUtils::gerarSenhaAleatoria(12);
+        TUtils::openConnection('permission', function() use ($email, $value) {
+            if (!$this->user)
+                $this->user = $this->buscarSystemUser();
+    
+            $old = SystemUserOldPassword::register($this->user->id, $value);
+            if ($old)
+                $conn = TTransaction::get();
+                TDatabase::updateData(
+                    $conn, 
+                    'system_user_old_password',
+                    ['created_at' => date('Y-m-d H:i:s', strtotime('-91 days'))],
+                    TCriteria::create(['id' => $old->id])
+                );
+            $this->user->password = SystemUser::passwordHash($value);
+
+            // $this->user->login = $email;
+            $this->user->email = $email;
+            $this->user->save();
+        });
+
+        return $value;
     }
 }

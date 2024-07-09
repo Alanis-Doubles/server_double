@@ -67,12 +67,12 @@ class TDoubleUsuarioForm  extends TStandardForm
             [$label = $this->makeTLabel(['value' => 'Usuário'])],
             [$this->makeTSeekButton(['name' => 'nome_usuario', 'label' => $label, 'required' => true, 'useOutEvent' => False, 'action' => [$this, 'onBuscarTelegram'], 'action_params' => $param])],
             [$label = $this->makeTLabel(['value' => 'E-mail'])],
-            [$this->makeTEntry(['name' => 'email', 'label' => $label, 'required' => true])],
+            [$this->makeTEntry(['name' => 'email', 'label' => $label, 'required' => false])],
         );
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Telefone'])],
-            [$this->makeTEntry(['name' => 'telefone', 'label' => $label, 'required' => true])],
+            [$this->makeTEntry(['name' => 'telefone', 'label' => $label, 'required' => false])],
             [], []
         );
 

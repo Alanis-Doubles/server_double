@@ -38,13 +38,7 @@ class TRanking
             ['name' => 'gale_3', 'label' => 'G3', 'width' => '5%', 'align' => 'center'],
         ];
 
-        // $dataGrid->actions = [
-        //     'actEditar' => ['label' => 'Editar' , 'image' => 'far:edit blue', 'field' => 'estrategia_id', 'action' => ['TDoubleEstrategiaForm', 'onEdit'], 'action_params' => ['register_state' => 'false', 'fromClass' => 'TDoubleDashboard']],
-        //     'actAtivar' => ['label' => 'Ativar/Inativar' , 'image' => 'fa:power-off orange', 'field' => 'estrategia_id', 'action' => ['TDoubleDashboard', 'onAtivarInativarEstrategia'], 'action_params' => ['register_state' => 'false']],
-        // ];
-
         $this->panel = $this->makeTDataGrid($dataGrid);
-        // $this->panel->addHeaderActionLink('', new TAction(['TDoubleEstrategiaForm', 'onInsert'], ['register_state' => 'false']), 'fa:plus');
 
         $this->datagrid = $this->getWidget('dataraking');
     }
@@ -58,8 +52,6 @@ class TDoubleDashboard extends TPage
     private $filterRanking;
     private $datagrid;
     private $botoes;
-
-    const BOTOES = ['white' => 'branco', 'red' => 'vermelho', 'black' => 'preto', 'other' => 'azul', 'break' => 'parar'];
 
     public function __construct($param = null)
     {
@@ -237,7 +229,9 @@ class TDoubleDashboard extends TPage
 JAVASCRIPT;
     }
 
-    public function onReload($param) {}
+    public function onReload($param) {
+        $a = '1';
+    }
 
     public function onAtivarInativarEstrategia($param) 
     {
@@ -474,6 +468,7 @@ JAVASCRIPT;
         if ($object->data_fim)
             $object->data_fim = TDate::convertToMask($object->data_fim, 'dd/mm/yyyy', 'yyyy-mm-dd');
 
+        // DoubleErros::registrar(3, 'dashboard', 'dash', json_encode($object));
         $dados = TUtils::openFakeConnection('double', function() use ($object){
             $usuariosTotal       = DoubleUsuario::where(1, '=', 1);
             $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');
@@ -483,7 +478,7 @@ JAVASCRIPT;
             $totalCancelamentos  = DoublePagamentoHistorico::where('tipo_evento', '=', 'CANCELAMENTO');
             $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO', 'CANCELAMENTO']);
 
-            if (isset($param['canal_id']) and $param['canal_id'])
+            if ($object->canal_id)
             {
                 $usuariosTotal       = $usuariosTotal->where('canal_id', '=', $object->canal_id);
                 $usuariosAtivos      = $usuariosAtivos->where('canal_id', '=', $object->canal_id);

@@ -7,7 +7,7 @@ class DoublePagamentoHistorico extends DoubleRecord
 {
     const TABLENAME  = 'double_pagamento_historico';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

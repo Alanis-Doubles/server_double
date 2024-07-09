@@ -39,8 +39,14 @@ class TDoublePlataformaForm  extends TStandardForm
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Valor Mínimo'])],
             [$this->makeTNumeric(['name' => 'valor_minimo', 'label' => $label, 'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.', 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [$label = $this->makeTLabel(['value' => 'Valor Mínimo Proteção'])],
+            [$this->makeTNumeric(['name' => 'valor_minimo_protecao', 'label' => $label, 'decimals' => 2, 'decimalsSeparator' => ',', 'thousandSeparator' => '.', 'required' => true, 'editable' => $param['method'] != 'onView'])],
+        );
+
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Controle de usuários por canal'])],
             [$this->makeTCombo(['name' => 'usuarios_canal', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%', 'required' => true, 'editable' => $param['method'] != 'onView'])],
+            [],[]
         );
 
         $tipo_sinais = ['GERA' => 'Gera Sinais', 'NAO_GERA' => 'Não Gera Sinais', 'PROPAGA_OUTRO' => 'Propaga Outro Canal', 'PROPAGA_VALIDA_SINAL' => 'Propaga e Valida Sinal'];

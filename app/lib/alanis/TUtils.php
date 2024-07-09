@@ -257,4 +257,18 @@ class TUtils
         return $result['text'];
     }
 
+    public static function gerarSenhaAleatoria($comprimento = 16) {
+        // Gera bytes aleatórios
+        $bytesAleatorios = random_bytes($comprimento);
+    
+        // Converte os bytes para uma string hexadecimal
+        $senha = bin2hex($bytesAleatorios);
+    
+        // Se você quiser a senha em um formato mais legível, pode usar base64_encode
+        // $senha = base64_encode($bytesAleatorios);
+    
+        // Limita o comprimento da senha ao valor desejado
+        return substr($senha, 0, $comprimento);
+    }
+
 }

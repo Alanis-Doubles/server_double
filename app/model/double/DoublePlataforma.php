@@ -7,7 +7,8 @@ class DoublePlataforma extends DoubleRecord
 {
     const TABLENAME  = 'double_plataforma';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
+    const DELETEDAT  = 'deleted_at';
 
     use RecordTrait;
 

@@ -6,7 +6,7 @@ class DoubleTraducaoPlataforma extends DoubleRecord
 {
     const TABLENAME  = 'double_traducao_plataforma';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

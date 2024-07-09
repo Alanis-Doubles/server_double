@@ -6,7 +6,7 @@ class DoubleErros extends DoubleRecord
 {
     const TABLENAME  = 'double_erros';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

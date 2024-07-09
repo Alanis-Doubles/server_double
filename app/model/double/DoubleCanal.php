@@ -6,7 +6,8 @@ class DoubleCanal extends DoubleRecord
 {
     const TABLENAME  = 'double_canal';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
+    const DELETEDAT  = 'deleted_at';
 
     use RecordTrait;
 

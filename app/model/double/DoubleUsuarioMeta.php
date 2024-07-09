@@ -6,7 +6,7 @@ class DoubleUsuarioMeta extends DoubleRecord
 {
     const TABLENAME  = 'double_usuario_meta';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

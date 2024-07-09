@@ -373,6 +373,8 @@ class SystemUser extends TRecord
     public static function validate($login)
     {
         $user = self::newFromLogin($login);
+        if (!$user)
+            $user = self::newFromEmail($login);
         
         if ($user instanceof SystemUser)
         {

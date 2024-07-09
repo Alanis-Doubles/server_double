@@ -2,7 +2,7 @@
 
 class TDoubleTranslate
 {
-    protected $list;
+    public $list;
     protected $plataforma_id;
 
     public function __construct($plataforma_id)

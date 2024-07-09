@@ -233,7 +233,24 @@ RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-
 RewriteRule ^api/webhook/([A-Za-z-_0-9]*)$ rest.php?call_method=POST&auth=None&class=TDoubleWebhook&method=processar&origem=$1&%{QUERY_STRING} [NC]
 
 
+RewriteRule ^double-dashboard$ index.php?class=TDoubleDashboard&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-dashboard$ engine.php?class=TDoubleDashboard&%{QUERY_STRING} [NC]
+
+RewriteRule ^double-plataformas$ index.php?class=TDoublePlataformaList&method=onReload&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-plataformas$ engine.php?class=TDoublePlataformaList&method=onReload&%{QUERY_STRING} [NC]
+
+RewriteRule ^double-canais$ index.php?class=TDoubleCanalList&method=onReload&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-canais$ engine.php?class=TDoubleCanalList&method=onReload&%{QUERY_STRING} [NC]
+
+RewriteRule ^double-usuarios$ index.php?class=TDoubleUsuarioList&method=onReload&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-usuarios$ engine.php?class=TDoubleUsuarioList&method=onReload&%{QUERY_STRING} [NC]
+
+RewriteRule ^double-estrategias$ index.php?class=TDoubleEstrategiaList&method=onReload&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-estrategias$ engine.php?class=TDoubleEstrategiaList&method=onReload&%{QUERY_STRING} [NC]
+
+RewriteRule ^double-dashboard-usuario$ index.php?class=TDoubleDashboardUsuario&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-dashboard-usuario$ engine.php?class=TDoubleDashboardUsuario&%{QUERY_STRING} [NC]
+
+
 ############################################################################################################################################
 
-RewriteRule ^api/teste$ rest.php?auth=None&class=TDoubleRobo&method=teste&%{QUERY_STRING} [NC]
-RewriteRule ^api/teste1$ rest.php?auth=None&class=TDoubleRobo&method=teste1&%{QUERY_STRING} [NC]

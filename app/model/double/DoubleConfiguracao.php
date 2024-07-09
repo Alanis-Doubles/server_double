@@ -6,7 +6,7 @@ class DoubleConfiguracao extends DoubleRecord
 {
     const TABLENAME  = 'double_configuracao';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

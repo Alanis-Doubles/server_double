@@ -6,7 +6,7 @@ class DoubleHistorico extends DoubleRecord
 {
     const TABLENAME  = 'double_historico';
     const PRIMARYKEY = 'id';
-        const IDPOLICY   = 'serial';
+    const IDPOLICY   = 'serial';
 
     use RecordTrait;
 

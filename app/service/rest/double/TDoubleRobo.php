@@ -365,7 +365,6 @@ class TDoubleRobo
 
     public function parar($param)
     {
-        // DoubleErros::registrar(1, 'TDoubleRobo', 'parar', 'erro', json_encode($param));
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
@@ -394,4 +393,24 @@ class TDoubleRobo
         });
         return $object->toArray(static::ATTRIBUTES);
     }
+
+    public function gerar_acesso($param)
+    {
+        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
+        
+        if (empty($param['chat_id']))
+            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
+
+        $senha = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
+
+            if (!isset($param['email']))
+                throw new Exception('E-mail não informado');
+
+            return $object->generate_access($param['email']);
+        });
+        return $senha;
+    }
 }
+
