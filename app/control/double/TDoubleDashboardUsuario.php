@@ -24,6 +24,8 @@ class TDoubleDashboardUsuario extends TPage
 
         $this->form = new BootstrapFormBuilder('form_TDoubleDashboardUsuario');
         $this->form->setFormTitle('Configurações');
+        if ($this->isMobile())
+            $this->form->addExpandButton('', 'fa:cogs');
 
         $this->form->addFields(
             [$this->makeTHidden(['name' => 'ultimo_id', 'value' => '0'])],
