@@ -51,6 +51,8 @@ class DoubleUsuario extends DoubleRecord
         $this->stop_loss = $this->stop_loss == null ? 0 : $this->stop_loss;
         $this->demo_jogadas = $this->demo_jogadas == null ? 0 : $this->demo_jogadas;
         $this->ciclo = $this->ciclo == null ? 'N' : $this->ciclo;
+        // $this->robo_status = $this->roboStatus;
+        // $this->robo_inicio = $this->roboInicio;
         $plataforma = new DoublePlataforma($this->plataforma_id, false);
         $system_group = $plataforma->system_group;
         $system_role = $plataforma->system_role;
@@ -229,37 +231,37 @@ class DoubleUsuario extends DoubleRecord
 
     public function get_roboStatus()
     {
-        $plataforma = TUtils::openFakeConnection('double', function () {
+        $usuario = TUtils::openFakeConnection('double', function () {
             return new self($this->id, false);
         });
-
-        return $plataforma->robo_status;
+        return $usuario->robo_status;
     }
 
     public function set_roboStatus($value)
     {
         TUtils::openConnection('double', function () use ($value) {
-            $plataforma = new self($this->id, false);
-            $plataforma->robo_status = $value;
-            $plataforma->save();
+            $usuario = new self($this->id, false);
+            $usuario->robo_status = $value;
+            $this->robo_status = $value;
+            $usuario->save();
         });
     }
 
     public function get_roboInicio()
     {
-        $plataforma =TUtils::openFakeConnection('double', function () {
+        $usuario =TUtils::openFakeConnection('double', function () {
             return new self($this->id, false);
         });
-        
-        return $plataforma->robo_inicio;
+        return $usuario->robo_inicio;
     }
 
     public function set_roboInicio($value)
     {
         TUtils::openConnection('double', function () use ($value) {
-            $plataforma = new self($this->id, false);
-            $plataforma->robo_inicio = $value;
-            $plataforma->save();
+            $usuario = new self($this->id, false);
+            $usuario->robo_inicio = $value;
+            $this->robo_inicio = $value;
+            $usuario->save();
         });
     }
 
@@ -420,5 +422,75 @@ class DoubleUsuario extends DoubleRecord
         });
 
         return $value;
+    }
+
+    public function get_possui_estrategias() 
+    {
+        $estrategias = TUtils::openFakeConnection('double', function(){
+            return DoubleEstrategia::where('usuario_id', '=', $this->id)
+                ->where('ativo', '=', 'Y')
+                ->where('deleted_at', 'is', null)
+                ->first();
+        });
+
+        if ($estrategias)
+            return true;
+        else
+            return false;
+    }
+
+    public function get_configuracao_texto() {
+        $translate = $this->plataforma->translate;
+
+        $texto = $translate->MSG_INICIO_ROBO_6;
+        $msg = str_replace(
+            ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
+            [
+                $this->nome,
+                number_format($this->ultimo_saldo, 2, ',', '.'),
+                number_format($this->valor, 2, ',', '.'),
+                $this->protecao,
+                number_format($this->stop_win, 2, ',', '.'),
+                number_format($this->stop_loss, 2, ',', '.') . '[' . ucfirst($this->tipo_stop_loss) . ']',
+                $this->ciclo == 'N' ? 'Não Habilitado' : 'Habilitado',
+                $this->protecao_branco == 'Y' ? 'Habilitado' : 'Não habilitado',
+                $this->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado'
+            ],
+            $texto
+        );
+
+        if ($this->entrada_automatica == 'Y')
+            $msg .= '\n     - Ocorrerá após o Stop WIN';
+        if ($this->entrada_automatica == 'A')
+            $msg .= '\n     - Ocorrerá após o Stop WIN e Stop LOSS';
+        if ($this->entrada_automatica == 'B')
+            $msg .= '\n     - Ocorrerá após o Stop LOSS';
+
+        if (($this->entrada_automatica == 'A' or $this->entrada_automatica == 'B') and $this->ciclo == 'A') {
+            $msg .= str_replace(
+                ['{ciclo}'],
+                [$translate->MSG_CICLO_7],
+                '\n     - {ciclo} habilitado para o Stop LOSS'
+            );
+
+            if ($this->valor_max_ciclo > 0)
+                $msg .= str_replace(
+                    ['{ciclo}', '{valor_max_ciclo}'],
+                    [
+                        $translate->BOTAO_ENTRADA_AUTOMATICA_VALOR_MAX_CICLO,
+                        number_format($this->valor_max_ciclo, 2, ',', '.')
+                    ],
+                    '\n     - {ciclo}: {valor_max_ciclo}'
+                );
+        }
+
+        if ($this->entrada_automatica != 'N')
+            $msg .= str_replace(
+                ['{quantidade}', '{tipo}'],
+                [$this->entrada_automatica_total_loss, $this->entrada_automatica_tipo],
+                '\n     - Será esperado a ocorrência de {quantidade} {tipo}'
+            );
+
+        return $msg;
     }
 }

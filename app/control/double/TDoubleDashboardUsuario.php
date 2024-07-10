@@ -469,54 +469,54 @@ class TDoubleDashboardUsuario extends TPage
                 'chat_id' => $usuario->chat_id
             ]);
 
-        $texto = $translate->MSG_INICIO_ROBO_6;
-        $msg = str_replace(
-            ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
-            [
-                $usuario->nome,
-                number_format($usuario->ultimo_saldo, 2, ',', '.'),
-                number_format($usuario->valor, 2, ',', '.'),
-                $usuario->protecao,
-                number_format($usuario->stop_win, 2, ',', '.'),
-                number_format($usuario->stop_loss, 2, ',', '.') . '[' . ucfirst($usuario->tipo_stop_loss) . ']',
-                $usuario->ciclo == 'Y' ? 'Habilitado' : 'Não habilitado',
-                $usuario->protecao_branco == 'Y' ? 'Habilitado' : 'Não habilitado',
-                $usuario->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado'
-            ],
-            $texto
-        );
+        // $texto = $translate->MSG_INICIO_ROBO_6;
+        // $msg = str_replace(
+        //     ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
+        //     [
+        //         $usuario->nome,
+        //         number_format($usuario->ultimo_saldo, 2, ',', '.'),
+        //         number_format($usuario->valor, 2, ',', '.'),
+        //         $usuario->protecao,
+        //         number_format($usuario->stop_win, 2, ',', '.'),
+        //         number_format($usuario->stop_loss, 2, ',', '.') . '[' . ucfirst($usuario->tipo_stop_loss) . ']',
+        //         $usuario->ciclo == 'Y' ? 'Habilitado' : 'Não habilitado',
+        //         $usuario->protecao_branco == 'Y' ? 'Habilitado' : 'Não habilitado',
+        //         $usuario->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado'
+        //     ],
+        //     $texto
+        // );
 
-        if ($usuario->entrada_automatica == 'Y')
-            $msg .= '\n     - Ocorrerá após o Stop WIN';
-        if ($usuario->entrada_automatica == 'A')
-            $msg .= '\n     - Ocorrerá após o Stop WIN e Stop LOSS';
-        if ($usuario->entrada_automatica == 'B')
-            $msg .= '\n     - Ocorrerá após o Stop LOSS';
+        // if ($usuario->entrada_automatica == 'Y')
+        //     $msg .= '\n     - Ocorrerá após o Stop WIN';
+        // if ($usuario->entrada_automatica == 'A')
+        //     $msg .= '\n     - Ocorrerá após o Stop WIN e Stop LOSS';
+        // if ($usuario->entrada_automatica == 'B')
+        //     $msg .= '\n     - Ocorrerá após o Stop LOSS';
 
-        if (($usuario->entrada_automatica == 'A' or $usuario->entrada_automatica == 'B') and $usuario->ciclo == 'A') {
-            $msg .= str_replace(
-                ['{ciclo}'],
-                [$translate->MSG_CICLO_7],
-                '\n     - {ciclo} habilitado para o Stop LOSS'
-            );
+        // if (($usuario->entrada_automatica == 'A' or $usuario->entrada_automatica == 'B') and $usuario->ciclo == 'A') {
+        //     $msg .= str_replace(
+        //         ['{ciclo}'],
+        //         [$translate->MSG_CICLO_7],
+        //         '\n     - {ciclo} habilitado para o Stop LOSS'
+        //     );
 
-            if ($usuario->valor_max_ciclo > 0)
-                $msg .= str_replace(
-                    ['{ciclo}', '{valor_max_ciclo}'],
-                    [
-                        $translate->BOTAO_ENTRADA_AUTOMATICA_VALOR_MAX_CICLO,
-                        number_format(valor_max_ciclo, 2, ',', '.')
-                    ],
-                    '\n     - {ciclo}: {valor_max_ciclo}'
-                );
-        }
+        //     if ($usuario->valor_max_ciclo > 0)
+        //         $msg .= str_replace(
+        //             ['{ciclo}', '{valor_max_ciclo}'],
+        //             [
+        //                 $translate->BOTAO_ENTRADA_AUTOMATICA_VALOR_MAX_CICLO,
+        //                 number_format(valor_max_ciclo, 2, ',', '.')
+        //             ],
+        //             '\n     - {ciclo}: {valor_max_ciclo}'
+        //         );
+        // }
 
-        if ($usuario->entrada_automatica != 'N')
-            $msg .= str_replace(
-                ['{quantidade}', '{tipo}'],
-                [$usuario->entrada_automatica_total_loss, $usuario->entrada_automatica_tipo],
-                '\n     - Será esperado a ocorrência de {quantidade} {tipo}'
-            );
+        // if ($usuario->entrada_automatica != 'N')
+        //     $msg .= str_replace(
+        //         ['{quantidade}', '{tipo}'],
+        //         [$usuario->entrada_automatica_total_loss, $usuario->entrada_automatica_tipo],
+        //         '\n     - Será esperado a ocorrência de {quantidade} {tipo}'
+        //     );
 
         $botao_inicio = [
             "resize_keyboard" => true, 
@@ -526,7 +526,7 @@ class TDoubleDashboardUsuario extends TPage
                 ] 
             ];
 
-        $telegram->sendMessage($usuario->chat_id, $msg, $botao_inicio);
+        $telegram->sendMessage($usuario->chat_id, $usuario->configuracao_texto, $botao_inicio);
         if ($param['apos_loss'] == 1 ) 
             $telegram->sendMessage(
                 $usuario->chat_id, 

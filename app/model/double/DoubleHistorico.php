@@ -18,60 +18,37 @@ class DoubleHistorico extends DoubleRecord
         $this->loadAttributes('double');
     }
 
-    public static function buscarHistorico($ant, $inicio, $plataforma_id, $canal_id, $call_status){
+    public static function buscarHistorico($ant, $inicio, $plataforma_id, $canal_id, $call_status, $usuario_id = null){
         $list = [];
         $status = '';
-        do {
+        // do {
             sleep(1);
-            try {
-                $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $canal_id, $inicio){
-                    return self::select()
-                        ->where('plataforma_id', '=', $plataforma_id)
-                        ->where('canal_id', '=', $canal_id)
-                        ->where('created_at', '>=', $inicio)
-                        ->last();
-                });
+            $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $canal_id, $inicio, $usuario_id){
+                return self::select()
+                    ->where('plataforma_id', '=', $plataforma_id)
+                    ->where('canal_id', '=', $canal_id)
+                    ->where('created_at', '>=', $inicio)
+                    ->where('usuario_id', ($usuario_id ? '=' : 'is'), $usuario_id)
+                    ->last();
+            });
 
-                if ($historico) {
-                    $list = [];
-                        $estrategia = $historico->estrategia;
-                        if ($estrategia)
-                            $estrategia->resultado = $historico->cor;
-                        $list['id'] = $historico->id;
-                        $list['tipo'] = $historico->tipo;
-                        if ($estrategia)
-                            $list['estrategia'] = $estrategia->id;
-                        if ($historico->cor)
-                            $list['cor'] = $historico->cor;
-                        if ($historico->informacao)
-                            $list['informacao'] = $historico->informacao;
-                        $list['created_at'] = $historico->created_at;                           
-                }
-                $status = $call_status();
-            } catch (\Throwable $e) {
-                // $service = null;
-                // $mensagem = $e->getMessage();
-                // TUtils::openConnection('double');;
-                // $error = new DoubleErros();
-                // $error->classe = 'DoubleHistorico';
-                // $error->metodo = 'buscarHistorico';
-                // $error->erro = $mensagem;
-                // $error->plataforma_id = $data->plataforma->id;
-                // $error->save();
-                // TTransaction::close();
-            } catch (Exception $e) {
-                // $service = null;
-                // $mensagem = $e->getMessage();
-                // TUtils::openConnection('double');;
-                // $error = new DoubleErros();
-                // $error->classe = 'DoubleHistorico';
-                // $error->metodo = 'buscarHistorico';
-                // $error->erro = $mensagem;
-                // $error->plataforma_id = $data->plataforma->id;
-                // $error->save();
-                // TTransaction::close();
+            if ($historico) {
+                $list = [];
+                    $estrategia = $historico->estrategia;
+                    if ($estrategia)
+                        $estrategia->resultado = $historico->cor;
+                    $list['id'] = $historico->id;
+                    $list['tipo'] = $historico->tipo;
+                    if ($estrategia)
+                        $list['estrategia'] = $estrategia->id;
+                    if ($historico->cor)
+                        $list['cor'] = $historico->cor;
+                    if ($historico->informacao)
+                        $list['informacao'] = $historico->informacao;
+                    $list['created_at'] = $historico->created_at;                           
             }
-        } while ($list == $ant AND $status == 'EXECUTANDO');
+            $status = $call_status();
+        // } while ($list == $ant AND $status == 'EXECUTANDO');
         
         if ($status != 'EXECUTANDO')
             return [];

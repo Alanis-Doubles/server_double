@@ -29,6 +29,22 @@ class TDoubleEstrategiaForm  extends TStandardForm
             [$this->makeTHidden(['name' => 'regra'])],
         );
 
+        if (TUtils::isDoubleJogadores() and isset($param['canal_id'])) {
+            $chat_id = TSession::getValue('usercustomcode');
+            $usuario = TUtils::openFakeConnection('double', function () use($param, $chat_id){
+                return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
+                    ->where('chat_id', '=', $chat_id)
+                    ->first();
+            });
+            $this->form->addFields(
+                [$this->makeTHidden(['name' => 'usuario_id', 'value' => $usuario->id])],
+            );
+        } else {
+            $this->form->addFields(
+                [$this->makeTHidden(['name' => 'usuario_id'])],
+            );
+        }
+
         $criteria = new TCriteria;
         $criteria->add(
             new TFilter(
@@ -199,6 +215,15 @@ class TDoubleEstrategiaForm  extends TStandardForm
                     'required' => true
                 ])],
             );
+
+        if (TUtils::isDoubleJogadores()){
+            $this->form->addFields(
+                [$label = $this->makeTLabel(['value' => 'Proteções'])],
+                [$this->makeTEntry(['name' => 'protecoes', 'label' => $label, 'required' => true, 'mask' => '9!'])],
+                [$label = $this->makeTLabel(['value' => 'Proteção no branco'])],
+                [$this->makeTCombo(['name' => 'protecao_branco', 'label' => $label, 'required' => true, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
+            );
+        }    
 
         // carregar as regras
         if ($object and $object->regra) {

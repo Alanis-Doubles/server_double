@@ -20,11 +20,11 @@ class DoubleEstrategia extends DoubleRecord
         $this->loadAttributes('double');
     }
 
-    public function validar($sinais, IDoublePlataforma $plataforma)
+    public function validar($sinais, IDoublePlataforma $plataforma, $aguarda_proximo = true)
     {
         switch ($this->tipo) {
             case 'COR':
-                $resultado = $this->validarCor($sinais);
+                $resultado = $this->validarCor($sinais, $aguarda_proximo);
                 break;
             case 'NUMERO':
                 $resultado = $this->validarNumero($sinais);
@@ -44,7 +44,7 @@ class DoubleEstrategia extends DoubleRecord
         return $resultado;
     }
 
-    public function validarCor($sinais)
+    public function validarCor($sinais, $aguarda_proximo = true)
     {
         if ($this->tipo_controle == 'APARTIR_HORA' and $this->valor_controle) {
             $now = new DateTime();
@@ -125,7 +125,8 @@ class DoubleEstrategia extends DoubleRecord
         $reverse_sinais = array_reverse($sinais);
         $str_sinais = implode(' - ', array_map($map_sinais, $reverse_sinais));
         $arrRegra = explode(' - ', $this->regra);
-        array_pop($arrRegra);
+        if ($aguarda_proximo)
+            array_pop($arrRegra);
         $str_regra = '/' . implode(' - ', $arrRegra) . '$/';
         $str_regra = str_replace(
             ['other'],

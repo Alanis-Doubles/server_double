@@ -19,13 +19,23 @@ class TDoubleEstrategiaList extends TCustomStandardList
         $criteria = new TCriteria;
         $criteria->add(
             new TFilter(
-                '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = (SELECT c.plataforma_id FROM double_canal c where c.id = double_estrategia.canal_id))',
+                '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = (SELECT c.plataforma_id FROM double_canal c where c.ativo = "Y" and c.id = double_estrategia.canal_id))',
                 'IN',
                 ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
 
-        $criteria->add( new TFilter('usuario_id', 'is', null) );
+        if (TUtils::isDoubleJogadores()) {
+            $criteria->add(
+                new TFilter(
+                    'usuario_id',
+                    'in',
+                    '(SELECT u.id from double_usuario u where u.chat_id = ' . TSession::getValue('usercustomcode') . ')'
+                )
+            );
+        } else {
+            $criteria->add( new TFilter('usuario_id', 'is', null) );
+        }
 
         $criteria_canal = new TCriteria;
         $criteria_canal->add(
@@ -35,8 +45,36 @@ class TDoubleEstrategiaList extends TCustomStandardList
                 ['GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
+
+        if (TUtils::isDoubleJogadores()) {
+            $criteria_canal->add(
+                new TFilter(
+                    '(SELECT u.chat_id FROM double_usuario u WHERE u.canal_id = double_canal.id and u.chat_id = ' . TSession::getValue('usercustomcode') . ')',
+                    '=',
+                    TSession::getValue('usercustomcode')
+                )
+            );
+        }
         
         $criteria_canal->add(  new TFilter( 'ativo', '=', 'Y') );
+
+        $tamanho = '45%';
+        $protecao = [];
+        $protecao_branco = [];
+        if (TUtils::isDoubleJogadores()){
+            $tamanho = '25%';
+            $protecao = [
+                'name'   => 'protecoes',
+                'label'  => 'Proteções',
+                'column' => ['width' => '10%', 'align' => 'center', 'order' => true]
+            ];
+
+            $protecao_branco = [
+                'name'   => 'protecao_branco',
+                'label'  => 'Proteção Branco',
+                'column' => ['width' => '10', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_sim_nao_transformer'])]
+            ];
+        }
 
         parent::__construct([
             'title'          => 'Estratégias',
@@ -80,8 +118,10 @@ class TDoubleEstrategiaList extends TCustomStandardList
                 [
                     'name'   => 'regra',
                     'label'  => 'Regra',
-                    'column' => ['width' => '45%', 'align' => 'left', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_regra'])]
+                    'column' => ['width' => $tamanho, 'align' => 'left', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_regra'])]
                 ],
+                $protecao,
+                $protecao_branco,
                 [
                     'name'    => 'resultado',
                     'label'   => 'Resultado',
@@ -114,7 +154,29 @@ class TDoubleEstrategiaList extends TCustomStandardList
     }
 
     public function doIncluir($param){
-        if ($search_canal = TSession::getValue($this->activeRecord.'_filter_search_canal_id')) {
+
+        $canais = TUtils::openFakeConnection('double', function () {
+            $consulta =  DoubleCanal::where('ativo', '=', 'Y')
+                ->where('(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
+                    'IN',
+                    ['GERA', 'PROPAGA_VALIDA_SINAL']
+            );
+
+            if (TUtils::isDoubleJogadores()) {
+                $consulta->where(
+                    '(SELECT u.chat_id FROM double_usuario u WHERE u.canal_id = double_canal.id and u.chat_id = ' . TSession::getValue('usercustomcode') . ')',
+                    '=',
+                    TSession::getValue('usercustomcode')
+                );
+            }
+            
+            return $consulta->load();
+        });
+
+        if (count($canais) == 1) {
+            $param['canal_id'] = $canais[0]->id;
+            TApplication::loadPage($param['formEdit'], 'onInsert', $param);
+        } elseif ($search_canal = TSession::getValue($this->activeRecord.'_filter_search_canal_id')) {
             $string = $search_canal->dump();
             preg_match("/'(\d+)'/", $string, $matches);
             $param['canal_id'] = $matches[1];
