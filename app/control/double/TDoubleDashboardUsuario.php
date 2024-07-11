@@ -363,6 +363,7 @@ class TDoubleDashboardUsuario extends TPage
                 'indicator2'  => TUtils::renderInfoBox('total-loss', 'LOSS', 'times', 'red', 0),
                 'indicator3'  => TUtils::renderInfoBox('total-lucro', 'Lucro/Perda', 'dollar-sign', 'green', 'R$ 0,00'),
                 'indicator4'  => TUtils::renderInfoBox('total-saldo', 'Saldo Atual', 'money-bill-alt', 'green', 'R$ 0,00'),
+                'indicator5'  => TUtils::renderInfoBox('maior-entrada', 'Maior Entrada', 'arrow-alt-circle-up', 'green', 'R$ 0,00'),
                 'status_robo' => $container_status,
                 'modo'        => $container_modo,
                 'sinais'      => $container
@@ -807,6 +808,7 @@ class TDoubleDashboardUsuario extends TPage
                     document.querySelector("#total-loss").textContent = data.total_loss;
                     document.querySelector("#total-lucro").textContent = 'R$ ' + data.lucro_prejuizo;
                     document.querySelector("#total-saldo").textContent = 'R$ ' + data.saldo;
+                    document.querySelector("#maior-entrada").textContent = 'R$ ' + data.maior_entrada;
 
                     if (data.robo_status == 'EXECUTANDO') {
                         document.querySelector("#robo-status").innerHTML = '<b>🟢 Seu robô está em execução</b>';

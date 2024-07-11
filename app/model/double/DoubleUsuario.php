@@ -404,7 +404,14 @@ class DoubleUsuario extends DoubleRecord
         TUtils::openConnection('permission', function() use ($email, $value) {
             if (!$this->user)
                 $this->user = $this->buscarSystemUser();
-    
+        
+            $conn = TTransaction::get();
+            TDatabase::clearData(
+                $conn, 
+                'system_user_old_password',
+                TCriteria::create(['system_user_id' => $this->user->id])
+            );
+
             $old = SystemUserOldPassword::register($this->user->id, $value);
             if ($old)
                 $conn = TTransaction::get();

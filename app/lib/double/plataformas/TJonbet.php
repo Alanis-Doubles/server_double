@@ -58,7 +58,7 @@ class TJonbet implements IDoublePlataforma
                     }
                 }
             } else {
-                DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', json_encode($content));
+                DoubleErros::registrar(1, 'TJonbet', 'aguardarSinal', 'Tentando reinniciar', json_encode($content));
                 $client = new Client(['http_errors' => false]);
                 sleep(1);
             }

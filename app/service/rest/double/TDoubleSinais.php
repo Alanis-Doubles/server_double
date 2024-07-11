@@ -94,6 +94,29 @@ class TDoubleSinais
             try {
                 if (!$service)
                     $service = $data->plataforma->service;
+
+                // $sinal_corrente = $service->sinalCorrente();
+                // if ($sinal_corrente['status_code'] == 200) {
+                //     $content = $sinal_corrente['data'];
+                //     if ($content->status == 'rolling') {
+                //         $novo_sinal = new stdClass;
+                //         $novo_sinal->id = $content->id;
+                //         $novo_sinal->cor = $content->color;
+                //         $novo_sinal->numero = $content->roll;
+                //         if ($ultimo_sinal != (array) $novo_sinal)
+                //         {
+                //             $ultimo_sinal = $novo_sinal;
+                //             TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
+                //                 $sinal = new DoubleSinal();
+                //                 $sinal->plataforma_id = $data->plataforma->id;
+                //                 $sinal->numero = $ultimo_sinal->numero;
+                //                 $sinal->cor = $data->plataforma->service->cores()[$sinal->numero];
+                //                 $sinal->id_referencia = $ultimo_sinal->id;
+                //                 $sinal->save();
+                //             });
+                //         }
+                //     }
+                // }
                 $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
                 TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
                     $sinal = new DoubleSinal();
@@ -447,6 +470,8 @@ class TDoubleSinais
                                 $botao[] = [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]];
                             if ($data->plataforma->url_suporte)
                                 $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]];
+                            if ($data->plataforma->url_robo)
+                                $botao[] = [["text" => $data->plataforma->translate->MSG_ROBO_AUTOMATICO,  "url" => $data->plataforma->url_robo]];
 
                             $telegram->sendMessage(
                                 $data->canal->channel_id,
@@ -686,6 +711,8 @@ class TDoubleSinais
                                 $botao[] = [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]];
                             if ($data->plataforma->url_suporte)
                                 $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]];
+                            if ($data->plataforma->url_robo)
+                                $botao[] = [["text" => $data->plataforma->translate->MSG_ROBO_AUTOMATICO,  "url" => $data->plataforma->url_robo]];
 
                         $telegram->sendMessage(
                             $data->canal->channel_id,
@@ -842,6 +869,8 @@ class TDoubleSinais
                             $botao[] = [["text" => str_replace(['{plataforma}'], [$data->plataforma->nome], $data->plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $data->plataforma->url_tutorial]];
                         if ($data->plataforma->url_suporte)
                             $botao[] = [["text" => $data->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $data->plataforma->url_suporte]];
+                        if ($data->plataforma->url_robo)
+                            $botao[] = [["text" => $data->plataforma->translate->MSG_ROBO_AUTOMATICO,  "url" => $data->plataforma->url_robo]];
 
                         $telegram->sendMessage(
                             $data->canal->channel_id,
@@ -981,7 +1010,8 @@ class TDoubleSinais
             $data->canal->processando_jogada = 'N';
             $data->canal->saveInTransaction();
 
-            if ($call_status() != 'EXECUTANDO')
+            $status = $call_status();
+            if ($status != 'EXECUTANDO')
                 $data->canal->statusSinais = 'PARADO';
         }
     }

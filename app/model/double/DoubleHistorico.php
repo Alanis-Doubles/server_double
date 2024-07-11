@@ -21,7 +21,7 @@ class DoubleHistorico extends DoubleRecord
     public static function buscarHistorico($ant, $inicio, $plataforma_id, $canal_id, $call_status, $usuario_id = null){
         $list = [];
         $status = '';
-        // do {
+        do {
             sleep(1);
             $historico = TUtils::openFakeConnection('double', function() use ($plataforma_id, $canal_id, $inicio, $usuario_id){
                 return self::select()
@@ -48,7 +48,7 @@ class DoubleHistorico extends DoubleRecord
                     $list['created_at'] = $historico->created_at;                           
             }
             $status = $call_status();
-        // } while ($list == $ant AND $status == 'EXECUTANDO');
+        } while ($list == $ant AND $status == 'EXECUTANDO');
         
         if ($status != 'EXECUTANDO')
             return [];

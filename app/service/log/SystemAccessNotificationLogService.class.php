@@ -90,7 +90,7 @@ class SystemAccessNotificationLogService
                     $html->enableSection(
                         'main',
                         [
-                            'login' => $notification->login,
+                            'login' => $notification->email,
                             'login_time' => $notification->login_time,
                             'ip_address' => $notification->ip_address,
                             'subject' => $subject,

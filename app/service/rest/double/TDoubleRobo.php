@@ -399,18 +399,59 @@ class TDoubleRobo
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
         
+        if (!$canal)
+            throw new Exception("Canal não suportado.");
+
         if (empty($param['chat_id']))
             throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
-        $senha = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
-            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
+        if (!isset($param['email']))
+            throw new Exception('E-mail não informado');
 
-            if (!isset($param['email']))
-                throw new Exception('E-mail não informado');
-
-            return $object->generate_access($param['email']);
+        $double_usuario = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
+            return DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
         });
-        return $senha;
+
+        if (!$double_usuario)
+            throw new Exception('Usuário não encontrado');
+
+        $usuarios = TUtils::openConnection('permission', function () use($double_usuario, $param){
+            return SystemUser::where('custom_code', '<>', $double_usuario->chat_id)
+                ->where('email', '=', $param['email'])
+                ->load();
+        });
+
+        if (count($usuarios) > 0)
+            throw new Exception('Este email já está sendo utilizado por outro usuário. Informe um novo email.');
+
+        $senha = $double_usuario->generate_access($param['email']);
+
+        (new TEmailValidator())->validate("E-mail {$double_usuario->email}", $double_usuario->email);
+
+        $html = new THtmlRenderer('app/resources/double/double_usuario_senha.html');
+        $html->enableTranslation();
+
+        $title = $ini['general']['title']??'System';
+        
+        $subject = 'Senha de acesso';
+        $content = str_replace('^1', $title, 'Utilize a senha abaixo para acessar seu Dashboard. Se estiver encontrando algum problema entre em contato com o suporte técnico.');
+        
+        $html->enableSection(
+            'main',
+            [
+                'url'   => DoubleConfiguracao::getConfiguracao('base_url'),
+                'login' => $double_usuario->email,
+                'password' => $senha,
+                'login_time' => date("Y-m-d H:i:s"),
+                'ip_address' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null,
+                'subject' => $subject,
+                'content' => $content,
+            ]
+        );
+
+        MailService::send($double_usuario->email, $subject, $html->getContents(), 'html');
+
+        return 'ok';
     }
 }
 
