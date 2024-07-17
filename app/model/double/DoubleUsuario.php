@@ -431,6 +431,18 @@ class DoubleUsuario extends DoubleRecord
         return $value;
     }
 
+    public function tst_generate_access($email, $senha) {
+        $user = TUtils::openFakeConnection('permission', function () {
+            return  $this->buscarSystemUser();
+        });
+
+        $value['email'] = $email;
+        $value['senha'] = SystemUser::passwordHash($senha);
+        $value['senha_atual'] = $user->password;
+
+        return $value;
+    }
+
     public function get_possui_estrategias() 
     {
         $estrategias = TUtils::openFakeConnection('double', function(){

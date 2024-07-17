@@ -21,7 +21,7 @@ class TDoubleEstrategiaList extends TCustomStandardList
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = (SELECT c.plataforma_id FROM double_canal c where c.ativo = "Y" and c.id = double_estrategia.canal_id))',
                 'IN',
-                ['GERA', 'PROPAGA_VALIDA_SINAL']
+                ['NAO_GERA', 'GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
 
@@ -42,7 +42,7 @@ class TDoubleEstrategiaList extends TCustomStandardList
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
                 'IN',
-                ['GERA', 'PROPAGA_VALIDA_SINAL']
+                ['NAO_GERA', 'GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
 
@@ -156,10 +156,11 @@ class TDoubleEstrategiaList extends TCustomStandardList
     public function doIncluir($param){
 
         $canais = TUtils::openFakeConnection('double', function () {
-            $consulta =  DoubleCanal::where('ativo', '=', 'Y')
+            $consulta =  DoubleCanal::select('id', 'nome')
+                ->where('ativo', '=', 'Y')
                 ->where('(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
                     'IN',
-                    ['GERA', 'PROPAGA_VALIDA_SINAL']
+                    ['NAO_GERA', 'GERA', 'PROPAGA_VALIDA_SINAL']
             );
 
             if (TUtils::isDoubleJogadores()) {
@@ -180,6 +181,7 @@ class TDoubleEstrategiaList extends TCustomStandardList
             $string = $search_canal->dump();
             preg_match("/'(\d+)'/", $string, $matches);
             $param['canal_id'] = $matches[1];
+            // print_r(json_encode($param));
             TApplication::loadPage($param['formEdit'], 'onInsert', $param);
         } else {
             new TMessage('error', 'Primeiro realize o filtro para o canal desejado.');

@@ -33,6 +33,9 @@ class SystemAccessNotificationLogService
         {
             TTransaction::open('log');
         }
+
+        if (!TSession::getValue('usermail'))
+            return;
         
         $object = new SystemAccessNotificationLog;
         $object->email = TSession::getValue('usermail');
@@ -98,7 +101,8 @@ class SystemAccessNotificationLogService
                         ]
                     );
 
-                    MailService::send($notification->email, $subject, $html->getContents(), 'html');
+                    if ($notification->email)
+                        MailService::send($notification->email, $subject, $html->getContents(), 'html');
 
                     $notification->delete();
                     TTransaction::close();

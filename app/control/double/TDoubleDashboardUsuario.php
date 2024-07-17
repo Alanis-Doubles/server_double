@@ -9,6 +9,54 @@ use Adianti\Widget\Util\TDropDown;
 use Adianti\Wrapper\BootstrapFormBuilder;
 use Symfony\Component\Console\Application;
 
+class TNewRanking 
+{
+    use TUIBuilderTrait;
+    use TTransformationTrait;
+
+    public $datagrid;
+    public $panel;
+
+    public function __construct($title, $top10 = false)
+    {
+        $dataGrid = new stdClass;
+        $dataGrid->name = $top10 ? 'topdataranking' : 'meudataranking';
+        $dataGrid->pagenavigator = false;
+        $dataGrid->title = $title;
+        $dataGrid->columns = [
+            ['name' => 'usuario_id', 'hide' => true, 'label' => 'Nome', 'width' => '10%', 'align' => 'left'],
+            ['name' => 'estrategia_id', 'hide' => true, 'label' => 'Nome', 'width' => '20%', 'align' => 'left'],
+            ['name' => 'canal_id', 'hide' => true, 'label' => 'Nome', 'width' => '20%', 'align' => 'left'],
+            ['name' => 'nome', 'label' => 'Nome', 'width' => '20%', 'align' => 'left'],
+            ['name' => 'regra', 'label' => 'Regra', 'width' => '30%', 'align' => 'left', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_regra'])],
+            ['name' => 'resultado', 'label' => 'Resultado', 'width' => '15%', 'align' => 'center', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_resultado'])],
+            ['name' => 'protecoes', 'label' => 'Tot. Gale', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'protecao_branco', 'label' => 'Branco', 'width' => '5%', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_sim_nao_transformer'])],
+            ['name' => 'win', 'label' => 'Win', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'loss', 'label' => 'Loss', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'percentual', 'label' => '%', 'width' => '5%', 'align' => 'center'],
+            ['name' => 'max_gales', 'label' => 'Max. Gale', 'width' => '5%', 'align' => 'center'],
+        ];
+
+        if ($top10) {
+            $dataGrid->columns = array_merge(
+                [
+                    ['name' => 'nome_usuario', 'label' => 'Usuário', 'width' => '20%', 'align' => 'left'],
+                ], 
+                $dataGrid->columns,
+            );
+
+            $dataGrid->actions = [
+                'actCopiar'  => ['label' => 'Copiar estratégia', 'image' => 'fa:copy', 'fields' => ['usuario_id', '*'], 'action' => ['TDoubleDashboardUsuario', 'doCopiarEstrategia'], 'action_params' =>  ['register_state' => 'false']],
+            ];
+        }
+
+        $this->panel = $this->makeTDataGrid($dataGrid);
+
+        $this->datagrid = $this->getWidget($dataGrid->name);
+    }
+}
+
 class TDoubleDashboardUsuario extends TPage
 {
     use TUIBuilderTrait;
@@ -36,7 +84,7 @@ class TDoubleDashboardUsuario extends TPage
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
                 'IN',
-                ['GERA', 'PROPAGA_VALIDA_SINAL']
+                ['NAO_GERA', 'GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
 
@@ -353,6 +401,9 @@ class TDoubleDashboardUsuario extends TPage
         $container_modo->id = 'modo';
         $container_modo->style = 'margin-bottom: 10px; margin-top: 0px';
 
+        $meuRanking = new TNewRanking('<i class="fas fa-trophy green"></i>  Ranking das Minhas Estratégias');
+        $topRanking = new TNewRanking('<i class="fas fa-trophy green"></i>  Ranking das 10 Melhores Estratégias', True);
+        // $this->datagrid = $meuRanking->datagrid;
 
         $body = new THtmlRenderer('app/resources/double/dashboard-usuario.html');
         $body->enableSection(
@@ -366,7 +417,9 @@ class TDoubleDashboardUsuario extends TPage
                 'indicator5'  => TUtils::renderInfoBox('maior-entrada', 'Maior Entrada', 'arrow-alt-circle-up', 'green', 'R$ 0,00'),
                 'status_robo' => $container_status,
                 'modo'        => $container_modo,
-                'sinais'      => $container
+                'sinais'      => $container,
+                'meuRanking'  => $meuRanking->panel,
+                'topRanking'  => $topRanking->panel,
             ]
         );
 
@@ -379,6 +432,45 @@ class TDoubleDashboardUsuario extends TPage
 
         TScript::create($this->getJavaScript());
         TScript::create('atualiza_configuracao()', TRUE, 1000);
+    }
+
+    public function doCopiarEstrategia($param) {
+        try {
+            TUtils::openConnection('double', function() use($param){
+                $chat_id = TSession::getValue('usercustomcode');
+                $canal_id = $param['canal_id'];
+                $usuario = DoubleUsuario::where('canal_id', '=', $canal_id)
+                    ->where('chat_id', '=', $chat_id)
+                    ->where('deleted_at', 'is', null)
+                    ->first();
+    
+                $estrategia =  DoubleEstrategia::where('regra', '=', $param['regra'])
+                    ->where('usuario_id', '=', $usuario->id)
+                    ->first();
+    
+                if ($estrategia)
+                    throw new Exception("Você já possui esta estratégia na sua lista");
+                    
+                $max = DoubleEstrategia::where('usuario_id', '=', $usuario->id)
+                        ->where('canal_id', '=', $canal_id)
+                        ->maxBy('ordem', 'max_ordem');
+    
+                $new = new DoubleEstrategia();
+                $new->usuario_id      = $usuario->id;
+                $new->canal_id        = $canal_id;
+                $new->nome            = $param['nome'];
+                $new->regra           = $param['regra'];
+                $new->resultado       = $param['resultado'];
+                $new->protecoes       = $param['protecoes'];
+                $new->protecao_branco = $param['protecao_branco'];
+                $new->ordem           = $max + 1;
+                $new->save();
+            });
+    
+            new TMessage('info', 'Estratégia copiada com sucesso.');
+        } catch (\Throwable $th) {
+            new TMessage('error', $th->getMessage());
+        }
     }
 
     public function serilizeAction($action, $param) {
@@ -647,7 +739,7 @@ class TDoubleDashboardUsuario extends TPage
             var options = {
                 chart: {
                     type: 'line',
-                    height: 350,
+                    height: 300,
                     animations: {
                         enabled: true,
                         easing: 'linear',
@@ -693,13 +785,18 @@ class TDoubleDashboardUsuario extends TPage
             };
 
             var chart = new ApexCharts(document.querySelector("#apexLineChart"), options);
+
             var interval_sinais        = null;       
             var interval_grafico       = null;      
             var interval_status        = null;       
+            var interval_topRanking    = null;       
+            var interval_meuRanking    = null;       
 
-            var fetchingData_sinais = false;
-            var fetchingData_grafico = false;
-            var fetchingData_status = false;
+            var fetchingData_sinais      = false;
+            var fetchingData_grafico     = false;
+            var fetchingData_status      = false;
+            var fetchingData_topRanking  = false;
+            var fetchingData_meuRanking  = false;
 
 
             function atualiza_grafico() {
@@ -801,7 +898,6 @@ class TDoubleDashboardUsuario extends TPage
 
                 __adianti_ajax_exec('class=TDoubleDashboardUsuario&method=statusJs&canal_id=' + canal_id, function(data) {
                     fetchingData_status = false;
-                    console.log(data);
                     var data = JSON.parse(data);
 
                     document.querySelector("#total-win").textContent = data.total_win;
@@ -828,6 +924,44 @@ class TDoubleDashboardUsuario extends TPage
 
                     if (!document.hidden && '/double-dashboard-usuario' == location.pathname)
                         interval_status = setInterval(atualiza_status, 5000);
+                }, false);
+            }
+
+            function atualiza_top_ranking() {
+                if (fetchingData_topRanking) {
+                    return;
+                }
+                fetchingData_topRanking = true;
+
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                clearInterval(interval_topRanking);
+                
+                __adianti_ajax_exec('class=TDoubleDashboardUsuario&method=topRankingJS&canal_id=' + canal_id, function(data) {
+                    fetchingData_topRanking = false;
+                    $("#topdataranking tbody").remove();
+                    $("#topdataranking").append(data);
+
+                    if (!document.hidden && '/double-dashboard-usuario' == location.pathname)
+                        interval_topRanking = setInterval(atualiza_top_ranking, 5000);
+                }, false);
+            }
+
+            function atualiza_meu_ranking() {
+                if (fetchingData_meuRanking) {
+                    return;
+                }
+                fetchingData_meuRanking = true;
+
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                clearInterval(interval_meuRanking);
+                
+                __adianti_ajax_exec('class=TDoubleDashboardUsuario&method=meuRankingJS&canal_id=' + canal_id, function(data) {
+                    fetchingData_meuRanking = false;
+                    $("#meudataranking tbody").remove();
+                    $("#meudataranking").append(data);
+
+                    if (!document.hidden && '/double-dashboard-usuario' == location.pathname)
+                        interval_meuRanking = setInterval(atualiza_meu_ranking, 5000);
                 }, false);
             }
 
@@ -911,10 +1045,14 @@ class TDoubleDashboardUsuario extends TPage
                     atualiza_sinais();
                     atualiza_grafico();
                     atualiza_status();
+                    atualiza_top_ranking();
+                    atualiza_meu_ranking();
                     
-                    interval_sinais        = setInterval(atualiza_sinais, 5000);
-                    interval_grafico       = setInterval(atualiza_grafico, 5000);
-                    interval_status        = setInterval(atualiza_status, 5000);
+                    interval_sinais     = setInterval(atualiza_sinais, 5000);
+                    interval_grafico    = setInterval(atualiza_grafico, 5000);
+                    interval_status     = setInterval(atualiza_status, 5000);
+                    interval_topRanking = setInterval(atualiza_top_ranking, 5000);
+                    interval_meuRanking = setInterval(atualiza_meu_ranking, 5000);
                 }
             }
 
@@ -923,11 +1061,12 @@ class TDoubleDashboardUsuario extends TPage
                     clearInterval(interval_sinais);
                     clearInterval(interval_grafico);
                     clearInterval(interval_status);
+                    clearInterval(interval_topRanking);
 
                     interval_sinais        = null;
                     interval_grafico       = null;
                     interval_status        = null;
-                    interval_configuracoes = null;
+                    interval_status = null;
                 }
             }
 
@@ -1062,7 +1201,7 @@ JAVASCRIPT;
                 ->first();
         });
 
-        return TDashboardUsuarioService::getHistorico($usuario->id, $param['ultimo_id']);
+        echo TDashboardUsuarioService::getHistorico($usuario->id, $param['ultimo_id']);
     }
 
     public static function statusJs($param) 
@@ -1074,7 +1213,7 @@ JAVASCRIPT;
                 ->first();
         });
 
-        return TDashboardUsuarioService::getStatusUsuario($usuario);
+        echo TDashboardUsuarioService::getStatusUsuario($usuario);
     }
 
     public static function usuarioJS($param)
@@ -1088,4 +1227,34 @@ JAVASCRIPT;
 
         echo json_encode($usuario->toArray());
     }   
+
+    public static function topRankingJS($param) {
+        $lista = TDashboardUsuarioService::getRanking($param['canal_id']);
+
+        $raking = new TNewRanking('', True);
+        $datagrid = $raking->datagrid;
+
+        foreach ($lista as $key => $value) {
+            $datagrid->addItem( (object) $value);
+        }
+        echo $datagrid->getBody();
+    }
+
+    public static function meuRankingJS($param) {
+        $usuario = TUtils::openFakeConnection('double', function () use ($param){
+            $chat_id = TSession::getValue('usercustomcode');
+            return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
+                ->where('chat_id', '=', $chat_id)
+                ->first();
+        });
+        $lista = TDashboardUsuarioService::getRanking($param['canal_id'], $usuario->id);
+
+        $raking = new TNewRanking('');
+        $datagrid = $raking->datagrid;
+
+        foreach ($lista as $key => $value) {
+            $datagrid->addItem( (object) $value);
+        }
+        echo $datagrid->getBody();
+    }
 }

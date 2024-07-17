@@ -59,8 +59,6 @@ class TDoubleSinais
     {
         $data = (object) $param['data'];
 
-        // DoubleErros::registrar(1, 'TDoubleSinais', 'executr', json_encode($data));
-
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
 
@@ -89,36 +87,15 @@ class TDoubleSinais
             $data->ultimo_sinal = [];
         $ultimo_sinal = $data->ultimo_sinal;
         $service = null;
+        $sair = false;
         try
         {
             try {
                 if (!$service)
                     $service = $data->plataforma->service;
 
-                // $sinal_corrente = $service->sinalCorrente();
-                // if ($sinal_corrente['status_code'] == 200) {
-                //     $content = $sinal_corrente['data'];
-                //     if ($content->status == 'rolling') {
-                //         $novo_sinal = new stdClass;
-                //         $novo_sinal->id = $content->id;
-                //         $novo_sinal->cor = $content->color;
-                //         $novo_sinal->numero = $content->roll;
-                //         if ($ultimo_sinal != (array) $novo_sinal)
-                //         {
-                //             $ultimo_sinal = $novo_sinal;
-                //             TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
-                //                 $sinal = new DoubleSinal();
-                //                 $sinal->plataforma_id = $data->plataforma->id;
-                //                 $sinal->numero = $ultimo_sinal->numero;
-                //                 $sinal->cor = $data->plataforma->service->cores()[$sinal->numero];
-                //                 $sinal->id_referencia = $ultimo_sinal->id;
-                //                 $sinal->save();
-                //             });
-                //         }
-                //     }
-                // }
                 $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
-                TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
+                $sinal = TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
                     $sinal = new DoubleSinal();
                     $sinal->plataforma_id = $data->plataforma->id;
                     $sinal->numero = $service->ultimoSinal();
@@ -127,6 +104,19 @@ class TDoubleSinais
                     $sinal->save();
 
                     return $sinal;
+                });
+
+                $sair = TUtils::openConnection('double', function () use($sinal){
+                    $existe = DoubleSinal::where('id_referencia', '=', $sinal->id_referencia)
+                        ->where('plataforma_id', '=', $sinal->plataforma_id)
+                        ->where('id', '<', $sinal->id)
+                        ->first();
+
+                    if ($existe) {
+                        $sinal->delete();
+                        return true;
+                    } else
+                        return false;
                 });
 
                 $status = $data->plataforma->statusSinais;
@@ -169,7 +159,8 @@ class TDoubleSinais
                 $data->plataforma->statusSinais = 'PARADO';
         }
 
-        if ($status == 'EXECUTANDO') {
+        if ($status == 'EXECUTANDO' and !$sair) 
+        {
             $token = TUtils::openFakeConnection('permission', function () {
                 $login = TSession::getValue('login');
                 $user = SystemUser::validate($login);
@@ -334,6 +325,10 @@ class TDoubleSinais
                 TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_sinal', $data);
         }
 
+        $data = new stdClass;
+        $data->inicio = 'Y';
+        TDoubleUtils::cmd_run('TDoubleSinais', 'validar_double_sinais', $data);
+
         self::$ultimo_historico = $historico;
         return $historico;
     }
@@ -455,7 +450,8 @@ class TDoubleSinais
                                 'tipo' => 'ENTRADA',
                                 'channel_id' => $data->canal->channel_id,
                                 'estrategia_id' => $estrategia->id, 
-                                'gale' => 0
+                                'gale' => 0, 
+                                'informacao' => "🎯 Após [{$ultimo_numero}]"
                             ];
 
                             $historico = self::registrar($payload);
@@ -1111,7 +1107,8 @@ class TDoubleSinais
                                 'channel_id' => $data->canal->channel_id,
                                 'estrategia_id' => $estrategia->id,
                                 'usuario_id' => $data->usuario->id,
-                                'gale' => 0
+                                'gale' => 0, 
+                                'informacao' => "🎯 Após [{$ultimo_numero}]"
                             ];
 
                             $historico = self::registrar($payload);
@@ -1276,6 +1273,7 @@ class TDoubleSinais
                     [["text" => $data->plataforma->translate->BOTAO_CONFIGURAR]],
                     [["text" => $modo_treinamento], ["text" => $modo_real]], 
                     [["text" => $data->plataforma->translate->BOTAO_INICIAR], ["text" => $iniciar_apos]], 
+                    [["text" => $data->plataforma->translate->BOTAO_GERAR_ACESSO_APP]]
                 ] 
             ];
 
@@ -1423,8 +1421,12 @@ class TDoubleSinais
                         $telegram->sendMessage(
                             $data->usuario->chat_id,
                             str_replace(
-                                ['{cor}'],
-                                [self::getCor($cor, $data->plataforma->translate)],
+                                ['{cor}', '{estrategia}', '{informacao}'],
+                                [
+                                    self::getCor($cor, $data->plataforma->translate), 
+                                    self::buscarNomeEstrategia($historico), 
+                                    isset($historico['informacao']) ? $historico['informacao'] : ''
+                                ],
                                 $data->plataforma->translate->MSG_CONFIRMADO_AGUARDANDO
                             ),
                             $botao
@@ -1460,11 +1462,12 @@ class TDoubleSinais
                             {
                                 if ($protecao == 0) {
                                     $message = str_replace(
-                                        ['{cor}', '{valor}', '{branco}'],
+                                        ['{cor}', '{valor}', '{branco}', '{estrategia}'],
                                         [
                                             self::getCor($cor, $data->plataforma->translate), 
                                             number_format($valor, 2, ',', '.'),
                                             $valor_branco == 0 ? "" : "🎯 Cor: " . self::getCor('white', $data->plataforma->translate) . " - Valor: R$ " . number_format($valor_branco, 2, ',', '.'). ". ",
+                                            self::buscarNomeEstrategia($historico)
                                         ],
                                         $data->plataforma->translate->MSG_OPERACAO_ENTRADA_REALIZADA
                                     );  
@@ -1489,12 +1492,13 @@ class TDoubleSinais
                                 }
                                 else
                                     $message = str_replace(
-                                        ['{protecao}', '{valor}', '{cor}', "{branco}"],
+                                        ['{protecao}', '{valor}', '{cor}', "{branco}", "{estrategia}"],
                                         [
                                             $protecao, 
                                             number_format($valor, 2, ',', '.'),
                                             self::getCor($cor, $data->plataforma->translate), 
-                                            $valor_branco == 0 ? "" : "🎯 Cor: " . self::getCor('white', $data->plataforma->translate) . " - Valor: R$ " . number_format($valor_branco, 2, ',', '.'). ". "
+                                            $valor_branco == 0 ? "" : "🎯 Cor: " . self::getCor('white', $data->plataforma->translate) . " - Valor: R$ " . number_format($valor_branco, 2, ',', '.'). ". ",
+                                            self::buscarNomeEstrategia($historico)
                                         ],
                                         $data->plataforma->translate->MSG_OPERACAO_MARTINGALE,
                                     );
@@ -1987,6 +1991,7 @@ class TDoubleSinais
                                     AND canal_id = {$data->canal->id}
                                     AND tipo IN ('WIN','LOSS')
                                     AND DATE(created_at) = CURDATE() 
+                                    AND usuario_id IS NULL
                                   GROUP BY 1");
         });
 
@@ -2194,5 +2199,57 @@ class TDoubleSinais
             return $sinal['data'];
         else
             http_response_code($sinal['status_code'] );
+    }
+
+    public function validar_double_sinais($params) {
+        $parar = DoubleConfiguracao::getConfiguracao('parar_validar_double_sinais');
+        if ($parar == 'Y')
+            return;
+
+        $executando = DoubleConfiguracao::getConfiguracao('executando_validar_double_sinais');
+        if ($params['data']['inicio'] == 'Y' and $executando == 'Y')
+            return;
+
+        try
+        {
+            DoubleConfiguracao::setConfiguracao('executando_validar_double_sinais', 'Y');
+            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'entrou');
+            TSession::setValue('unit_database', 'double');
+            TSession::setValue('login', 'api');
+            
+            $token = TUtils::openFakeConnection('permission', function () {
+                $login = TSession::getValue('login');
+                $user = SystemUser::validate($login);
+                return ApplicationAuthenticationRestService::getToken($user);
+            });
+
+            $plataformas = TUtils::openFakeConnection('double', function() {
+                return DoublePlataforma::where('ativo', '=', 'Y')
+                    ->where('tipo_sinais', '<>', 'PROPAGA_OUTRO')
+                    ->load();
+            });
+
+            // executa busca de sinais
+            foreach ($plataformas as $key => $plataforma) {
+                $data = new stdClass;
+                $data->inicio = $plataforma->status_sinais == 'EXECUTANDO' ?  false : true;
+                $data->token = $token;
+                $data->plataforma_id = $plataforma->id;
+                $data->tipo = 'cmd';
+                TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
+                DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', " .. Plataforma {$plataforma->nome}");
+            }
+
+            sleep(30);
+            
+            $data = new stdClass;
+            $data->inicio = 'N';
+            TDoubleUtils::cmd_run('TDoubleSinais', 'validar_double_sinais', $data);
+        } catch (\Throwable $th) {
+            DoubleConfiguracao::setConfiguracao('executando_validar_double_sinais', 'N');
+            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', $th->getMessage());
+        } finally {
+            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'saiu');
+        }
     }
 }

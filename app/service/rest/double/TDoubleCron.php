@@ -1,5 +1,6 @@
 <?php
 
+use Adianti\Registry\TSession;
 use Adianti\Database\TTransaction;
 
 class TDoubleCron

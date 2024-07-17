@@ -453,5 +453,38 @@ class TDoubleRobo
 
         return 'ok';
     }
+
+    public function tst_gerar_acesso($param)
+    {
+        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
+        
+        if (!$canal)
+            throw new Exception("Canal não suportado.");
+
+        if (empty($param['chat_id']))
+            throw new Exception($param['plataforma']->translate->MSG_OPERACAO_NAO_SUPORTADA);
+
+        if (!isset($param['email']))
+            throw new Exception('E-mail não informado');
+
+        $double_usuario = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
+            return DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
+        });
+
+        if (!$double_usuario)
+            throw new Exception('Usuário não encontrado');
+
+        $usuarios = TUtils::openConnection('permission', function () use($double_usuario, $param){
+            return SystemUser::where('custom_code', '<>', $double_usuario->chat_id)
+                ->where('email', '=', $param['email'])
+                ->load();
+        });
+
+        if (count($usuarios) > 0)
+            throw new Exception('Este email já está sendo utilizado por outro usuário. Informe um novo email.');
+
+        return $double_usuario->tst_generate_access($param['email'], $param['senha']);
+    }
 }
 

@@ -36,39 +36,11 @@ class TDashboardUsuarioService
         }
 
         // Retorna os dados em formato JSON
-        echo json_encode(array_reverse($list));
+        return json_encode(array_reverse($list));
     }
 
     public static function getStatusUsuario($usuario)
     {
-        // $sql = "SELECT usuario_id,
-        //                robo_status,
-        //                modo_treinamento,
-        //                valor_entrada, 
-        //                stop_win, 
-        //                stop_loss,
-        //                SUM(CASE WHEN tipo = 'win' THEN 1 ELSE 0 END) AS total_win,
-        //                SUM(CASE WHEN tipo = 'loss' THEN 1 ELSE 0 END) AS total_loss,
-        //                SUM(valor) lucro_prejuizo
-        //           FROM (SELECT u.id usuario_id, 
-        //                        u.robo_status, 
-        //                        u.modo_treinamento,
-        //                        u.valor valor_entrada,
-        //                        u.stop_win,
-        //                        u.stop_loss,
-        //                        CASE ROW_NUMBER() OVER (PARTITION BY uh.entrada_id ORDER BY uh.entrada_id, uh.id) -1
-        //                             WHEN u.protecao then if(uh.valor > 0, 'WIN', 'LOSS')
-        //                             WHEN 0 THEN IF(uh.valor > 0, 'WIN', 'ENTRADA')
-        //                             ELSE IF(uh.valor > 0, 'WIN', 'GALE')
-        //                         END tipo,
-        //                         IFNULL(uh.valor, 0) valor
-        //                   FROM double_usuario u
-        //                   LEFT JOIN double_usuario_historico uh ON uh.usuario_id = u.id
-        //                                                        AND uh.created_at >= u.robo_inicio
-        //                  WHERE u.id = {$usuario->id}
-        //                 ) tmp
-        //            GROUP BY usuario_id, robo_status, modo_treinamento, valor_entrada, stop_win, stop_loss";
-
         $sql = "SELECT dh.usuario_id, 
                         du.robo_status,
                         du.modo_treinamento,
@@ -105,10 +77,120 @@ class TDashboardUsuarioService
             'lucro_prejuizo'   => number_format($result[0]['lucro_prejuizo'], 2, ',', '.'),
             'saldo'            => number_format($saldo, 2, ',', '.'),
             'maior_entrada'    => number_format($result[0]['maior_entrada'], 2, ',', '.'),
-            // 'valor_entrada'    => number_format($result[0]['valor_entrada'], 2, ',', '.'),
-            // 'stop_win'         => number_format($result[0]['stop_win'], 2, ',', '.'),
-            // 'stop_loss'        => number_format($result[0]['stop_loss'], 2, ',', '.'),
         ];
-        echo json_encode($convert);
+
+        $nao_mostra_treinamento = DoubleConfiguracao::getConfiguracao('nao_mostra_treinamento');
+        if (in_array($usuario->chat_id, explode(',', $nao_mostra_treinamento)))
+            $convert['modo_treinamento'] = 'N';
+
+        return json_encode($convert);
+    }
+
+    public static function getRanking($canal_id, $usuario_id = null) {
+        // $sql = "SELECT su.name AS nome_usuario,
+        //                de.usuario_id,
+        //                de.id estrategia_id,
+        //                ca.plataforma_id,
+        //                de.canal_id,
+        //                de.nome,
+        //                de.regra,
+        //                de.resultado,
+        //                de.protecoes,
+        //                de.protecao_branco,
+        //                SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END) AS total_win,
+        //                SUM(CASE WHEN dh.tipo = 'loss' THEN 1 ELSE 0 END) AS total_loss,
+        //                (SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END) / COUNT(1)) * 100 AS percentual,
+        //                IF(ISNULL(MAX(gale)), 0, MAX(gale)) AS max_gales
+        //           FROM double_estrategia de ";
+        // if ($usuario_id) 
+        //     $sql .= " LEFT ";
+        // $sql .= " JOIN double_historico dh ON dh.estrategia_id = de.id 
+        //                                   AND DATE(dh.created_at) >= DATE_ADD(CURDATE(), INTERVAL -0 DAY)
+        //                                   AND dh.tipo IN ('WIN', 'LOSS')
+        //           JOIN double_usuario du ON du.id = de.usuario_id
+        //           JOIN system_users su ON su.custom_code = du.chat_id
+        //           JOIN double_canal ca ON ca.id = de.canal_id
+        //          WHERE de.canal_id = {$canal_id} 
+        //            AND de.deleted_at is NULL";
+        // if ($usuario_id)   
+        //     $sql .= " AND de.usuario_id = {$usuario_id} AND de.ativo = 'Y' ";
+
+        // $sql .= " GROUP BY su.name, de.usuario_id, de.canal_id, de.id, de.nome, de.regra, de.resultado, de.protecoes, de.protecao_branco
+        //           ORDER BY percentual DESC, total_win ASC, total_loss DESC, max_gales DESC, de.id ASC";
+        $sql = "  SELECT ranked.*,
+                		 su.name AS nome_usuario,
+                		 ca.plataforma_id
+                  FROM ( SELECT *, 
+                                ROW_NUMBER() OVER (PARTITION BY regra ORDER BY percentual DESC, total_win ASC, total_loss DESC, max_gales DESC) as rn
+                			  from ( SELECT de.usuario_id,
+                						    de.id estrategia_id,
+                						    de.canal_id,
+                						    de.nome,
+                						    de.regra,
+                						    de.resultado,
+                						    de.protecoes,
+                						    de.protecao_branco,
+                                            du.chat_id,
+                						    SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END) AS total_win,
+                						    SUM(CASE WHEN dh.tipo = 'loss' THEN 1 ELSE 0 END) AS total_loss,
+                						    (SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END) / COUNT(1)) * 100 AS percentual,
+                						    IF(ISNULL(MAX(dh.gale)), 0, MAX(dh.gale)) AS max_gales
+                						FROM double_estrategia de ";
+        if ($usuario_id)
+            $sql .= " LEFT ";
+        $sql .= " JOIN double_historico dh ON dh.estrategia_id = de.id 
+                						                        AND DATE(dh.created_at) >= DATE_ADD(CURDATE(), INTERVAL -0 DAY)
+                						                        AND dh.tipo IN ('WIN', 'LOSS')
+                					    JOIN double_usuario du ON du.id = de.usuario_id
+                                       WHERE de.usuario_id IS NOT NULL
+                                         AND de.deleted_at IS NULL
+                					     AND de.canal_id = {$canal_id} ";
+        if ($usuario_id)
+            $sql .= " AND de.usuario_id = {$usuario_id} AND de.ativo = 'Y' ";
+        else 
+            $sql .= " AND du.robo_status = 'EXECUTANDO' ";
+        $sql .= " GROUP BY de.usuario_id, de.id, de.canal_id, de.nome, de.regra, de.resultado, de.protecoes, de.protecao_branco, du.chat_id ";
+        if (!$usuario_id)
+            $sql .= " HAVING SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END) > 0";
+        $sql .= " ) lista
+                		 ) ranked	
+                  JOIN system_users su ON su.custom_code = ranked.chat_id
+                  JOIN double_canal ca ON ca.id = ranked.canal_id
+                 WHERE rn = 1
+                 ORDER BY percentual DESC, total_win ASC, total_loss DESC, max_gales DESC, estrategia_id ASC";
+        if (!$usuario_id)
+            $sql .= " LIMIT 10";
+
+        $result = TUtils::openFakeConnection('double', function () use($sql){
+            $conn = TTransaction::get();
+            $list = TDatabase::getData(
+                $conn, 
+                $sql
+            );
+
+            return $list;
+        });
+
+        $convert = [];
+        foreach ($result as $key => $value) {
+            $convert[] = [
+                'usuario_id'       => $value['usuario_id'],
+                'nome_usuario'     => $value['nome_usuario'],
+                'estrategia_id'    => $value['estrategia_id'],
+                'plataforma_id'    => $value['plataforma_id'],
+                'canal_id'         => $value['canal_id'],
+                'nome'             => $value['nome'],
+                'regra'            => $value['regra'],
+                'resultado'        => $value['resultado'],
+                'win'              => $value['total_win'],
+                'loss'             => $value['total_loss'],
+                'percentual'       => number_format($value['percentual'], 2, ',', '.'),
+                'max_gales'        => $value['max_gales'],
+                'protecoes'        => $value['protecoes'],
+                'protecao_branco'  => $value['protecao_branco'],
+            ];        
+        }
+        
+        return $convert;
     }
 }
