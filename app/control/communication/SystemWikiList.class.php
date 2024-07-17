@@ -41,7 +41,7 @@ class SystemWikiList extends TStandardList
         parent::setCriteria($criteria);
         
         $this->form = new BootstrapFormBuilder('wiki_list_form');
-        $this->form->setFormTitle("Wiki");
+        $this->form->setFormTitle(_t("Courses"));
         
         $id = new TEntry('id');
         $title = new TEntry('title');

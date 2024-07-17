@@ -1,4 +1,6 @@
 <?php
+
+use Adianti\Widget\Form\THtmlEditor;
 /**
  * SystemWikiForm
  *
@@ -25,7 +27,7 @@ class SystemWikiForm extends TPage
         parent::setTargetContainer('adianti_right_panel');
 
         $this->form = new BootstrapFormBuilder('wiki_form');
-        $this->form->setFormTitle('Wiki');
+        $this->form->setFormTitle(_t("Course"));
 
         $id = new THidden('id');
         $searchable = new TRadioGroup('searchable');
@@ -58,7 +60,7 @@ class SystemWikiForm extends TPage
         $description->setSize('100%');
         
         $content->setSize('100%', 350);
-        $content->addCustomButton("wiki_link", "Wiki.applyLink", _t("Add wiki link"), new TImage('fab:wikipedia-w'), true);
+        $content->addCustomButton("wiki_link", "Wiki.applyLink", "📚 ". _t("Add course link"), new TImage('fab:wikipediaa'), true);
         
         $this->group_list = new TCheckList('group_list');
         $this->group_list->setIdColumn('id');

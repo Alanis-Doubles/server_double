@@ -42,6 +42,30 @@ class ApplicationTranslator
         $this->messages['en'][] = 'Select unit';
         $this->messages['pt'][] = 'Selecionar unidade';
         $this->messages['es'][] = 'Seleccionar unidad';
+
+        $this->messages['en'][] = 'Courses';
+        $this->messages['pt'][] = 'Cursos';
+        $this->messages['es'][] = 'Cursos';
+
+        $this->messages['en'][] = '📚 Courses';
+        $this->messages['pt'][] = '📚 Cursos';
+        $this->messages['es'][] = '📚 Cursos';
+
+        $this->messages['en'][] = '📝 Page managements';
+        $this->messages['pt'][] = '📝 Gestão de páginas';
+        $this->messages['es'][] = '📝 Gestión de páginas';
+
+        $this->messages['en'][] = '🔎 Search pages';
+        $this->messages['pt'][] = '🔎 Buscar páginas';
+        $this->messages['es'][] = '🔎 Buscar páginas';
+
+        $this->messages['en'][] = 'Course';
+        $this->messages['pt'][] = 'Curso';
+        $this->messages['es'][] = 'Curso';
+
+        $this->messages['en'][] = 'Add course link';
+        $this->messages['pt'][] = 'Adicionar link do curso';
+        $this->messages['es'][] = 'Agregar enlace del curso';
         
         
         foreach ($this->messages as $lang => $messages)

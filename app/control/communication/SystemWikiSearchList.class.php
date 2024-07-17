@@ -1,4 +1,9 @@
 <?php
+
+use Adianti\Base\TStandardList;
+use Adianti\Database\TExpression;
+use Adianti\Widget\Form\TMultiSearch;
+
 /**
  * SystemWikiSearchList
  *
@@ -29,6 +34,19 @@ class SystemWikiSearchList extends TStandardList
         parent::setDefaultOrder('title', 'asc');         // defines the default order
         parent::addFilterField('title', 'like', 'search', null, TExpression::OR_OPERATOR); // filterField, operator, formField
         parent::addFilterField('content', 'like', 'search', null, TExpression::OR_OPERATOR); // filterField, operator, formField
+        parent::addFilterField('description', 'like', 'search', null, TExpression::OR_OPERATOR); // filterField, operator, formField
+        parent::addFilterField(
+            'EXISTS(SELECT system_wiki_page_id FROM system_wiki_tag t WHERE t.system_wiki_page_id = system_wiki_page.id and tag in', 
+            '', 
+            'tags', 
+            function($data){
+                $new = [];
+                foreach ($data as $x)
+                    $new[] = "'$x'";
+                return 'NOESC:('. implode(',', $new) . '))';
+            }, 
+            TExpression::OR_OPERATOR
+        );
         
         $criteria = new TCriteria;
         $criteria->add(new TFilter('active', '=', 'Y'));
@@ -42,14 +60,33 @@ class SystemWikiSearchList extends TStandardList
         
         $this->form = new BootstrapFormBuilder('wiki_search_list');
         $this->form->setData( TSession::getValue(__CLASS__.'_filter_data') );
-        $this->form->setFormTitle("Wiki");
+        $this->form->setFormTitle(_t("Courses"));
 
         $search = new TEntry('search');
         $search->setSize('100%');
         $search->placeholder = _t('Description') . '...';
+
+        $tags = new TMultiSearch('tags');
+        $tags->setSize('100%', 38);
+        $tags->placeholder = "Tags ...";
+        $tags->setMinLength(1);
+        $tags->addItems(
+            TUtils::openFakeConnection('double', function(){
+                $list = SystemWikiTag::select('distinct tag')->load();
+
+                $options = [];
+                foreach ($list as $key => $value) {
+                    $options[$value->tag] = $value->tag;
+                }
+                return $options;
+            })
+        );
         
         $row1 = $this->form->addFields([$search]);
         $row1->layout = ['col-sm-12'];
+
+        $row2 = $this->form->addFields([$tags]);
+        $row2->layout = ['col-sm-12'];
 
         $btn_onsearch = $this->form->addAction(_t("Search"), new TAction([$this, 'onSearch']), 'fas:search #ffffff');
         $btn_onsearch->addStyleClass('btn-primary'); 
@@ -64,8 +101,15 @@ class SystemWikiSearchList extends TStandardList
         
         $column_title->setTransformer( function($value, $object, $row) {
             $content = new TElement('div');
+
+            $tags = array_map(function($tag) {
+                return TElement::tag('span', $tag, ['class' => 'badge bg-green']);
+            }, $object->getTags());
+
+            $content->add(TElement::tag('div', $tags));
             $content->add(TElement::tag('a', $object->title, ['href' => 'index.php?class=SystemWikiView&method=onLoad&key=' . $object->id, 'generator' => 'adianti']));
             $content->add(TElement::tag('small', $object->date_updated . ' - ' . $object->description));
+
             $content->{'class'} = 'system-wiki-result';
             
             return $content;

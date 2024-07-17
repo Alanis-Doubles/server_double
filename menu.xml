@@ -106,12 +106,12 @@
       </menuitem>
     </menu>
   </menuitem>
-  <menuitem label="🌐 Wiki">
+  <menuitem label="_t{📚 Courses}">
     <menu>
-      <menuitem label="📝 _t{Page management}">
+      <menuitem label="_t{📝 Page managements}">
         <action>SystemWikiList</action>
       </menuitem>
-      <menuitem label="🔎 _t{Search pages}">
+      <menuitem label="_t{🔎 Search pages}">
         <action>SystemWikiSearchList</action>
       </menuitem>
     </menu>
