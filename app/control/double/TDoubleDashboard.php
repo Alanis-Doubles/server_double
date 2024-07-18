@@ -71,7 +71,7 @@ class TDoubleDashboard extends TPage
             new TFilter(
                 '(SELECT p.tipo_sinais FROM double_plataforma p WHERE p.id = double_canal.plataforma_id)',
                 'IN',
-                ['GERA', 'PROPAGA_VALIDA_SINAL']
+                ['NAO_GERA', 'GERA', 'PROPAGA_VALIDA_SINAL']
             )
         );
         
@@ -471,22 +471,34 @@ JAVASCRIPT;
         // DoubleErros::registrar(3, 'dashboard', 'dash', json_encode($object));
         $dados = TUtils::openFakeConnection('double', function() use ($object){
             $usuariosTotal       = DoubleUsuario::where(1, '=', 1);
-            $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');
+            // $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');
             $usuariosNovos       = DoubleUsuario::where(1, '=', 1);
             $totalTestes         = DoubleUsuario::where('demo_jogadas', '<', 5);
             $totalPagamentos     = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO']);
             $totalCancelamentos  = DoublePagamentoHistorico::where('tipo_evento', '=', 'CANCELAMENTO');
             $totalAssinaturas    = DoublePagamentoHistorico::where('tipo_evento', 'in', ['PAGAMENTO', 'RENOVACAO', 'CANCELAMENTO']);
 
+            $usuariosAtivos = [];
+
             if ($object->canal_id)
             {
                 $usuariosTotal       = $usuariosTotal->where('canal_id', '=', $object->canal_id);
-                $usuariosAtivos      = $usuariosAtivos->where('canal_id', '=', $object->canal_id);
+                // $usuariosAtivos      = $usuariosAtivos->where('canal_id', '=', $object->canal_id);
                 $usuariosNovos       = $usuariosNovos->where('canal_id', '=', $object->canal_id);
                 $totalTestes         = $totalTestes->where('canal_id', '=', $object->canal_id);
                 $totalPagamentos     = $totalPagamentos->where('canal_id', '=', $object->canal_id);
                 $totalCancelamentos  = $totalCancelamentos->where('canal_id', '=', $object->canal_id);
                 $totalAssinaturas    = $totalAssinaturas->where('canal_id', '=', $object->canal_id);
+
+                $sqlAtivos = "SELECT COUNT(DISTINCT dh.usuario_id) total
+                                FROM double_usuario_historico dh
+                                JOIN double_usuario du on du.id = dh.usuario_id
+                               WHERE dh.created_at >= NOW() - INTERVAL 1 HOUR
+                                 AND du.canal_id = {$object->canal_id}
+                                 and di.robo_status = 'EXECUTANDO'";
+                                 
+                $conn = TTransaction::get();
+                $usuariosAtivos = TDatabase::getData($conn, $sqlAtivos);
             }
 
             $adicionarFiltroData = function(TRepository $objeto, $campo, $data_inicio, $data_fim)
@@ -509,7 +521,9 @@ JAVASCRIPT;
             $totalAssinaturas    = $adicionarFiltroData($totalAssinaturas, 'created_at', $object->data_inicio, $object->data_fim);
 
             $dados['totalUsuarios']         = $usuariosTotal->count() ?? 0;
-            $dados['usuariosAtivos']        = $usuariosAtivos->count() ?? 0;
+            $dados['novosUsuarios']         = $usuariosNovos->count() ?? 0;
+            $dados['usuariosAtivos']        = count($usuariosAtivos) > 0 ? $usuariosAtivos[0]['total'] : 0;
+            // $dados['usuariosAtivos']        = $usuariosAtivos->count() ?? 0;
             $dados['novosUsuarios']         = $usuariosNovos->count() ?? 0;
             $dados['totalTestesIniciados']  = $totalTestes->count() ?? 0;
             $dados['totalPlanosAssinados']  = ($totalPagamentos->count() ?? 0) - ($totalCancelamentos->count() ?? 0);
