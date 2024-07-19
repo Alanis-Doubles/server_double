@@ -157,7 +157,7 @@ class TDashboardUsuarioService
                   JOIN system_users su ON su.custom_code = ranked.chat_id
                   JOIN double_canal ca ON ca.id = ranked.canal_id
                  WHERE rn = 1
-                 ORDER BY percentual DESC, total_win ASC, total_loss DESC, max_gales DESC, estrategia_id ASC";
+                 ORDER BY percentual DESC, total_win DESC, total_loss ASC, max_gales DESC, estrategia_id ASC";
         if (!$usuario_id)
             $sql .= " LIMIT 10";
 

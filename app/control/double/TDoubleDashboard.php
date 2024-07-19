@@ -495,7 +495,7 @@ JAVASCRIPT;
                                 JOIN double_usuario du on du.id = dh.usuario_id
                                WHERE dh.created_at >= NOW() - INTERVAL 1 HOUR
                                  AND du.canal_id = {$object->canal_id}
-                                 and di.robo_status = 'EXECUTANDO'";
+                                 and du.robo_status = 'EXECUTANDO'";
                                  
                 $conn = TTransaction::get();
                 $usuariosAtivos = TDatabase::getData($conn, $sqlAtivos);
