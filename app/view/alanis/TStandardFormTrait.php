@@ -26,7 +26,7 @@ trait TStandardFormTrait
         $this->form->enableClientValidation();
 
         $this->form->addHeaderActionLink(_t('Close'), new TAction([$this, 'onClose']), 'fa:times red');
-        if ($param['method'] != 'onView') {
+        if (!isset($param['method']) or (isset($param['method']) and $param['method'] != 'onView')) {
             $btn = $this->form->addAction(_t('Save'), new TAction(array($this, 'onSave'), array_merge($param, ['static' => '1'])), 'far:save');
             $btn->class = 'btn btn-sm btn-primary';
             $this->form->addActionLink(_t('Close'), new TAction(array($this, 'onClose')), 'fa:times red');

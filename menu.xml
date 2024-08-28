@@ -26,6 +26,9 @@
       <menuitem label="🎯 Objetivos">
         <action>TDoubleUsuarioObjetivo</action>
       </menuitem>
+      <menuitem label="📨 Mensagem Direta">
+        <action>TDoubleMensagemDiretaForm</action>
+      </menuitem>
     </menu>
   </menuitem>
   <menuitem label="_t{Administration}">

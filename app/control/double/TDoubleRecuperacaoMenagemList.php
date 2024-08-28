@@ -14,12 +14,18 @@ class TDoubleRecuperacaoMenagemList extends TCustomStandardList
     {
         $this->status = ['NOVO' => 'Novo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => 'Aguardando pagamento', 'ATIVO' => 'Ativo', 'INATIVO' => 'Inativo', 'EXPIRADO' => 'Expirado']; 
 
+        $criteria = new TCriteria;
+        $criteria->add(
+            new TFilter('mensagem_direta', '=', 'N')
+        );
+
         parent::__construct([
             'title'          => 'Mensagens de recuperação',
             'database'       => 'double',
             'activeRecord'   => 'DoubleRecuperacaoMensagem',
             'defaultOrder'   => 'id',
             'formEdit'       => 'TDoubleRecuperacaoMensagemForm',
+            'criteria'       => $criteria,
             'items'          => [
                 [
                     'name'   => 'status',
