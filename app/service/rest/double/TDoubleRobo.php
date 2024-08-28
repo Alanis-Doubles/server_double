@@ -10,7 +10,7 @@ class TDoubleRobo
         'chat_id', 'nome', 'nome_usuario', 'email', 'telefone', 'status', 'valor', 'protecao', 'stop_win', 'stop_loss', 'ultimo_saldo',
         'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
         'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo', 'metas',
-        'usuario_meta', 'valor_max_ciclo', 'protecao_branco', 'modo_treinamento', 'banca_treinamento'
+        'usuario_meta', 'valor_max_ciclo', 'protecao_branco', 'modo_treinamento', 'banca_treinamento', 'status_objetivo', 'robo_status'
     ];
 
     public function carregar($param)
@@ -24,7 +24,7 @@ class TDoubleRobo
 
         $object = TUtils::openConnection('double', function () use ($param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id, $param['canal']->id);
-
+            
             if (!$object) {
                 $object = new DoubleUsuario();
                 $object->chat_id = $param['chat_id'];
@@ -177,12 +177,13 @@ class TDoubleRobo
             }
         } catch (\Throwable $e) {
             $mensagem = $e->getMessage();
-            TUtils::openConnection('double', function() use ($param, $mensagem) {
+            $trace = json_encode($e->getTrace());
+            TUtils::openConnection('double', function() use ($param, $mensagem, $trace, $method) {
                 $error = new DoubleErros();
                 $error->classe = 'TDoubleRobo';
-                $error->metodo = 'handle';
+                $error->metodo = 'handle - ' . $method;
                 $error->erro = $mensagem;
-                $error->detalhe = json_encode($param);
+                $error->detalhe = $trace;
                 $error->plataforma_id = $param['plataforma']->id;
                 $error->save();
             });
@@ -306,12 +307,26 @@ class TDoubleRobo
             return $object;
         });
 
-        $data = new stdClass;
-        $data->usuario_id = $object->id;
-        $data->plataforma_id = $plataforma->id;
-        $data->tipo = 'cmd';
-        $data->inicio = true;
-        TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') {
+            $object->robo_status = 'EXECUTANDO';
+            if (!isset($param['nao_reseta_inicio']))
+                $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+            $object->saveInTransaction();
+
+            $redis_param = [
+                'usuario_id' => $object->id
+            ];
+            // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+            TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+        } else {
+            $data = new stdClass;
+            $data->usuario_id = $object->id;
+            $data->plataforma_id = $plataforma->id;
+            $data->tipo = 'cmd';
+            $data->inicio = true;
+            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        }
 
         return $object->toArray(static::ATTRIBUTES);
     }
@@ -353,12 +368,28 @@ class TDoubleRobo
             return $object;
         });
         
-        $data = new stdClass;
-        $data->usuario_id = $object->id;
-        $data->plataforma_id = $plataforma->id;
-        $data->tipo = 'cmd';
-        $data->inicio = true;
-        TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') {
+            $object->robo_status = 'EXECUTANDO';
+            if (!isset($param['nao_reseta_inicio']))
+                $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+            $object->saveInTransaction();
+
+            $redis_param = [
+                'usuario_id' => $object->id
+            ];
+            // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+            TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+        } else {
+            $data = new stdClass;
+            $data->usuario_id = $object->id;
+            $data->plataforma_id = $plataforma->id;
+            $data->tipo = 'cmd';
+            $data->inicio = true;
+            if (isset($param['nao_reseta_inicio']))
+                $data->nao_reseta_inicio = 'Y';
+            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        }
 
         return $object->toArray(static::ATTRIBUTES);
     }
@@ -374,7 +405,7 @@ class TDoubleRobo
         $object = TUtils::openConnection('double', function() use ($plataforma, $param, $canal) {
             $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
 
-            $object->robo_status = 'PARANDO';
+            $object->robo_status = 'PARADO';
             $object->robo_iniciar = 'N';
             $object->robo_iniciar_apos_loss = 'N';
             $object->robo_processando_jogada = 'N';
@@ -388,6 +419,9 @@ class TDoubleRobo
                 $object->usuario_meta->proxima_execucao = null;
                 $object->usuario_meta->save();
             }
+
+            if ($object->status_objetivo == 'EXECUTANDO')
+                $object->usuario_objetivo->parar();
 
             return $object;
         });

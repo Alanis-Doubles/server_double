@@ -23,6 +23,9 @@
       <menuitem label="🔊 Mensagens de recuperação">
         <action>TDoubleRecuperacaoMenagemList</action>
       </menuitem>
+      <menuitem label="🎯 Objetivos">
+        <action>TDoubleUsuarioObjetivo</action>
+      </menuitem>
     </menu>
   </menuitem>
   <menuitem label="_t{Administration}">

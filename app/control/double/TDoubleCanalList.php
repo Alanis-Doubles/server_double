@@ -202,12 +202,22 @@ class TDoubleCanalList extends TCustomStandardList
         $data->canal_id = $param['id'];
         $data->inicio = true;
 
-        if ($param['tipo_sinais'] == 'GERA')
-            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);
-        elseif ($param['tipo_sinais'] == 'PROPAGA_VALIDA_SINAL')
-            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_validar_sinal', $data);
-        else    
-            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_sinal', $data);
+        // if ($param['tipo_sinais'] == 'GERA')
+        //     TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);
+        // elseif ($param['tipo_sinais'] == 'PROPAGA_VALIDA_SINAL')
+        //     TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_validar_sinal', $data);
+        // else    
+        //     TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal_propagar_sinal', $data);
+
+        if (in_array($param['tipo_sinais'] , ['GERA', 'PROPAGA_VALIDA_SINAL'])) {
+            $canal = DoubleCanal::identificar($param['id']);
+            $canal->statusSinais = 'EXECUTANDO';
+        
+            $redis_param = [
+                'canal_id' => $canal->id,
+            ];
+            TUtils::cmd_run('TDoubleCanalConsumer', 'run', $redis_param);
+        }
 
         new TMessage('info', 'Serviço iniciado.', new TAction([$this, 'onReload'], $param));
     }

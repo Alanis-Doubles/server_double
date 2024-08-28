@@ -65,7 +65,7 @@ class TDoublePlataformaList extends TCustomStandardList
                 ],
             ],
             'actions' => [
-                'actExecutar'  => ['label' => 'Executar/Parar serviço', 'image' => 'fas:play-circle red', 'fields' => ['id', '*'], 'action' => [$this, 'doExecutarServico'], 'action_params' =>  ['register_state' => 'false']],
+                'actExecutar'  => ['label' => 'Executar/Parar serviço', 'image' => 'fas:play-circle red', 'fields' => ['id', 'nome', 'idioma', 'status_sinais'], 'action' => [$this, 'doExecutarServico'], 'action_params' =>  ['register_state' => 'false']],
             ]
         ]);
     }

@@ -19,6 +19,7 @@ class DoubleUsuario extends DoubleRecord
     private $obj_canal;
     private $obj_ultimo_pagamento;
     private $obj_usuario_meta;
+    private $obj_usuario_objetivo;
 
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
@@ -45,6 +46,8 @@ class DoubleUsuario extends DoubleRecord
     {
         unset($this->usuarios_canal);
         unset($this->usuario_canal);
+        unset($this->plataforma);
+
         $this->valor = $this->valor == null ? 0 : $this->valor;
         $this->protecao = $this->protecao == null ? 0 : $this->protecao;
         $this->stop_win = $this->stop_win == null ? 0 : $this->stop_win;
@@ -88,6 +91,11 @@ class DoubleUsuario extends DoubleRecord
             if ($lastState['status'] != $this->status)
                 $this->data_envio_recuperacao = null;
         }
+
+        unset($this->telefone);
+        unset($this->nome);
+        unset($this->nome_usuario);
+        unset($this->nome_email);
         
         parent::store();
     }
@@ -101,6 +109,14 @@ class DoubleUsuario extends DoubleRecord
                 ->first();
         });
     }
+
+    public static function identificarPorId($usuario_id)
+    {
+        return TUtils::openFakeConnection('double', function() use($usuario_id) {
+            return new DoubleUsuario($usuario_id, false);
+        });
+    }
+
 
     private function buscarSystemUser()
     {
@@ -466,7 +482,7 @@ class DoubleUsuario extends DoubleRecord
             ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
             [
                 $this->nome,
-                number_format($this->ultimo_saldo, 2, ',', '.'),
+                number_format($this->plataforma->service->saldo($this), 2, ',', '.'),
                 number_format($this->valor, 2, ',', '.'),
                 $this->protecao,
                 number_format($this->stop_win, 2, ',', '.'),
@@ -511,5 +527,25 @@ class DoubleUsuario extends DoubleRecord
             );
 
         return $msg;
+    }
+
+    public function get_usuario_objetivo()
+    {
+        if (!$this->obj_usuario_objetivo) {
+            $this->obj_usuario_objetivo =  TUtils::openConnection('double', function () {
+                return DoubleUsuarioObjetivo::where('usuario_id', '=', $this->id)
+                    ->first();
+            });
+        }
+        
+        return $this->obj_usuario_objetivo;
+    }
+
+    public function get_status_objetivo()
+    {
+        if ($this->usuario_objetivo)
+            return $this->usuario_objetivo->status;
+        else
+            return 'PARADO';
     }
 }

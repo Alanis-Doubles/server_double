@@ -26,18 +26,6 @@ class TelegramRest
             $payload['reply_markup'] = $reply_markup;
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
-        // $client = new Client(['http_errors' => false]);
-        // $response = $client->request(
-        //     'POST', 
-        //     $location.'sendMessage',
-        //     [
-        //         'json' => $payload,
-        //         'headers' => [
-        //             'Content-Type' => 'application/json',
-        //             'Accept' => 'application/json'
-        //         ]
-        //     ]
-        // );
 
         $ch = curl_init();
     
@@ -57,11 +45,6 @@ class TelegramRest
               ),
         );
         
-        // if (!empty($authorization))
-        // {
-        //     $defaults[CURLOPT_HTTPHEADER] = ['Authorization: '. $authorization];
-        // }
-        
         curl_setopt_array($ch, $defaults);
         $output = curl_exec ($ch);
         
@@ -74,12 +57,11 @@ class TelegramRest
             $canal->saveInTransaction();
         }
         
-        // if ($response->getStatusCode() == 200)
         $contents = null;
         if ($http_status == 200)
             $contents = json_decode($output);
         else
-            DoubleErros::registrar('3', 'DoubleErros', 'sendMessage', $location . 'sendMessage', $http_status);
+            DoubleErros::registrar(1, 'DoubleErros', 'sendMessage', $location . 'sendMessage', json_encode($payload) );
         return $contents;
     }
 

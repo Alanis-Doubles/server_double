@@ -28,9 +28,12 @@ class SystemSqlLogService implements AdiantiLoggerInterface
         $new_conn = serialize(TConnection::getDatabaseInfo('log'));
         
         $open_transaction = ($cur_conn !== $new_conn);
+        $login = TSession::getValue('login');
+        if ($login !== 'edson_alanis')
+            return;
         
         // avoid log of log
-        if ($dbname !== 'log' AND (in_array(substr($message,0,6), array('INSERT', 'UPDATE', 'DELETE') ) ) )
+        if ($dbname !== 'log' AND (in_array(substr($message,0,6), array('INSERT', 'UPDATE', 'DELETE', 'SELECT') ) ) )
         {
             $info = TTransaction::getDatabaseInfo();
             $date_mask = (in_array($info['type'], ['sqlsrv', 'dblib', 'mssql'])) ? 'Ymd H:i:s' : 'Y-m-d H:i:s';

@@ -1146,6 +1146,9 @@ trait TUIBuilderTrait
                 if (isset($Column->{'enableSearch'}) and $Column->{'enableSearch'})
                     $search[] = (string) $Column->{'name'};
 
+                if (isset($Column->{'data_property'}))
+                    $dgcolumn->setDataProperty($Column->{'data_property'}['name'], $Column->{'data_property'}['value']);
+
                 if (isset($Column->{'order'}) and $Column->{'order'})
                 {
                     $order = new TAction(array($this, 'onReload'));

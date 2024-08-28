@@ -271,4 +271,36 @@ class TUtils
         return substr($senha, 0, $comprimento);
     }
 
+    public static function cmd_run($class, $method, $parms)
+    {
+        $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+        if (!$server_root) 
+            {
+                $server_root = $_SERVER['DOCUMENT_ROOT'];
+                DoubleConfiguracao::setConfiguracao('server_root', $server_root);
+            }
+
+        $param = http_build_query($parms);
+        
+        $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
+        if (substr(php_uname(), 0, 7) == "Windows") {
+            pclose(popen("start /B " . $command, "r"));
+        } else {
+            $tentativa = 1;
+            while ($tentativa <= 5)
+            {
+                try {
+                    exec($command . " > /dev/null &");
+                    break;
+                } catch (\Throwable $e) {
+                    $tentativa += 1;
+                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                } catch (Exception $e){
+                    $tentativa += 1;
+                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                }
+            }
+        }
+    }
+
 }

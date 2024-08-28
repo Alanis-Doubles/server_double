@@ -562,55 +562,6 @@ class TDoubleDashboardUsuario extends TPage
                 'chat_id' => $usuario->chat_id
             ]);
 
-        // $texto = $translate->MSG_INICIO_ROBO_6;
-        // $msg = str_replace(
-        //     ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
-        //     [
-        //         $usuario->nome,
-        //         number_format($usuario->ultimo_saldo, 2, ',', '.'),
-        //         number_format($usuario->valor, 2, ',', '.'),
-        //         $usuario->protecao,
-        //         number_format($usuario->stop_win, 2, ',', '.'),
-        //         number_format($usuario->stop_loss, 2, ',', '.') . '[' . ucfirst($usuario->tipo_stop_loss) . ']',
-        //         $usuario->ciclo == 'Y' ? 'Habilitado' : 'Não habilitado',
-        //         $usuario->protecao_branco == 'Y' ? 'Habilitado' : 'Não habilitado',
-        //         $usuario->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado'
-        //     ],
-        //     $texto
-        // );
-
-        // if ($usuario->entrada_automatica == 'Y')
-        //     $msg .= '\n     - Ocorrerá após o Stop WIN';
-        // if ($usuario->entrada_automatica == 'A')
-        //     $msg .= '\n     - Ocorrerá após o Stop WIN e Stop LOSS';
-        // if ($usuario->entrada_automatica == 'B')
-        //     $msg .= '\n     - Ocorrerá após o Stop LOSS';
-
-        // if (($usuario->entrada_automatica == 'A' or $usuario->entrada_automatica == 'B') and $usuario->ciclo == 'A') {
-        //     $msg .= str_replace(
-        //         ['{ciclo}'],
-        //         [$translate->MSG_CICLO_7],
-        //         '\n     - {ciclo} habilitado para o Stop LOSS'
-        //     );
-
-        //     if ($usuario->valor_max_ciclo > 0)
-        //         $msg .= str_replace(
-        //             ['{ciclo}', '{valor_max_ciclo}'],
-        //             [
-        //                 $translate->BOTAO_ENTRADA_AUTOMATICA_VALOR_MAX_CICLO,
-        //                 number_format(valor_max_ciclo, 2, ',', '.')
-        //             ],
-        //             '\n     - {ciclo}: {valor_max_ciclo}'
-        //         );
-        // }
-
-        // if ($usuario->entrada_automatica != 'N')
-        //     $msg .= str_replace(
-        //         ['{quantidade}', '{tipo}'],
-        //         [$usuario->entrada_automatica_total_loss, $usuario->entrada_automatica_tipo],
-        //         '\n     - Será esperado a ocorrência de {quantidade} {tipo}'
-        //     );
-
         $botao_inicio = [
             "resize_keyboard" => true, 
             "keyboard" => [
@@ -650,7 +601,7 @@ class TDoubleDashboardUsuario extends TPage
             'plataforma' => $usuario->plataforma->nome,
             'idioma' => $usuario->plataforma->idioma,
             'channel_id' => $usuario->canal->channel_id,
-            'chat_id' => $usuario->chat_id
+            'chat_id' => $usuario->chat_id,
         ]);
 
         $iniciar_apos = $usuario->plataforma->translate->BOTAO_INICIAR_LOSS;
@@ -715,6 +666,9 @@ class TDoubleDashboardUsuario extends TPage
             $tipo_entrada_automatica =  $object->tipo_entrada_automatica;
             if ($entrada_automatica !== 'N' && $tipo_entrada_automatica) 
                 $entrada_automatica = $tipo_entrada_automatica;
+
+            if ($entrada_automatica == 'N')
+                $usuario->valor_max_ciclo = 0;
 
             $usuario->ciclo              = $ciclo;
             $usuario->entrada_automatica = $entrada_automatica;
@@ -803,6 +757,10 @@ class TDoubleDashboardUsuario extends TPage
                 if (fetchingData_grafico) {
                     return;
                 }
+
+                if (!document.getElementsByName('canal_id'))
+                    return;
+                
                 fetchingData_grafico = true;
 
                 canal_id = document.getElementsByName('canal_id')[0].value;
@@ -872,6 +830,10 @@ class TDoubleDashboardUsuario extends TPage
                 if (fetchingData_sinais) {
                     return;
                 }
+
+                if (!document.getElementsByName('canal_id'))
+                    return;
+
                 fetchingData_sinais = true;
                 
                 canal_id = document.getElementsByName('canal_id')[0].value;
@@ -891,6 +853,10 @@ class TDoubleDashboardUsuario extends TPage
                 if (fetchingData_status) {
                     return;
                 }
+
+                if (!document.getElementsByName('canal_id'))
+                    return;
+
                 fetchingData_status = true;
 
                 canal_id = document.getElementsByName('canal_id')[0].value;
@@ -906,7 +872,9 @@ class TDoubleDashboardUsuario extends TPage
                     document.querySelector("#total-saldo").textContent = 'R$ ' + data.saldo;
                     document.querySelector("#maior-entrada").textContent = 'R$ ' + data.maior_entrada;
 
-                    if (data.robo_status == 'EXECUTANDO') {
+                    var executando = data.status_objetivo == 'EXECUTANDO' || data.robo_status == 'EXECUTANDO';
+                        
+                    if (executando) {
                         document.querySelector("#robo-status").innerHTML = '<b>🟢 Seu robô está em execução</b>';
                         document.querySelector('#btn_iniciar').style.display = 'none';
                         document.querySelector('#btn_parar').style.display = 'inline';
@@ -931,6 +899,10 @@ class TDoubleDashboardUsuario extends TPage
                 if (fetchingData_topRanking) {
                     return;
                 }
+
+                if (!document.getElementsByName('canal_id'))
+                    return;
+                
                 fetchingData_topRanking = true;
 
                 canal_id = document.getElementsByName('canal_id')[0].value;

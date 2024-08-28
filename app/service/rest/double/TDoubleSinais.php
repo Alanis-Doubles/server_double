@@ -26,9 +26,24 @@ class TDoubleSinais
         if ($tipo_sinais == 'PROPAGA_OUTRO')
             throw new Exception('Plataforma não configurada para buscar sinais');
 
+        $plataforma = $data->plataforma;
+
         $data->plataforma_id = $data->plataforma->id;
         unset($data->plataforma);
-        TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
+
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') {
+            $plataforma->statusSinais = 'EXECUTANDO';
+
+            $redis_param = [
+                'plataforma' => $plataforma->nome,
+                'idioma' => $plataforma->idioma
+            ];
+            // php cmd.php "class=TDoubleSinaisPublisher&method=run&plataforma=jonbet&idioma=ptBR"
+            TUtils::cmd_run('TDoubleSinaisPublisher', 'run', $redis_param);
+        }
+        else
+            TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
 
         if ($tipo_sinais == 'GERA') {
             $canais = TUtils::openFakeConnection('double', function() use ($data){
@@ -39,7 +54,17 @@ class TDoubleSinais
 
             foreach ($canais as $key => $canal) {
                 $data->canal_id = $canal->id;
-                TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);
+                if ($use_redis == 'Y') {
+                    $canal->statusSinais = 'EXECUTANDO';
+        
+                    $redis_param = [
+                        'canal_id' => $canal->id,
+                    ];
+                    // php cmd.php "class=TDoubleCanalConsumer&method=run&channel_id=-1002093089587"
+                    TUtils::cmd_run('TDoubleCanalConsumer', 'run', $redis_param);
+                }
+                else
+                    TDoubleUtils::cmd_run('TDoubleSinais', 'executar_canal', $data);
             }           
         }
     }
@@ -48,15 +73,29 @@ class TDoubleSinais
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
 
-        if ($plataforma->statusSinais == 'EXECUTANDO') {
-            $plataforma->statusSinais = 'PARANDO';
-        } else {
-            $plataforma->statusSinais = 'PARADO';
-        }
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            if ($plataforma->tipo_sinais == 'GERA') {
+                $canais = TUtils::openFakeConnection('double', function() use ($plataforma){
+                    return DoubleCanal::where('plataforma_id', '=', $plataforma->id)
+                        ->where('ativo', '=', 'Y')
+                        ->load();
+                });
+
+                foreach ($canais as $key => $canal) {
+                    $canal->statusSinais = 'PARADO';
+                }
+            }
+
+        $plataforma->statusSinais = 'PARADO';
     }
 
     public static function executar($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
 
         $token = $data->token;
@@ -94,30 +133,65 @@ class TDoubleSinais
                 if (!$service)
                     $service = $data->plataforma->service;
 
-                $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
-                $sinal = TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
-                    $sinal = new DoubleSinal();
-                    $sinal->plataforma_id = $data->plataforma->id;
-                    $sinal->numero = $service->ultimoSinal();
-                    $sinal->cor = $data->plataforma->service->cores()[$sinal->numero];
-                    $sinal->id_referencia = $ultimo_sinal->id;
-                    $sinal->save();
+                // $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
+                $response = $service->sinalCorrente();
+                $content = $response['data'];
+                // DoubleErros::registrar('1', 'TDoubleSinais', 'executar', $response['status_code'], json_encode($response['data']));
+                if ($response['status_code'] == 200) {
+                    if ($content->status == 'rolling') {
+                        if (!isset($ultimo_sinal['id']) or (isset($ultimo_sinal['id']) and $content->id !== $ultimo_sinal['id']))
+                        {
+                            $sinal = TUtils::openConnection('double', function() use ($data, $service, $content) {
+                                $sinal = new DoubleSinal();
+                                $sinal->plataforma_id = $data->plataforma->id;
+                                $sinal->numero = $content->roll;
+                                $sinal->cor = $data->plataforma->service->cores()[$sinal->numero];
+                                $sinal->id_referencia = $content->id;
+                                $sinal->save();
+            
+                                return $sinal;
+                            });
 
-                    return $sinal;
-                });
+                            $ultimo_sinal['id'] = $sinal->id_referencia;
+            
+                            $sair = TUtils::openConnection('double', function () use($sinal){
+                                $existe = DoubleSinal::where('id_referencia', '=', $sinal->id_referencia)
+                                    ->where('plataforma_id', '=', $sinal->plataforma_id)
+                                    ->where('id', '<', $sinal->id)
+                                    ->first();
+            
+                                if ($existe) {
+                                    $sinal->delete();
+                                    return true;
+                                } else
+                                    return false;
+                            });
+                        }
+                    }
+                }
+                // $sinal = TUtils::openConnection('double', function() use ($data, $service, $ultimo_sinal) {
+                //     $sinal = new DoubleSinal();
+                //     $sinal->plataforma_id = $data->plataforma->id;
+                //     $sinal->numero = $service->ultimoSinal();
+                //     $sinal->cor = $data->plataforma->service->cores()[$sinal->numero];
+                //     $sinal->id_referencia = $ultimo_sinal->id;
+                //     $sinal->save();
 
-                $sair = TUtils::openConnection('double', function () use($sinal){
-                    $existe = DoubleSinal::where('id_referencia', '=', $sinal->id_referencia)
-                        ->where('plataforma_id', '=', $sinal->plataforma_id)
-                        ->where('id', '<', $sinal->id)
-                        ->first();
+                //     return $sinal;
+                // });
 
-                    if ($existe) {
-                        $sinal->delete();
-                        return true;
-                    } else
-                        return false;
-                });
+                // $sair = TUtils::openConnection('double', function () use($sinal){
+                //     $existe = DoubleSinal::where('id_referencia', '=', $sinal->id_referencia)
+                //         ->where('plataforma_id', '=', $sinal->plataforma_id)
+                //         ->where('id', '<', $sinal->id)
+                //         ->first();
+
+                //     if ($existe) {
+                //         $sinal->delete();
+                //         return true;
+                //     } else
+                //         return false;
+                // });
 
                 $status = $data->plataforma->statusSinais;
             } catch (\Throwable $e) // in case of exception
@@ -135,22 +209,7 @@ class TDoubleSinais
                         $error->save();
                     });
                 }
-            } catch (Exception $e) // in case of exception
-            {
-                $service = null;
-                $mensagem = $e->getMessage();
-                if (!str_contains($mensagem, "Broken frame") and !str_contains($mensagem, "id_referencia"))
-                {
-                    TUtils::openConnection('double', function() use ($mensagem, $data) {
-                        $error = new DoubleErros();
-                        $error->classe = 'TDoubleSinais';
-                        $error->metodo = 'executar';
-                        $error->erro = $mensagem;
-                        $error->plataforma_id = $data->plataforma->id;
-                        $error->save();
-                    });
-                }
-            }
+            } 
         } finally
         {
             $service = null;
@@ -229,6 +288,10 @@ class TDoubleSinais
 
     public static function registrar_enviar_sinal_canal($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $canal = null;
 
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
@@ -327,7 +390,7 @@ class TDoubleSinais
 
         $data = new stdClass;
         $data->inicio = 'Y';
-        TDoubleUtils::cmd_run('TDoubleSinais', 'validar_double_sinais', $data);
+        // TDoubleUtils::cmd_run('TDoubleSinais', 'validar_double_sinais', $data);
 
         self::$ultimo_historico = $historico;
         return $historico;
@@ -337,15 +400,19 @@ class TDoubleSinais
     {
         $canal = DoubleCanal::identificar($param['canal_id']);
 
-        if ($canal->statusSinais == 'EXECUTANDO') {
-            $canal->statusSinais = 'PARANDO';
-        } else {
+        // if ($canal->statusSinais == 'EXECUTANDO') {
+            // $canal->statusSinais = 'PARANDO';
+        // } else {
             $canal->statusSinais = 'PARADO';
-        }
+        // }
     }
 
     public static function executar_canal($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
 
         $token = $data->token;
@@ -635,6 +702,10 @@ class TDoubleSinais
 
     public static function executar_canal_propagar_sinal($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
@@ -789,6 +860,10 @@ class TDoubleSinais
 
     public static function executar_canal_propagar_validar_sinal($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
@@ -1042,6 +1117,10 @@ class TDoubleSinais
 
     public static function executar_usuario_sinais($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
@@ -1234,6 +1313,10 @@ class TDoubleSinais
 
     public static function executar_usuario($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         $data = (object) $param['data'];
         $token = $data->token;
         ApplicationAuthenticationService::fromToken($token);
@@ -1286,7 +1369,8 @@ class TDoubleSinais
             if ($data->inicio)
             {
                 $data->usuario->roboStatus = 'EXECUTANDO';
-                $data->usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+                if (!isset($data->nao_reseta_inicio))
+                    $data->usuario->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
                 $data->historico = [];
 
                 $data->usuario->executando_usuario_sinais = 'N';
@@ -1557,12 +1641,17 @@ class TDoubleSinais
                                     );
                                 }
 
+                                if ($data->usuario->status_objetivo == 'EXECUTANDO') {
+                                    if ($data->usuario->usuario_objetivo->atualizar_progresso())
+                                        break;
+                                }
+
                                 if ($data->usuario->tipo_stop_loss == 'QUANTIDADE')
                                     $ocorreu_stop_loss = $data->usuario->quantidade_loss >= $data->usuario->stop_loss;
                                 else
-                                    $ocorreu_stop_loss = -$data->usuario->stop_loss >= $lucro;
+                                    $ocorreu_stop_loss = -round($data->usuario->stop_loss, 2) >= $lucro;
 
-                                $ocorreu_stop_win = round($data->usuario->stop_win, 1) <= round($lucro, 1);
+                                $ocorreu_stop_win = round($data->usuario->stop_win, 2) <= round($lucro, 1);
 
                                 if ($ocorreu_stop_loss or $ocorreu_stop_win) {
                                     $entrada_automatica = false;
@@ -1635,6 +1724,10 @@ class TDoubleSinais
                                             $data->usuario->usuario_meta->saveInTransaction();
                                         }
                                     }
+
+                                    if ($botao_inicio != $botao and  $data->usuario->status_objetivo == 'EXECUTANDO') 
+                                        $botao_inicio = $botao;
+                                    
                                     $data->usuario->saveInTransaction();
                                     if (!$meta_atingida)
                                         $telegram->sendMessage($data->usuario->chat_id, $message, $botao_inicio);
@@ -1664,6 +1757,9 @@ class TDoubleSinais
                                     $data->usuario->usuario_meta->proxima_execucao = null;
                                     $data->usuario->usuario_meta->saveInTransaction();
                                 }
+
+                                if ($data->status_objetivo == 'EXECUTANDO')
+                                    $data->usuario_objetivo->parar();
 
                                 $telegram->sendMessage(
                                     $data->usuario->chat_id, 
@@ -1706,6 +1802,9 @@ class TDoubleSinais
                                     $data->usuario->usuario_meta->proxima_execucao = null;
                                     $data->usuario->usuario_meta->saveInTransaction();
                                 }
+
+                                if ($data->status_objetivo == 'EXECUTANDO')
+                                    $data->usuario_objetivo->parar();
                                 
                                 $telegram->sendMessage(
                                     $data->usuario->chat_id, 
@@ -2084,6 +2183,10 @@ class TDoubleSinais
 
     public function verificar($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         TSession::setValue('unit_database', 'double');
         $login = TSession::setValue('login', 'api');
 
@@ -2115,6 +2218,10 @@ class TDoubleSinais
 
     public function verificar_canal($param)
     {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+
         TSession::setValue('unit_database', 'double');
         $login = TSession::setValue('login', 'api');
 
@@ -2201,7 +2308,12 @@ class TDoubleSinais
             http_response_code($sinal['status_code'] );
     }
 
-    public function validar_double_sinais($params) {
+    public function validar_double_sinais($params) 
+    {
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') 
+            return ;
+        
         $parar = DoubleConfiguracao::getConfiguracao('parar_validar_double_sinais');
         if ($parar == 'Y')
             return;
@@ -2240,7 +2352,7 @@ class TDoubleSinais
                 DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', " .. Plataforma {$plataforma->nome}");
             }
 
-            sleep(30);
+            sleep(20);
             
             $data = new stdClass;
             $data->inicio = 'N';

@@ -230,6 +230,8 @@ RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/sinais/([A-Za-z-_0-9]*)$ rest
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=handle&plataforma=$1&idioma=$2&channel_id=$3&chat_id=$4&%{QUERY_STRING} [NC]
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/robo/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)$ rest.php?auth=Bearer&class=TDoubleRobo&method=$5&plataforma=$1&idioma=$2&channel_id=$3&chat_id=$4&%{QUERY_STRING} [NC]
 
+RewriteRule ^api/cronjob/([A-Za-z-_0-9]*)$ rest.php?call_method=GET&auth=None&class=TDoubleCron&method=$1&%{QUERY_STRING} [NC]
+
 RewriteRule ^api/webhook/([A-Za-z-_0-9]*)$ rest.php?call_method=POST&auth=None&class=TDoubleWebhook&method=processar&origem=$1&%{QUERY_STRING} [NC]
 
 
@@ -251,6 +253,8 @@ RewriteRule ^xhr-double-estrategias$ engine.php?class=TDoubleEstrategiaList&meth
 RewriteRule ^double-dashboard-usuario$ index.php?class=TDoubleDashboardUsuario&%{QUERY_STRING} [NC]
 RewriteRule ^xhr-double-dashboard-usuario$ engine.php?class=TDoubleDashboardUsuario&%{QUERY_STRING} [NC]
 
+RewriteRule ^double-usuario-objetivo$ index.php?class=TDoubleUsuarioObjetivo&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-double-usuario-objetivo$ engine.php?class=TDoubleUsuarioObjetivo&%{QUERY_STRING} [NC]
 
 ############################################################################################################################################
 

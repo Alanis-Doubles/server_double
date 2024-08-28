@@ -136,4 +136,115 @@ class TDoubleCron
 
         echo date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
     }
+
+    public function atualizar_objetivos()
+    {
+        while (true) 
+        {       
+            echo "Script executado em: " . date('Y-m-d H:i:s') . "\n";
+
+            TSession::setValue('unit_database', 'double');
+            TSession::setValue('login', 'api');
+
+            // atualiza as execuções
+            $lista = TUtils::openFakeConnection('double', function () {
+                return DoubleUsuarioObjetivoExecucao::where('status', '=', 'EXECUTANDO')->load();
+            });
+
+            DoubleErros::registrar(1, 'TDoubleCron', 'atualizar_objetivos 1', count($lista));
+            echo "Total de execuções ativas: " . count($lista) . "\n";
+            foreach ($lista as $execucao) {
+                $execucao->atualizar_progresso();
+            }
+
+            // inicia nova execução
+            $lista = TUtils::openFakeConnection('double', function () {
+                $sql = "SELECT usuario_objetivo_id,
+                            MAX(proxima_execucao) as proxima_execucao
+                        FROM double_usuario_objetivo_execucao ue
+                        WHERE status = 'FINALIZADO'
+                        AND NOT EXISTS(SELECT 1 FROM double_usuario_objetivo_execucao tmp
+                                        WHERE tmp.usuario_objetivo_id = ue.usuario_objetivo_id
+                                            AND tmp.status = 'EXECUTANDO')
+                        GROUP BY usuario_objetivo_id";
+                $conn = TTransaction::get();
+                return TDatabase::getData(
+                    $conn, 
+                    $sql
+                );
+
+            });
+
+            $data_atual = new DateTime();
+            foreach ($lista as $item) {
+                $data_proxima_execucao = new DateTime($item['proxima_execucao']);
+                if ($data_atual >= $data_proxima_execucao) {
+                    TUtils::openFakeConnection('double', function () use($item) {
+                        $execucao = DoubleUsuarioObjetivoExecucao::where('status', '=', 'AGUARDANDO')
+                            ->where('usuario_objetivo_id', '=', $item['usuario_objetivo_id'])
+                            ->first();
+
+                        if (!$execucao)
+                            return null;
+
+                        $execucao->status          = 'EXECUTANDO';
+                        $execucao->inicio_execucao = (new DateTime())->format('Y-m-d H:i:s');
+                        $execucao->save();
+
+                        $objetivo = $execucao->usuario_objetivo;
+                        $usuario  = $execucao->usuario;
+
+                        $usuario->valor               = $execucao->valor_entrada;
+                        $usuario->protecao            = $objetivo->protecoes;
+                        $usuario->stop_win            = $execucao->valor_stop_win;
+                        $usuario->stop_loss           = $usuario->protecao + 1;
+                        $usuario->tipo_stop_loss      = 'QUANTIDADE';
+                        // $usuario->stop_loss           = $execucao->valor_stop_loss;
+                        // $usuario->tipo_stop_loss      = 'VALOR';
+                        $usuario->modo_treinamento    = $objetivo->modo_treinamento;
+                        $usuario->protecao_branco     = $objetivo->protecao_branco;
+                        $usuario->ciclo               = 'A';
+                        $usuario->entrada_automatica  = 'B';
+                        $usuario->valor_max_ciclo     = 0;
+                        $usuario->save();
+
+                        $translate = $usuario->plataforma->translate;
+
+                        $botao_inicio = [
+                            "resize_keyboard" => true, 
+                            "keyboard" => [
+                                    [["text" => $translate->BOTAO_CONFIGURAR]],
+                                    [["text" => $translate->BOTAO_PARAR_ROBO]], 
+                                ] 
+                            ];
+
+                        $robo = new TDoubleRobo();
+                        $robo->iniciar_apos_loss([
+                            'plataforma' => $usuario->plataforma->nome,
+                            'idioma' => $usuario->plataforma->idioma,
+                            'channel_id' => $usuario->canal->channel_id,
+                            'chat_id' => $usuario->chat_id,
+                            'nao_reseta_inicio' => 'Y'
+                        ]);
+
+                        $telegram = $usuario->canal->telegram;
+                        $telegram->sendMessage($usuario->chat_id, 'Execução do objetivo iniciado');
+                        $telegram->sendMessage($usuario->chat_id, $usuario->configuracao_texto, $botao_inicio);
+                        $telegram->sendMessage(
+                            $usuario->chat_id, 
+                            str_replace(
+                                ['{quantidade}', '{tipo}'],
+                                [$usuario->entrada_automatica_total_loss, $usuario->entrada_automatica_tipo],
+                                $translate->MSG_INICIO_ROBO_9
+                            )
+                        );
+                    });
+                }
+            }
+
+            sleep(60); // Aguarda 60 segundos antes de executar novamente
+        }
+
+        // echo 'ok\n';
+    }
 }

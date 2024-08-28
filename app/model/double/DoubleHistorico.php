@@ -11,6 +11,7 @@ class DoubleHistorico extends DoubleRecord
     use RecordTrait;
 
     private $obj_estrategia;
+    private $obj_canal;
 
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
@@ -45,7 +46,7 @@ class DoubleHistorico extends DoubleRecord
                         $list['cor'] = $historico->cor;
                     if ($historico->informacao)
                         $list['informacao'] = $historico->informacao;
-                    $list['created_at'] = $historico->created_at;                           
+                    //$list['created_at'] = $historico->created_at;                           
             }
             $status = $call_status();
         } while ($list == $ant AND $status == 'EXECUTANDO');
@@ -63,5 +64,14 @@ class DoubleHistorico extends DoubleRecord
             });
         }
         return $this->obj_estrategia;
+    }
+
+    public function get_canal(){
+        if (!$this->obj_canal and $this->canal_id) {
+            $this->obj_canal = TUtils::openFakeConnection('double', function() {
+                return new DoubleCanal($this->canal_id);
+            });
+        }
+        return $this->obj_canal;
     }
 }

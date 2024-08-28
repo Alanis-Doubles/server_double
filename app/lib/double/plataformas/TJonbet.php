@@ -20,7 +20,8 @@ class TJonbet implements IDoublePlataforma
         $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'GET',
-            'https://jon.bet/api/roulette_games/current',
+            'https://jon.bet/api/singleplayer-originals/originals/roulette_games/current/1',
+            // 'https://jon.bet/api/roulette_games/current',
             
             [
                 'headers' => [

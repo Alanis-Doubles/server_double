@@ -44,14 +44,19 @@ class TDashboardUsuarioService
         $sql = "SELECT dh.usuario_id, 
                         du.robo_status,
                         du.modo_treinamento,
+                        EXISTS(SELECT 1 FROM double_usuario_objetivo_execucao doe
+                                WHERE doe.usuario_objetivo_id = do.id
+                                  AND doe.status = 'PARADO') execucao_status_parado,
+                        IFNULL(do.status, 'PARADO') status_objetivo,
                         IFNULL(SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END), 0) AS total_win,
                         IFNULL(SUM(CASE WHEN dh.tipo = 'loss' THEN 1 ELSE 0 END), 0) AS total_loss,
                         IFNULL(SUM(dh.valor), 0) AS lucro_prejuizo,
     	                IFNULL(MAX(dh.valor_entrada + dh.valor_branco), 0) AS maior_entrada
                    FROM double_usuario du
                    LEFT JOIN double_usuario_historico dh ON du.id = dh.usuario_id AND dh.created_at >= du.robo_inicio
+                   LEFT JOIN double_usuario_objetivo do ON do.usuario_id = du.id
                   WHERE du.id = {$usuario->id}
-                  GROUP BY dh.usuario_id, du.robo_status, du.modo_treinamento";
+                  GROUP BY dh.usuario_id, du.robo_status, du.modo_treinamento, do.id, do.status";
 
         $result = TUtils::openFakeConnection('double', function () use($sql){
             $conn = TTransaction::get();
@@ -69,14 +74,16 @@ class TDashboardUsuarioService
 
 
         $convert = [
-            'usuario_id'       => $result[0]['usuario_id'],
-            'robo_status'      => $result[0]['robo_status'],
-            'modo_treinamento' => $result[0]['modo_treinamento'],
-            'total_win'        => $result[0]['total_win'],
-            'total_loss'       => $result[0]['total_loss'],
-            'lucro_prejuizo'   => number_format($result[0]['lucro_prejuizo'], 2, ',', '.'),
-            'saldo'            => number_format($saldo, 2, ',', '.'),
-            'maior_entrada'    => number_format($result[0]['maior_entrada'], 2, ',', '.'),
+            'usuario_id'              => $result[0]['usuario_id'],
+            'robo_status'             => $result[0]['robo_status'],
+            'modo_treinamento'        => $result[0]['modo_treinamento'],
+            'status_objetivo'         => $result[0]['status_objetivo'],
+            'execucao_status_parado'  => $result[0]['execucao_status_parado'] == 1 ? 'Y' : 'N',
+            'total_win'               => $result[0]['total_win'],
+            'total_loss'              => $result[0]['total_loss'],
+            'lucro_prejuizo'          => number_format($result[0]['lucro_prejuizo'], 2, ',', '.'),
+            'saldo'                   => number_format($saldo, 2, ',', '.'),
+            'maior_entrada'           => number_format($result[0]['maior_entrada'], 2, ',', '.'),
         ];
 
         $nao_mostra_treinamento = DoubleConfiguracao::getConfiguracao('nao_mostra_treinamento');
