@@ -61,7 +61,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://82.112.244.136:5000/buscar_sinal/$server_name/{$usuario->id}",
+            CURLOPT_URL => "http://127.0.0.1:5000/buscar_sinal/$server_name/{$usuario->id}",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -286,24 +286,31 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
 
         while (true)
         {
-            if ($usuario->roboStatus !== 'EXECUTANDO') 
+            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'roboStatus', $usuario->roboStatus);
+            if ($usuario->roboStatus !== 'EXECUTANDO') {
+                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'sair');
                 break;
+            }
 
             try {
                 foreach ($this->pubsub as $message) {
                     $message = (object) $message;
         
                     if ($message->kind === 'message') {
+                        DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $message->kind, $usuario->roboStatus);
                         if ($usuario->roboStatus == 'EXECUTANDO')  {
                             // echo "received message: {$message->channel} - {$message->payload}\n";
                             $this->gerar_sinais($usuario);
-                        } else
+                        } else {
+                            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saindo');
                             $this->pubsub->unsubscribe(($channel_name));
+                            break;
+                        }
                     }
-                    break;
+                    // break;
                 }    
             } catch (\Throwable $th) {
-                $trace = json_encode($th->getTrace());
+                $trace = ''; //json_encode($th->getTrace());
                 DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $th->getMessage(), $trace);
 
                 $redis = new Client();
@@ -311,5 +318,6 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                 $this->pubsub->subscribe($channel_name);
             }
         }    
+        DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saiu');
     }
 } 

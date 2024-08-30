@@ -240,6 +240,9 @@ class LoginForm extends TPage
      */
     public static function checkForPasswordRenew($user)
     {
+        if ($user->login == 'api')
+            return false;
+
         TTransaction::open('permission');
         if (SystemUserOldPassword::needRenewal($user->id))
         {

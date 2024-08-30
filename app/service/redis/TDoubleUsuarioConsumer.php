@@ -19,7 +19,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $redis->lpush($channel_name, json_encode($historico));
 
         $payload = json_encode($historico);
-        echo "$channel_name - $payload\n";
+        // echo "$channel_name - $payload\n";
     }
 
     private function aguardar_entrada()
@@ -299,6 +299,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                         $retorno = $callback_jogar();
                         if ($retorno !== '') {
                             $this->pubsub->unsubscribe($channel_sinais);
+                            break;
                         }
                         continue;
                     }
@@ -326,7 +327,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
                             $lucro = number_format($lucro, 2, ',', '.');
                         } else {
-                            sleep(2);
+                            sleep(15);
                             $lucro += $valor;
                             $saldo = $usuario->plataforma->service->saldo($usuario);
                             $banca = number_format($saldo, 2, ',', '.');
@@ -531,7 +532,11 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                         }
                     }
 
-                    $callback_jogar();
+                    $retorno= $callback_jogar();
+                    if ($retorno !== '') {
+                        $this->pubsub->unsubscribe($channel_sinais);
+                        break;
+                    }
                 }
 
                 $usuario->quantidade_loss = 0;
@@ -554,6 +559,17 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $usuario->roboStatus = 'PARADO';
         sleep(5);
         $usuario->roboStatus = 'EXECUTANDO';
+
+        $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
+        if (substr(php_uname(), 0, 7) == "Windows") 
+        {
+            $command = 'powershell.exe -Command "Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match \''. $processo . '\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"';
+        }
+        else 
+        {
+            $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
+        }
+        shell_exec($command);
 
         $redis_param = [
             'usuario_id' => $usuario->id
@@ -609,7 +625,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     }
                 } 
             } catch (\Throwable $th) {
-                $trace = json_encode($th->getTrace());
+                $trace = ''; // json_encode($th->getTrace());
                 DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioConsumer', 'run', $th->getMessage(), $trace);
 
                 $redis = new Client();

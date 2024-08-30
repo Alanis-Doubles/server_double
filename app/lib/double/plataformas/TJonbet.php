@@ -225,12 +225,14 @@ class TJonbet implements IDoublePlataforma
             'color' => ['red' => 1, 'black' => 2, 'white' => 0][$cor],
             'currency_type' => $content[0]->currency_type,
             'free_bet' => false,
+            'room_id' => 1,
             'wallet_id' => $content[0]->id
         ];
 
         $response = $client->request(
             'POST',
-            'https://jon.bet/api/roulette_bets',
+            'https://jon.bet/api/singleplayer-originals/originals/roulette_bets',
+            // 'https://jon.bet/api/roulette_bets',
             [
                 'json' => $payload,
                 'headers' => [
@@ -243,9 +245,9 @@ class TJonbet implements IDoublePlataforma
 
         if ($response->getStatusCode() != 200) {
             $content = json_decode($response->getBody()->getContents());
-            if ($content->error->code == '1010') 
+            /*if ($content->error->code == '1010') 
                 return 'saldo_insuficiente';
-            elseif ($content->error->code == '1005') 
+            else*/ if ($content->error->code == '1005') 
                 return 'saldo_insuficiente';
             else 
                 return $content->error->message;

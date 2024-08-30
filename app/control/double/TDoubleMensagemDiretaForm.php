@@ -82,6 +82,8 @@ class TDoubleMensagemDiretaForm  extends TStandardForm
 
         TUtils::cmd_run('TDoubleCron', 'enviar_mensagem_direta', []);
 
+        Self::onClose([]);
+
         return $object;
     }
 

@@ -872,4 +872,11 @@ class TDoubleUsuarioObjetivo extends TStandardList
 
         JAVASCRIPT;
     }
+
+    private function getJavaScriptRedis()
+    {
+        return <<<JAVASCRIPT
+        
+        JAVASCRIPT;
+    }
 }

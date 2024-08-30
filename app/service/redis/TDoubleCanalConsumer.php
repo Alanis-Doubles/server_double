@@ -56,7 +56,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://82.112.244.136:5000/buscar_sinal/$server_name",
+            CURLOPT_URL => "http://127.0.0.1:5000/buscar_sinal/$server_name",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -209,6 +209,9 @@ class TDoubleCanalConsumer extends TDoubleRedis
 
         $output = $this->gerar_entrada($canal);
         if ($output) {
+            if ($output['tipo'] !== 'ENTRADA')
+                return;
+            
             $historico = $this->notificar_consumidores($output);
             $entrada_id = $historico['id'];
             $estrategia_id = $historico['estrategia_id'];

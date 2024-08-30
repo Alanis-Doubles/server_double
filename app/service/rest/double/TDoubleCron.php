@@ -245,14 +245,14 @@ class TDoubleCron
         });
 
 
-        echo date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
+        // echo date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
     }
 
     public function atualizar_objetivos()
     {
         while (true) 
         {       
-            echo "Script executado em: " . date('Y-m-d H:i:s') . "\n";
+            // echo "Script executado em: " . date('Y-m-d H:i:s') . "\n";
 
             TSession::setValue('unit_database', 'double');
             TSession::setValue('login', 'api');
@@ -263,7 +263,7 @@ class TDoubleCron
             });
 
             DoubleErros::registrar(1, 'TDoubleCron', 'atualizar_objetivos 1', count($lista));
-            echo "Total de execuções ativas: " . count($lista) . "\n";
+            // echo "Total de execuções ativas: " . count($lista) . "\n";
             foreach ($lista as $execucao) {
                 $execucao->atualizar_progresso();
             }

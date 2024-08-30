@@ -35,7 +35,7 @@ def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuar
 dados = {
     'turbo_cash': {
         "plataforma_id": 1,
-        'channel_id': -1002222871476,
+        'channel_id': -1002153700953,
         'url_connection': 'mysql+mysqlconnector://app_usr:MjXx2QjjlQcua88r@82.112.244.136/app_turbocash',
         'estrategia_id': 1
     },
