@@ -20,7 +20,9 @@
     "arthurkushman/php-wss": "^2.0",
     "pear/http_request2": "^2.6",
     "google/cloud-translate": "^1.17",
-    "predis/predis": "^2.2"
+    "predis/predis": "^2.2",
+    "textalk/websocket": "^1.5",
+    "cboden/ratchet": "^0.4.4"
   },
   "config": {
     "preferred-install": {

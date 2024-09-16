@@ -1,12 +1,11 @@
-import json
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from DoubleIA import DoubleIA
 
 app = Flask(__name__)
 
 
-def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id):
-    double_ia = DoubleIA(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id)
+def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping):
+    double_ia = DoubleIA(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping)
 
     last_number, last_color, next_color, pattern, estrategia_id = double_ia.prever()
     if last_number is None:
@@ -35,9 +34,12 @@ def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuar
 dados = {
     'turbo_cash': {
         "plataforma_id": 1,
-        'channel_id': -1002153700953,
+        'channel_id': -1001908999841,
         'url_connection': 'mysql+mysqlconnector://app_usr:MjXx2QjjlQcua88r@82.112.244.136/app_turbocash',
-        'estrategia_id': 1
+        'estrategia_id': 1,
+        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'red', 9: 'red', 10: 'red',
+                          11: 'black', 12: 'black', 13: 'black', 14: 'black', 15: 'black', 16: 'black', 17: 'black', 18: 'black', 19: 'black',
+                          20: 'black'}
     },
     'speed_green': {
         "plataforma_id": 3
@@ -46,7 +48,9 @@ dados = {
         "plataforma_id": 14,
         'channel_id': -1002093089587,
         'url_connection': 'mysql+mysqlconnector://root@localhost/double_joao',
-        'estrategia_id': 197
+        'estrategia_id': 197,
+        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
+                          11: 'black', 12: 'black', 13: 'black', 14: 'black'}
     }
 }
 
@@ -60,7 +64,8 @@ def lrange(server_name, usuario_id):
             dados[server_name]['channel_id'],
             dados[server_name]['url_connection'],
             dados[server_name]['estrategia_id'],
-            usuario_id
+            usuario_id,
+            dados[server_name]['color_mapping'],
         )
         # print(json.dumps(payload, ensure_ascii=False))
         return jsonify(payload), 200

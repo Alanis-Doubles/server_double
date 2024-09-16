@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 
 
 class DoubleIA:
-    def __init__(self, plataforma_id, channel_id, url_connection, estrategia_id=None, usuario_id=None):
+    def __init__(self, plataforma_id, channel_id, url_connection, estrategia_id=None, usuario_id=None, color_mapping=None):
         self.plataforma_id = plataforma_id
         self.channel_id = channel_id
         self.url_connection = url_connection
@@ -16,8 +16,9 @@ class DoubleIA:
         self.usuario_id = usuario_id
 
         # Mapeamento das cores
-        self.color_mapping = {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
-                              11: 'black', 12: 'black', 13: 'black', 14: 'black'}
+        # self.color_mapping = {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
+        #                       11: 'black', 12: 'black', 13: 'black', 14: 'black'}
+        self.color_mapping = color_mapping
         self.color_to_code = {'white': 0, 'red': 1, 'black': 2}
 
     # Função para buscar os dados do MySQL

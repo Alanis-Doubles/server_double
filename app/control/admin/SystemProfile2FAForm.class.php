@@ -12,6 +12,12 @@
 class SystemProfile2FAForm extends TPage
 {
     private $form;
+
+    public function show()
+    {
+        $this->onLoad([]);
+        parent::show();
+    }
     
     /**
      * onLoad

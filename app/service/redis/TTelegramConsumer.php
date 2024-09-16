@@ -5,8 +5,32 @@ use Predis\Client;
 class TTelegramConsumer extends TDoubleRedis
 {
     private $queue;
+
+    public function notificar_consumidores($payload)
+    {
+        if ($payload['chat_id'] < 0)
+            return;
+
+        $canal = TUtils::openFakeConnection('double', function() use ($payload){
+            return DoubleCanal::where('telegram_token', '=', $payload['telegram_token'])->first();
+        });
+
+        if (!$canal)
+            return;
+
+        $channel_name = strtolower("{$this->serverName()}_mensagem_{$canal->plataforma->nome}_{$canal->plataforma->idioma}");
+
+        $redis = new Client();
+        // echo "mensagem: ". json_encode(payload) . "\n";
+        $mensagem = $payload['message'];
+        $mensagem = nl2br($mensagem);// str_replace('\n', '<br>', $mensagem);
+        $redis->publish($channel_name, json_encode(['message' => $mensagem, 'chat_id' => $payload['chat_id']]));
+        echo "{$channel_name}: enviado\n";
+    }
     
     public function sendMessageToTelegram($payload) {
+        $this->notificar_consumidores($payload);
+
         echo "chat_id: {$payload['chat_id']}\n{$payload['message']}\n";
         $telegram_host = DoubleConfiguracao::getConfiguracao('telegram_host');
         $telegram_token = $payload['telegram_token'];
@@ -51,13 +75,15 @@ class TTelegramConsumer extends TDoubleRedis
         else {
             $error_message = curl_error($ch);
             $error_number = curl_errno($ch);
-            DoubleErros::registrar(
-                1, 
-                'TTelegramConsumer', 
-                'sendMessageToTelegram', 
-                "cURL error ({$error_number}): {$error_message}",
-                json_encode($telegram_payload)
-            );
+            $json_erro = json_encode($telegram_payload);
+            // DoubleErros::registrar(
+            //     1, 
+            //     'TTelegramConsumer', 
+            //     'sendMessageToTelegram', 
+            //     "cURL error ({$error_number}): {$error_message}",
+            //     json_encode($telegram_payload)
+            // );
+            echo "cURL error ({$error_number}): {$error_message}\nJSON: $json_erro";
         }
 
         $redis = new Client();

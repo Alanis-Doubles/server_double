@@ -95,6 +95,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                     'run', 
                     $th->getMessage()
                 ); 
+                $redis = new Client();
             }
         }
     }

@@ -134,7 +134,7 @@ final class CreatePlataforma extends AbstractMigration
             ->addColumn('stop_win', 'double', ['default' => 0, 'null' => false])
             ->addColumn('stop_loss', 'double', ['default' => 0, 'null' => false])
             ->addColumn('ultimo_saldo', 'double', ['default' => 0, 'null' => false])
-            ->addColumn('ciclo', 'enum', ['values' => ['Y','N'], 'default' => 'N', 'null' => false])
+            ->addColumn('ciclo', 'enum', ['values' => ['Y','N','A','B'], 'default' => 'N', 'null' => false])
             ->addColumn('demo_jogadas', 'integer', ['default' => 0, 'null' => false])
             ->addColumn('demo_inicio', 'datetime')
             ->addColumn('data_expiracao', 'date')

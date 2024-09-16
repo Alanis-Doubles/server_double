@@ -317,8 +317,16 @@ class TDoubleRobo
             $redis_param = [
                 'usuario_id' => $object->id
             ];
-            // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
-            TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+
+            if (substr(php_uname(), 0, 7) == "Windows") 
+            {
+                // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+                TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+            } else 
+            {
+                $programa = self::configurarArquivoSupervisor($object->id);
+                // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
+            }
         } else {
             $data = new stdClass;
             $data->usuario_id = $object->id;
@@ -378,8 +386,16 @@ class TDoubleRobo
             $redis_param = [
                 'usuario_id' => $object->id
             ];
-            // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
-            TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+            
+            if (substr(php_uname(), 0, 7) == "Windows") 
+            {
+                // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+                TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+            } else 
+            {
+                $programa = self::configurarArquivoSupervisor($object->id);
+                // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
+            }
         } else {
             $data = new stdClass;
             $data->usuario_id = $object->id;
@@ -423,9 +439,83 @@ class TDoubleRobo
             if ($object->status_objetivo == 'EXECUTANDO')
                 $object->usuario_objetivo->parar();
 
+            // if (substr(php_uname(), 0, 7) != "Windows") 
+            // {
+            //     // $programa = self::configurarArquivoSupervisor($object->id);
+            //     // DoubleErros::registrar(1, 'TDoubleRobo', 'parar', $programa);
+            //     // if (!empty($programa)) 
+            //     // {
+            //     //     DoubleErros::registrar(1, 'TDoubleRobo', 'parar', exec('whoami'));
+            //     //     try {
+            //     //         exec("sudo supervisorctl stop {$programa}consumer {$programa}sinais_consumer 2>&1", $output, $return_var);
+            //     //         if ($return_var !== 0) {
+            //     //             DoubleErros::registrar(1, 'TDoubleRobo', 'parar', $output, $return_var);
+            //     //         }
+            //     //     } catch (\Throwable $th) {
+            //     //         DoubleErros::registrar(1, 'TDoubleRobo', 'parar', $th->getMessage());
+            //     //     }
+            //     // } else {
+            //     //     DoubleErros::registrar(1, 'TDoubleRobo', 'parar', '22');
+            //     // }
+            //     TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'stop']);
+            // }
+
             return $object;
         });
         return $object->toArray(static::ATTRIBUTES);
+    }
+
+    // public static function supervisor($param) 
+    // {
+    //     DoubleErros::registrar(1, 'TDoubleRobo', 'supervisor', exec('whoami'));
+    //     $programa = self::configurarArquivoSupervisor($param['id']);
+    //     if (!empty($programa)) 
+    //     {
+    //         try {
+    //             exec("sudo /usr/bin/supervisorctl {$param['comando']} {$programa}consumer {$programa}sinais_consumer 2>&1", $output, $return_var);
+    //             DoubleErros::registrar(1, 'TDoubleRobo', 'supervisor', $output, $return_var);
+    //         } catch (\Throwable $th) {
+    //             DoubleErros::registrar(1, 'TDoubleRobo', 'supervisor', $th->getMessage());
+    //         }
+    //     } 
+    // }
+
+    public static function configurarArquivoSupervisor($usuario_id)
+    {
+        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+
+        $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
+        if (file_exists($filename))
+            return "{$server_name}_usuario_{$usuario_id}_";
+
+        $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+        DoubleErros::registrar(1, 'TDoubleRobo', 'configurarArquivoSupervisor', exec('whoami'), $server_root);
+
+        $usuarioConfig = "[program:{$server_name}_usuario_{$usuario_id}_consumer]\n";
+        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
+        // $usuarioConfig .= "command=php /mnt/d/GitHub/alanis-doubles/server_double/cmd.php 'class=TDoubleUsuarioConsumer&method=run&usuario_id={$usuario_id}'\n";
+        $usuarioConfig .= "autostart=true\n";
+        $usuarioConfig .= "autorestart=true\n";
+        $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log\n";
+        // $usuarioConfig .= "stdout_logfile=/mnt/d/GitHub/alanis-doubles/server_double/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log\n";
+        $usuarioConfig .= "numprocs=1\n";
+        $usuarioConfig .= "\n";
+        $usuarioConfig .= "[program:{$server_name}_usuario_{$usuario_id}_sinais_consumer]\n";
+        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario_id}'\n";
+        // $usuarioConfig .= "command=php /mnt/d/GitHub/alanis-doubles/server_double/cmd.php 'class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
+        $usuarioConfig .= "autostart=true\n";
+        $usuarioConfig .= "autorestart=true\n";
+        $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log\n";
+        // $usuarioConfig .= "stdout_logfile=/mnt/d/GitHub/alanis-doubles/server_double/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log\n";
+        $usuarioConfig .= "numprocs=1\n";
+        $usuarioConfig .= "\n";
+
+        $criado = file_put_contents($filename, $usuarioConfig);
+
+        sleep(11);
+        DoubleErros::registrar(1, 'TDoubleRobo', 'configurarArquivoSupervisor', "1", $criado);
+
+        return '';
     }
 
     public function gerar_acesso($param)
@@ -519,6 +609,28 @@ class TDoubleRobo
             throw new Exception('Este email já está sendo utilizado por outro usuário. Informe um novo email.');
 
         return $double_usuario->tst_generate_access($param['email'], $param['senha']);
+    }
+
+    public function tst_edson_alanis($param) 
+    {
+        $list = TUtils::openFakeConnection('double', function (){
+            $usuarios = DoubleUsuario::all();
+
+            $lista = [];
+            foreach ($usuarios as $usuario) {
+                if (!$usuario->token_acesso)
+                    continue;
+
+                $payload = TCrypto::decrypt($usuario->token_acesso, $usuario->chat_id);
+                $object = json_decode($payload);
+                if ($object->username == 'edson.alanis@gmail.com')
+                    $lista[] = $usuario->id;
+            }
+
+            return $lista;
+        });
+
+        return $list;
     }
 }
 

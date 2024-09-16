@@ -1,11 +1,13 @@
 <?php
 
+use Predis\Client;
 use Adianti\Control\TPage;
 use Adianti\Control\TAction;
 use Adianti\Registry\TSession;
 use Adianti\Widget\Form\TForm;
 use Adianti\Widget\Base\TScript;
 use Adianti\Widget\Util\TDropDown;
+use Adianti\Widget\Container\TPanel;
 use Adianti\Wrapper\BootstrapFormBuilder;
 use Symfony\Component\Console\Application;
 
@@ -23,6 +25,7 @@ class TNewRanking
         $dataGrid->name = $top10 ? 'topdataranking' : 'meudataranking';
         $dataGrid->pagenavigator = false;
         $dataGrid->title = $title;
+        $dataGrid->disableDefaultClick = true;
         $dataGrid->columns = [
             ['name' => 'usuario_id', 'hide' => true, 'label' => 'Nome', 'width' => '10%', 'align' => 'left'],
             ['name' => 'estrategia_id', 'hide' => true, 'label' => 'Nome', 'width' => '20%', 'align' => 'left'],
@@ -405,7 +408,35 @@ class TDoubleDashboardUsuario extends TPage
         $topRanking = new TNewRanking('<i class="fas fa-trophy green"></i>  Ranking das 10 Melhores Estratégias', True);
         // $this->datagrid = $meuRanking->datagrid;
 
-        $body = new THtmlRenderer('app/resources/double/dashboard-usuario.html');
+        $historico = new TPanelGroup();
+        $historico->{'style'} = 'width: 100%;height: 655px;margin: 14px; margin-top: 0px; min-height: 50px;';
+
+        $div_pai = new TElement('div');
+        $div_pai->id = 'container_conversa';
+        $div_pai->style = '
+            height: 650px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;';
+        $historico->add($div_pai);
+
+        $div_conversa = new TElement('div');
+        $div_conversa->id = 'campo_conversa';
+        $width_conv = $this->isMobile() ? '95%' : '60%';
+        $div_conversa->style = "height: 95%; /* Altura ajustada para permitir a rolagem */
+            width: {$width_conv}; /* Largura do campo de conversa */
+            margin-top: -20px;
+            overflow-y: auto; /* Ativa a barra de rolagem vertical */
+            overflow-x: hidden; /* Desativa a barra de rolagem horizontal */
+            border: 1px solid #ccc;
+            background-image: url('app/images/fundo_telegram.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;";
+        $div_pai->add($div_conversa);
+
+        $body = new THtmlRenderer('app/resources/double/dashboard-usuario-2.html');
         $body->enableSection(
             'main',
             [
@@ -420,6 +451,7 @@ class TDoubleDashboardUsuario extends TPage
                 'sinais'      => $container,
                 'meuRanking'  => $meuRanking->panel,
                 'topRanking'  => $topRanking->panel,
+                'historico'   => $historico,
             ]
         );
 
@@ -430,8 +462,15 @@ class TDoubleDashboardUsuario extends TPage
 
         parent::add($container);
 
-        TScript::create($this->getJavaScript());
-        TScript::create('atualiza_configuracao()', TRUE, 1000);
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') {
+            TScript::create($this->getJavaScriptRedisWS());
+            // TScript::create($this->getJavaScriptRedis());
+        }
+        else
+            TScript::create($this->getJavaScript());
+
+        // TScript::create('atualiza_configuracao()', TRUE, 1000);
     }
 
     public function doCopiarEstrategia($param) {
@@ -471,6 +510,8 @@ class TDoubleDashboardUsuario extends TPage
         } catch (\Throwable $th) {
             new TMessage('error', $th->getMessage());
         }
+
+        TScript::create('atualiza_configuracao()', TRUE, 1000);
     }
 
     public function serilizeAction($action, $param) {
@@ -940,7 +981,6 @@ class TDoubleDashboardUsuario extends TPage
             function atualiza_configuracao() {
                 canal_id = document.getElementsByName('canal_id')[0].value;
                 __adianti_ajax_exec('class=TDoubleDashboardUsuario&method=usuarioJs&canal_id=' + canal_id, function(data) {
-                    console.log(data);
                     var data = JSON.parse(data);
 
                     document.getElementsByName('valor_entrada')[0].value = data.valor;
@@ -1093,6 +1133,621 @@ class TDoubleDashboardUsuario extends TPage
 JAVASCRIPT;
     }
 
+    private function getJavaScriptRedis()
+    {
+        $chat_id = TSession::getValue('usercustomcode');
+        
+        return <<<JAVASCRIPT
+        console.log('1');
+        var options = {
+            chart: {
+                type: 'line',
+                height: 300,
+                animations: {
+                    enabled: true,
+                    easing: 'linear',
+                    dynamicAnimation: {
+                        speed: 1000
+                    }
+                }
+            },
+            series: [{
+                name: 'Acumulado',
+                data: []
+            }, {
+                name: 'Valor',
+                data: []
+            }],
+            xaxis: {
+                type: 'datetime',
+                labels: {
+                    format: 'HH:mm:ss',
+                    datetimeUTC: false
+                },
+                timezone: 'America/Sao_Paulo',
+                categories: []
+            },
+            yaxis: [{
+                title: {
+                    text: 'Acumulado'
+                }
+            }, {
+                opposite: true,
+                title: {
+                    text: 'Lucro/Prejuízo'
+                }
+            }],
+            dataLabels: {
+                enabled: false
+            },
+            tooltip: {
+                x: {
+                    format: 'dd/MM/yyyy HH:mm:ss'
+                }
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#apexLineChart"), options);
+        var eventSource = null;
+
+        function atualiza_sinais() {
+            if (!document.getElementsByName('canal_id'))
+                return;
+
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            __adianti_ajax_exec('api/dashboard/usuario/sinaisJs?canal_id=' + canal_id, function(mensagem) {
+                var campoSinais = document.getElementById('campo_sinais');
+                campoSinais.innerHTML = mensagem.data;
+            }, false);
+        }
+
+        function atualiza_grafico() {
+            if (!document.getElementsByName('canal_id'))
+                return;
+            
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            ultimo_id = document.getElementsByName('ultimo_id')[0].value;
+
+            __adianti_ajax_exec('api/dashboard/usuario/getHistoricoJs?canal_id=' + canal_id + '&chat_id={$chat_id}&ultimo_id=' + ultimo_id, function(mensagem) {
+                var data = JSON.parse(mensagem.data);
+                if (data.length > 0) {
+                    var newData = [{
+                        name: 'Valor Acumulado',
+                        data: chart.w.config.series[0].data
+                    }, {
+                        name: 'Lucro/Prejuízo',
+                        data: chart.w.config.series[1].data
+                    }];
+
+                    data.forEach(item => {
+                        if (newData[0].data.length >= 20)
+                            newData[0].data.shift();
+                        newData[0].data.push({
+                            x: item.data,
+                            y: parseFloat(item.acumulado)
+                        });
+
+                        if (newData[1].data.length >= 20)
+                            newData[1].data.shift();
+                        newData[1].data.push({
+                            x: item.data,
+                            y: parseFloat(item.valor)
+                        });
+                    });
+
+                    var allYValues = newData.flatMap(series => series.data.map(point => point.y));
+                    var minY = Math.min(...allYValues) - 5;
+                    var maxY = Math.max(...allYValues) + 5;
+
+                    chart.updateOptions({
+                        yaxis: [{
+                            title: {
+                                text: 'Valor Acumulado'
+                            },
+                            min: minY,
+                            max: maxY
+                        }, {
+                            title: {
+                                text: 'Lucro/Prejuízo'
+                            },
+                            opposite: true,
+                            min: minY,
+                            max: maxY
+                        }]
+                    });
+
+                    document.getElementsByName('ultimo_id')[0].value = data[data.length-1].id;
+                    chart.updateSeries(newData);
+                };
+            }, false);
+        };
+
+        function atualiza_top_ranking() {
+            if (!document.getElementsByName('canal_id'))
+                return;
+            
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            
+            __adianti_ajax_exec('api/dashboard/usuario/topRankingJS?canal_id=' + canal_id, function(mensagem) {
+                $("#topdataranking tbody").remove();
+                $("#topdataranking").append(mensagem.data);
+
+                mapearLinks();
+            }, false);
+        }
+
+        function atualiza_meu_ranking() {
+            if (!document.getElementsByName('canal_id'))
+                return;
+
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            
+            __adianti_ajax_exec('api/dashboard/usuario/meuRankingJs?&canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                $("#meudataranking tbody").remove();
+                $("#meudataranking").append(mensagem.data);
+            }, false);
+        }
+
+        function atualiza_status() {
+            if (!document.getElementsByName('canal_id'))
+                return;
+
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            __adianti_ajax_exec('api/dashboard/usuario/statusJs?canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                var data = JSON.parse(mensagem.data);
+
+                document.querySelector("#total-win").textContent = data.total_win;
+                document.querySelector("#total-loss").textContent = data.total_loss;
+                document.querySelector("#total-lucro").textContent = 'R$ ' + data.lucro_prejuizo;
+                document.querySelector("#total-saldo").textContent = 'R$ ' + data.saldo;
+                document.querySelector("#maior-entrada").textContent = 'R$ ' + data.maior_entrada;
+
+                var executando = data.status_objetivo == 'EXECUTANDO' || data.robo_status == 'EXECUTANDO';
+                    
+                if (executando) {
+                    document.querySelector("#robo-status").innerHTML = '<b>🟢 Seu robô está em execução</b>';
+                    document.querySelector('#btn_iniciar').style.display = 'none';
+                    document.querySelector('#btn_parar').style.display = 'inline';
+                }
+                else {
+                    document.querySelector("#robo-status").innerHTML ='<b>🔴 Seu robô está parado</b>';
+                    document.querySelector('#btn_iniciar').style.display = 'inline';
+                    document.querySelector('#btn_parar').style.display = 'none';
+                }
+
+                    if (data.modo_treinamento == 'Y')
+                    document.querySelector("#modo").innerHTML = '<b>📚 Você está no modo treinamento</b>';
+                else
+                    document.querySelector("#modo").innerHTML ='<b>🏆 Você está no modo real</b>';
+            }, false);
+        }
+
+        function atualiza_configuracao() {
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            __adianti_ajax_exec('api/dashboard/usuario/usuarioJs?canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                var data = JSON.parse(mensagem.data);
+
+                document.getElementsByName('valor_entrada')[0].value = data.valor.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                document.getElementsByName('gale')[0].value = data.protecao;
+                document.getElementsByName('stop_win')[0].value = data.stop_win.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                document.getElementsByName('stop_loss')[0].value = data.stop_loss.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                document.getElementsByName('tipo_stop_loss')[0].value = data.tipo_stop_loss;
+                document.getElementsByName('modo_treinamento')[0].value = data.modo_treinamento;
+                document.getElementsByName('banca_treinamento')[0].value = data.banca_treinamento.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
+                document.getElementsByName('tipo_espera')[0].value = data.entrada_automatica_tipo;
+                document.getElementsByName('quantidade_espera')[0].value = data.entrada_automatica_total_loss;
+                document.getElementsByName('valor_max_ciclo')[0].value = data.valor_max_ciclo.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                
+                var ciclo = data.ciclo;
+                var usa_ciclo = ciclo;
+                if (ciclo !== 'N')
+                    usa_ciclo = 'Y';
+                document.getElementsByName('usa_ciclo')[0].value = usa_ciclo;
+                document.getElementsByName('ciclo_stop_loss')[0].value = ciclo;
+                
+                var entrada_automatica = data.entrada_automatica;
+                var usa_entrada_automatica = entrada_automatica;
+                if (entrada_automatica !== 'N')
+                    usa_entrada_automatica = 'Y';
+                document.getElementsByName('entrada_automatica')[0].value = usa_entrada_automatica;
+                document.getElementsByName('tipo_entrada_automatica')[0].value = entrada_automatica;
+            }, false);
+        }
+
+        function doChangeCanal() {
+            canal_id = document.getElementsByName('canal_id')[0].value;
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('http://server_double.test/api/dashboard/usuario/notificacoes?canal_id=' + canal_id + '&chat_id={$chat_id}');
+
+            atualiza_sinais();
+            atualiza_grafico();
+            atualiza_top_ranking();
+            atualiza_meu_ranking();
+            atualiza_status();
+            atualiza_configuracao();
+
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                
+                if (data.channel == 'atualiza_sinais') {
+                    atualiza_sinais();
+                    atualiza_grafico();
+                    atualiza_top_ranking();
+                    atualiza_meu_ranking();
+                    atualiza_status();
+                    atualiza_configuracao();
+                    mapearLinks();
+                } 
+
+                if (data.channel == "mensagem_usuario") {
+                    var payload = JSON.parse(data.payload);
+                    adicionarMensagem(payload.message, 'recebida');
+                }
+            };
+
+            eventSource.onerror = function(err) {
+                console.error('Erro de conexão:', err);
+            };
+
+        }
+
+        function adicionarMensagem(html, tipo) {
+            const campoConversa = document.getElementById('campo_conversa');
+            
+            const novaMensagem = document.createElement('p');
+            novaMensagem.classList.add('mensagem', tipo);
+            novaMensagem.innerHTML = html;
+            
+            campoConversa.appendChild(novaMensagem);
+            
+            campoConversa.scrollTop = campoConversa.scrollHeight;
+        }
+
+        function finalizarEventSource() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+                console.log('Conexão EventSource fechada.');
+            }
+        }
+
+        window.addEventListener('beforeunload', function() {
+            finalizarEventSource();
+        });
+
+        function mapearLinks() {
+            var links = document.querySelectorAll('a, button');
+            links.forEach(element => {
+                if (element.tagName === 'A' && element.getAttribute('href') === '#') {
+                    return; 
+                }
+
+                element.addEventListener('click', function(event) {
+                    finalizarEventSource();
+                });
+            });
+        }
+
+        chart.render();
+        doChangeCanal();
+JAVASCRIPT;
+    }
+
+    private function getJavaScriptRedisWS()
+    {
+        $chat_id = TSession::getValue('usercustomcode');
+        $take = $this->isMobile() ? 21 : 16;
+        $servidor_ws = DoubleConfiguracao::getConfiguracao('servidor_ws');
+        
+        return <<<JAVASCRIPT
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 300,
+                    animations: {
+                        enabled: true,
+                        easing: 'linear',
+                        dynamicAnimation: {
+                            speed: 1000
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Acumulado',
+                    data: []
+                }, {
+                    name: 'Valor',
+                    data: []
+                }],
+                xaxis: {
+                    type: 'datetime',
+                    labels: {
+                        format: 'HH:mm:ss',
+                        datetimeUTC: false
+                    },
+                    timezone: 'America/Sao_Paulo',
+                    categories: []
+                },
+                yaxis: [{
+                    title: {
+                        text: 'Acumulado'
+                    }
+                }, {
+                    opposite: true,
+                    title: {
+                        text: 'Lucro/Prejuízo'
+                    }
+                }],
+                dataLabels: {
+                    enabled: false
+                },
+                tooltip: {
+                    x: {
+                        format: 'dd/MM/yyyy HH:mm:ss'
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#apexLineChart"), options);
+            var socket = null;
+
+            function atualiza_sinais() {
+                if (!document.getElementsByName('canal_id'))
+                    return;
+
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                __adianti_ajax_exec('api/dashboard/usuario/sinaisJs?canal_id=' + canal_id + '&take={$take}', function(mensagem) {
+                    var campoSinais = document.getElementById('campo_sinais');
+                    campoSinais.innerHTML = mensagem.data;
+                }, false);
+            }
+
+            function atualiza_grafico() {
+                if (!document.getElementsByName('canal_id'))
+                    return;
+                
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                ultimo_id = document.getElementsByName('ultimo_id')[0].value;
+
+                __adianti_ajax_exec('api/dashboard/usuario/getHistoricoJs?canal_id=' + canal_id + '&chat_id={$chat_id}&ultimo_id=' + ultimo_id, function(mensagem) {
+                    var data = JSON.parse(mensagem.data);
+                    if (data.length > 0) {
+                        var newData = [{
+                            name: 'Valor Acumulado',
+                            data: chart.w.config.series[0].data
+                        }, {
+                            name: 'Lucro/Prejuízo',
+                            data: chart.w.config.series[1].data
+                        }];
+
+                        data.forEach(item => {
+                            if (newData[0].data.length >= 20)
+                                newData[0].data.shift();
+                            newData[0].data.push({
+                                x: item.data,
+                                y: parseFloat(item.acumulado)
+                            });
+
+                            if (newData[1].data.length >= 20)
+                                newData[1].data.shift();
+                            newData[1].data.push({
+                                x: item.data,
+                                y: parseFloat(item.valor)
+                            });
+                        });
+
+                        var allYValues = newData.flatMap(series => series.data.map(point => point.y));
+                        var minY = Math.min(...allYValues) - 5;
+                        var maxY = Math.max(...allYValues) + 5;
+
+                        chart.updateOptions({
+                            yaxis: [{
+                                title: {
+                                    text: 'Valor Acumulado'
+                                },
+                                min: minY,
+                                max: maxY
+                            }, {
+                                title: {
+                                    text: 'Lucro/Prejuízo'
+                                },
+                                opposite: true,
+                                min: minY,
+                                max: maxY
+                            }]
+                        });
+
+                        document.getElementsByName('ultimo_id')[0].value = data[data.length-1].id;
+                        chart.updateSeries(newData);
+                    };
+                }, false);
+            };
+
+            function atualiza_top_ranking() {
+                if (!document.getElementsByName('canal_id'))
+                    return;
+                
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                
+                __adianti_ajax_exec('api/dashboard/usuario/topRankingJS?canal_id=' + canal_id, function(mensagem) {
+                    $("#topdataranking tbody").remove();
+                    $("#topdataranking").append(mensagem.data);
+
+                    mapearLinks();
+                }, false);
+            }
+
+            function atualiza_meu_ranking() {
+                if (!document.getElementsByName('canal_id'))
+                    return;
+
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                
+                __adianti_ajax_exec('api/dashboard/usuario/meuRankingJs?&canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                    $("#meudataranking tbody").remove();
+                    $("#meudataranking").append(mensagem.data);
+                }, false);
+            }
+
+            function atualiza_status() {
+                if (!document.getElementsByName('canal_id'))
+                    return;
+
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                __adianti_ajax_exec('api/dashboard/usuario/statusJs?canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                    var data = JSON.parse(mensagem.data);
+
+                    document.querySelector("#total-win").textContent = data.total_win;
+                    document.querySelector("#total-loss").textContent = data.total_loss;
+                    document.querySelector("#total-lucro").textContent = 'R$ ' + data.lucro_prejuizo;
+                    document.querySelector("#total-saldo").textContent = 'R$ ' + data.saldo;
+                    document.querySelector("#maior-entrada").textContent = 'R$ ' + data.maior_entrada;
+
+                    var executando = data.status_objetivo == 'EXECUTANDO' || data.robo_status == 'EXECUTANDO';
+                        
+                    if (executando) {
+                        document.querySelector("#robo-status").innerHTML = '<b>🟢 Seu robô está em execução</b>';
+                        document.querySelector('#btn_iniciar').style.display = 'none';
+                        document.querySelector('#btn_parar').style.display = 'inline';
+                    }
+                    else {
+                        document.querySelector("#robo-status").innerHTML ='<b>🔴 Seu robô está parado</b>';
+                        document.querySelector('#btn_iniciar').style.display = 'inline';
+                        document.querySelector('#btn_parar').style.display = 'none';
+                    }
+
+                        if (data.modo_treinamento == 'Y')
+                        document.querySelector("#modo").innerHTML = '<b>📚 Você está no modo treinamento</b>';
+                    else
+                        document.querySelector("#modo").innerHTML ='<b>🏆 Você está no modo real</b>';
+                }, false);
+            }
+
+            function atualiza_configuracao() {
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                __adianti_ajax_exec('api/dashboard/usuario/usuarioJs?canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                    var data = JSON.parse(mensagem.data);
+
+                    document.getElementsByName('valor_entrada')[0].value = data.valor.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    document.getElementsByName('gale')[0].value = data.protecao;
+                    document.getElementsByName('stop_win')[0].value = data.stop_win.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    document.getElementsByName('stop_loss')[0].value = data.stop_loss.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    document.getElementsByName('tipo_stop_loss')[0].value = data.tipo_stop_loss;
+                    document.getElementsByName('modo_treinamento')[0].value = data.modo_treinamento;
+                    document.getElementsByName('banca_treinamento')[0].value = data.banca_treinamento.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
+                    document.getElementsByName('tipo_espera')[0].value = data.entrada_automatica_tipo;
+                    document.getElementsByName('quantidade_espera')[0].value = data.entrada_automatica_total_loss;
+                    document.getElementsByName('valor_max_ciclo')[0].value = data.valor_max_ciclo.toLocaleString('pt-br', {minimumFractionDigits: 2});
+                    
+                    var ciclo = data.ciclo;
+                    var usa_ciclo = ciclo;
+                    if (ciclo !== 'N')
+                        usa_ciclo = 'Y';
+                    document.getElementsByName('usa_ciclo')[0].value = usa_ciclo;
+                    document.getElementsByName('ciclo_stop_loss')[0].value = ciclo;
+                    
+                    var entrada_automatica = data.entrada_automatica;
+                    var usa_entrada_automatica = entrada_automatica;
+                    if (entrada_automatica !== 'N')
+                        usa_entrada_automatica = 'Y';
+                    document.getElementsByName('entrada_automatica')[0].value = usa_entrada_automatica;
+                    document.getElementsByName('tipo_entrada_automatica')[0].value = entrada_automatica;
+                }, false);
+            }
+
+            function doChangeCanal() {
+                canal_id = document.getElementsByName('canal_id')[0].value;
+                if (socket) {
+                    socket.close(1000, 'Fechamento pelo usuário');
+                }
+
+                socket = new WebSocket('{$servidor_ws}/ws?canal_id=' + canal_id + '&chat_id={$chat_id}');
+
+                socket.onopen = function(event) {
+                    console.log('Conexão WebSocket estabelecida.');
+                };
+
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    if (data.channel == 'atualiza_sinais') {
+                        atualiza_sinais();
+                        atualiza_grafico();
+                        atualiza_top_ranking();
+                        atualiza_meu_ranking();
+                        atualiza_status();
+                        atualiza_configuracao();
+                        mapearLinks();
+                    } 
+
+                    if (data.channel == "mensagem_usuario") {
+                        var payload = JSON.parse(data.payload);
+                        adicionarMensagem(payload.message, 'recebida');
+                    }
+                };
+
+                socket.onerror = function(error) {
+                    console.error('Erro na conexão WebSocket:', error);
+                };
+
+                socket.onclose = function(event) {
+                    console.log('Conexão WebSocket fechada.');
+                };
+
+                atualiza_sinais();
+                atualiza_grafico();
+                atualiza_top_ranking();
+                atualiza_meu_ranking();
+                atualiza_status();
+                atualiza_configuracao();
+                mapearLinks();
+            }
+
+            function adicionarMensagem(html, tipo) {
+                const campoConversa = document.getElementById('campo_conversa');
+                
+                const novaMensagem = document.createElement('p');
+                novaMensagem.classList.add('mensagem', tipo);
+                novaMensagem.innerHTML = html;
+                
+                campoConversa.appendChild(novaMensagem);
+                
+                campoConversa.scrollTop = campoConversa.scrollHeight;
+            }
+
+            function finalizarEventSource() {
+                if (socket) {
+                    socket.close(1000, 'Fechamento pelo usuário');
+                    socket = null;
+                }
+            }
+
+            window.addEventListener('beforeunload', function() {
+                finalizarEventSource();
+            });
+
+            function mapearLinks() {
+                var links = document.querySelectorAll('a, button');
+                links.forEach(element => {
+                    if (element.tagName === 'A' && element.getAttribute('href') === '#') {
+                        return; 
+                    }
+
+                    element.addEventListener('click', function(event) {
+                        finalizarEventSource();
+                    });
+                });
+            }
+
+            chart.render();
+            doChangeCanal();
+JAVASCRIPT;
+    }
+
     public static function onAddOption($param, $bet_name)
     {
         $path = 'app/images/regras/';
@@ -1137,11 +1792,12 @@ JAVASCRIPT;
         });
 
         $bet_name = $canal->plataforma->nome;
+        $take = $param['take'] ?? 16;
 
-        $sinais = TUtils::openFakeConnection('double', function () use ($canal){
+        $sinais = TUtils::openFakeConnection('double', function () use ($canal, $take){
             $sinais = DoubleSinal::where('plataforma_id', '=', $canal->plataforma_id)
                 ->orderBy('id', 'desc')
-                ->take(16)
+                ->take($take)
                 ->load();
 
             if ($sinais) {
@@ -1161,43 +1817,43 @@ JAVASCRIPT;
             if ($object)
                 $option .= $object->getContents();
         }
-        echo $option;
+
+        // echo $option;
+        return $option;
     }
 
     public static function getHistoricoJs($param)
     {
         $usuario = TUtils::openFakeConnection('double', function () use ($param){
-            $chat_id = TSession::getValue('usercustomcode');
             return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
-                ->where('chat_id', '=', $chat_id)
+                ->where('chat_id', '=', $param['chat_id'])
                 ->first();
         });
 
-        echo TDashboardUsuarioService::getHistorico($usuario->id, $param['ultimo_id']);
+        // echo TDashboardUsuarioService::getHistorico($usuario->id, $param['ultimo_id']);
+        return TDashboardUsuarioService::getHistorico($usuario->id, $param['ultimo_id']);
     }
 
     public static function statusJs($param) 
     {
         $usuario = TUtils::openFakeConnection('double', function () use ($param){
-            $chat_id = TSession::getValue('usercustomcode');
             return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
-                ->where('chat_id', '=', $chat_id)
+                ->where('chat_id', '=', $param['chat_id'])
                 ->first();
         });
 
-        echo TDashboardUsuarioService::getStatusUsuario($usuario);
+        return TDashboardUsuarioService::getStatusUsuario($usuario);
     }
 
     public static function usuarioJS($param)
     {
         $usuario = TUtils::openFakeConnection('double', function () use ($param){
-            $chat_id = TSession::getValue('usercustomcode');
             return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
-                ->where('chat_id', '=', $chat_id)
+                ->where('chat_id', '=', $param['chat_id'])
                 ->first();
         });
 
-        echo json_encode($usuario->toArray());
+        return json_encode($usuario->toArray());
     }   
 
     public static function topRankingJS($param) {
@@ -1209,14 +1865,15 @@ JAVASCRIPT;
         foreach ($lista as $key => $value) {
             $datagrid->addItem( (object) $value);
         }
-        echo $datagrid->getBody();
+        // echo $datagrid->getBody();
+        return $datagrid->getBody()->getContents();
     }
 
     public static function meuRankingJS($param) {
         $usuario = TUtils::openFakeConnection('double', function () use ($param){
-            $chat_id = TSession::getValue('usercustomcode');
+            // $chat_id = TSession::getValue('usercustomcode');
             return DoubleUsuario::where('canal_id', '=', $param['canal_id'])
-                ->where('chat_id', '=', $chat_id)
+                ->where('chat_id', '=', $param['chat_id'])
                 ->first();
         });
         $lista = TDashboardUsuarioService::getRanking($param['canal_id'], $usuario->id);
@@ -1227,6 +1884,7 @@ JAVASCRIPT;
         foreach ($lista as $key => $value) {
             $datagrid->addItem( (object) $value);
         }
-        echo $datagrid->getBody();
+        // echo $datagrid->getBody();
+        return $datagrid->getBody()->getContents();
     }
 }

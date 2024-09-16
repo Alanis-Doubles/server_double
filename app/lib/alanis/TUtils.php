@@ -283,6 +283,7 @@ class TUtils
         $param = http_build_query($parms);
         
         $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
+        // DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', $command);
         if (substr(php_uname(), 0, 7) == "Windows") {
             pclose(popen("start /B " . $command, "r"));
         } else {

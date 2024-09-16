@@ -231,3 +231,49 @@ div[form=form_login] .panel-heading{
     padding: 0px 30px 20px 0px;
     color: #555;
 }
+
+.mensagem {
+    margin: 10px 2px;
+    padding: 10px 15px;
+    border-radius: 15px;
+    position: relative;
+    font-size: 14px;
+    word-wrap: break-word;
+    display: block;
+    max-width: fit-content;
+}
+
+.mensagem.enviada {
+    background-color: #dcf8c6; /* Cor de fundo das mensagens enviadas */
+    margin-left: auto;
+    border-top-right-radius: 0;
+}
+
+.mensagem.recebida {
+    background-color: #ffffff; /* Cor de fundo das mensagens recebidas */
+    border: 1px solid #ccc;
+    margin-right: auto;
+    border-top-left-radius: 0;
+}
+
+.mensagem.enviada::after, .mensagem.recebida::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.mensagem.enviada::after {
+    border-width: 0 0 15px 15px;
+    border-color: transparent transparent transparent #dcf8c6;
+    right: -10px;
+    top: 0;
+}
+
+.mensagem.recebida::after {
+    border-width: 15px 15px 0 0;
+    border-color: #ffffff transparent transparent transparent;
+    left: -10px;
+    top: 0;
+}

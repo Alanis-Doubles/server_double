@@ -14,12 +14,14 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
     private function notificar_usuario_historico_consumidores($historico)
     {
         $channel_name = strtolower("{$this->serverName()}_usuario_historico");
+        $channel_notify = strtolower("{$this->serverName()}_usuario_historico_notify");
 
         $redis = new Client();
         $redis->lpush($channel_name, json_encode($historico));
+        $redis->publish($channel_notify, json_encode($historico));
 
         $payload = json_encode($historico);
-        // echo "$channel_name - $payload\n";
+        echo "$channel_notify - $payload\n";
     }
 
     private function aguardar_entrada()
@@ -556,49 +558,72 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $this->fazer_entrada = strtolower("{$this->serverName()}_{$canal->plataforma->nome}_{$canal->plataforma->idioma}_fazer_entrada");
         $this->channel_entrada = strtolower("{$this->serverName()}_{$canal->plataforma->nome}_{$canal->plataforma->idioma}_notificar_entrada");
 
-        $usuario->roboStatus = 'PARADO';
-        sleep(5);
-        $usuario->roboStatus = 'EXECUTANDO';
+        // $manutencao_chat_ids = DoubleConfiguracao::getConfiguracao('manutencao_chat_ids');
+        // if (in_array($usuario->chat_id, explode(',', $manutencao_chat_ids)))
+        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        if (substr(php_uname(), 0, 7) != "Windows")
+        {   // Novo fluxo
+            $redis = new Client();
+            $this->pubsub = $redis->pubSubLoop();
+            $this->pubsub->subscribe($this->channel_historico);
+            $this->pubsub->subscribe($this->usuario_historico);
 
-        $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
-        if (substr(php_uname(), 0, 7) == "Windows") 
-        {
-            $command = 'powershell.exe -Command "Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match \''. $processo . '\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"';
-        }
-        else 
-        {
-            $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
-        }
-        shell_exec($command);
+            while (true) {
+                $output = shell_exec("supervisorctl status {$server_name}_usuario_{$usuario->id}_consumer");
+                echo "output: {$output}\n";
+                // Usa expressão regular para extrair o PID
+                preg_match('/pid (\d+)/', $output, $matches);
+                if (isset($matches[1])) 
+                    break;
+            }
+            echo "output: {$output}\n";
+            // Usa expressão regular para extrair o PID
+            preg_match('/pid (\d+)/', $output, $matches);
 
-        $redis_param = [
-            'usuario_id' => $usuario->id
-        ];
-        // php cmd.php "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id=7"
-        TUtils::cmd_run('TDoubleUsuarioSinaisConsumer', 'run', $redis_param);
+            // Verifica se o PID foi encontrado
+            if (isset($matches[1])) {
+                $pid_supervidor = $matches[1];
+                echo "O PID extraído é: {$pid_supervidor} \n";
 
-        $redis = new Client();
-        $this->pubsub = $redis->pubSubLoop();
-        $this->pubsub->subscribe($this->channel_historico);
-        $this->pubsub->subscribe($this->usuario_historico);
-          
-        while (true) 
-        {
-            if ($usuario->roboStatus !== 'EXECUTANDO')
-                break;
+                // Processo que será procurado
+                $processo = "class=TDoubleUsuarioConsumer&method=run&usuario_id={$usuario->id}&server_name={$this->serverName()}";
 
+                // Comando para obter todos os PIDs do processo
+                $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\'';
+
+                // Executa o comando e captura os PIDs
+                $output = shell_exec($command);
+
+                // Remove espaços em branco e transforma a saída em um array
+                $pids = array_filter(explode("\n", trim($output)));
+
+                // Verifica e mata os PIDs que não são 123
+                foreach ($pids as $pid) {
+                    // Remove espaços em branco ao redor do PID e verifica se não é vazio
+                    $pid = trim($pid);
+                    
+                    // Verifica se o PID é válido e diferente de 123
+                    if ($pid && $pid != $pid_supervidor) {
+                        // Executa o comando kill para o PID válido
+                        shell_exec('kill -9 ' . escapeshellarg($pid));
+                        echo "Processo com PID $pid foi encerrado.\n";
+                    } else {
+                        echo "Processo com PID $pid não foi encerrado.\n";
+                    }
+                }
+            } else {
+                echo "PID não encontrado.\n";
+            }
+            
             try {
                 foreach ($this->pubsub as $message) {
                     $message = (object) $message;
-                    // echo "received message: {$message->channel} - {$message->payload}\n";
                     if ($message->kind === 'message' ) 
                     {
                         if ($usuario->roboStatus == 'EXECUTANDO') 
                         {
                             $usuario = DoubleUsuario::identificarPorId($usuario->id);
         
-                            // echo "received message: {$message->channel} - {$message->payload}\n";
-                            
                             // Verifica se o usuário possui estratégias próprias e se o histórico é do canal
                             // >> se SIM ignora a mensagem
                             if ($usuario->possui_estrategias and $message->channel == $this->channel_historico)
@@ -609,31 +634,101 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             if (!$usuario->possui_estrategias and $message->channel == $this->usuario_historico)
                                 continue;
         
-                            // echo "received message: {$message->channel} - {$message->payload}\n";
+                            echo "received message: {$message->channel} - {$message->payload}\n";
                             $this->processar_sinais($usuario, $message);
-                            if ($usuario->roboStatus !== 'EXECUTANDO') 
-                            {
-                                $this->pubsub->unsubscribe($this->channel_historico);
-                                $this->pubsub->unsubscribe($this->usuario_historico);
-                            }
-                        } else 
-                        {
-                            $this->pubsub->unsubscribe($this->channel_historico);
-                            $this->pubsub->unsubscribe($this->usuario_historico);
-                            break;
                         }
                     }
                 } 
             } catch (\Throwable $th) {
-                $trace = ''; // json_encode($th->getTrace());
-                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioConsumer', 'run', $th->getMessage(), $trace);
-
-                $redis = new Client();
-                $this->pubsub = $redis->pubSubLoop();
-                $this->pubsub->subscribe($this->channel_historico);
-                $this->pubsub->subscribe($this->usuario_historico);
+                $this->pubsub->unsubscribe($this->channel_historico);
+                $this->pubsub->unsubscribe($this->usuario_historico);
+                
+                $trace = $th->getTrace();
+                $message = $th->getMessage();
+                echo "---\n$message\n---\n$trace\n---\n";
             } 
+        } else
+        {
+            $usuario->roboStatus = 'PARADO';
+            sleep(5);
+            $usuario->roboStatus = 'EXECUTANDO';
+
+            $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
+            if (substr(php_uname(), 0, 7) == "Windows") 
+            {
+                $command = 'powershell.exe -Command "Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match \''. $processo . '\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"';
+            }
+            else 
+            {
+                $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
+            }
+            shell_exec($command);
+
+            $redis_param = [
+                'usuario_id' => $usuario->id
+            ];
+            // php cmd.php "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id=7"
+            TUtils::cmd_run('TDoubleUsuarioSinaisConsumer', 'run', $redis_param);
+         
+
+            $redis = new Client();
+            $this->pubsub = $redis->pubSubLoop();
+            $this->pubsub->subscribe($this->channel_historico);
+            $this->pubsub->subscribe($this->usuario_historico);
+            
+            while (true) 
+            {
+                if ($usuario->roboStatus !== 'EXECUTANDO')
+                    break;
+
+                try {
+                    foreach ($this->pubsub as $message) {
+                        $message = (object) $message;
+                        // echo "received message: {$message->channel} - {$message->payload}\n";
+                        if ($message->kind === 'message' ) 
+                        {
+                            if ($usuario->roboStatus == 'EXECUTANDO') 
+                            {
+                                $usuario = DoubleUsuario::identificarPorId($usuario->id);
+            
+                                // echo "received message: {$message->channel} - {$message->payload}\n";
+                                
+                                // Verifica se o usuário possui estratégias próprias e se o histórico é do canal
+                                // >> se SIM ignora a mensagem
+                                if ($usuario->possui_estrategias and $message->channel == $this->channel_historico)
+                                    continue;
+            
+                                // Verifica se o usuário não possui estratégias próprias e se o histórico é do usuário
+                                // >> se SIM ignora a mensagem
+                                if (!$usuario->possui_estrategias and $message->channel == $this->usuario_historico)
+                                    continue;
+            
+                                echo "received message: {$message->channel} - {$message->payload}\n";
+                                $this->processar_sinais($usuario, $message);
+                                if ($usuario->roboStatus !== 'EXECUTANDO') 
+                                {
+                                    $this->pubsub->unsubscribe($this->channel_historico);
+                                    $this->pubsub->unsubscribe($this->usuario_historico);
+                                }
+                            } else 
+                            {
+                                $this->pubsub->unsubscribe($this->channel_historico);
+                                $this->pubsub->unsubscribe($this->usuario_historico);
+                                break;
+                            }
+                        }
+                    } 
+                } catch (\Throwable $th) {
+                    $trace = ''; // json_encode($th->getTrace());
+                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioConsumer', 'run', $th->getMessage(), $trace);
+
+                    $redis = new Client();
+                    $this->pubsub = $redis->pubSubLoop();
+                    $this->pubsub->subscribe($this->channel_historico);
+                    $this->pubsub->subscribe($this->usuario_historico);
+                } 
+            }
+            
         }
-        
     }
 }

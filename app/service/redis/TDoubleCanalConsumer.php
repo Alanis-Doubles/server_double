@@ -9,7 +9,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
     public function notificar_consumidores($historico)
     {
         $channel_name = strtolower("{$this->serverName()}_canal_historico");
-        echo json_encode($historico) . "\n";
+        // echo json_encode($historico) . "\n";
 
         $historico_canal = TUtils::openConnection('double', function () use ($historico) {
             $object = new DoubleHistorico();
@@ -71,14 +71,16 @@ class TDoubleCanalConsumer extends TDoubleRedis
 
         curl_close($curl);
 
+        $json = null;
         if ($http_status == 200) {
             // $output = trim(shell_exec($command));
             // echo "python: {$output}\n";
             // DoubleErros::registrar(1, 'canal', 'run', 'python', $output);
 
+            echo "python: {$$response}\n";
             $historico = json_decode($response);
 
-            $json = null;
+            
             if (json_last_error() === JSON_ERROR_NONE) {
                 $json = [
                     'plataforma_id' => $canal->plataforma->id,
@@ -93,8 +95,10 @@ class TDoubleCanalConsumer extends TDoubleRedis
             } else 
             {
                 echo json_last_error_msg();
-                DoubleErros::registrar($canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
+                // DoubleErros::registrar($canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
             }
+        } else {
+            echo "Erro: {$response}\n";
         }
         return $json;
     }
@@ -216,7 +220,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
             $entrada_id = $historico['id'];
             $estrategia_id = $historico['estrategia_id'];
             $cor = $output['cor'];
-            DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
+            // DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
             $canal = DoubleCanal::identificar($canal->id);
 
             $botao = [];

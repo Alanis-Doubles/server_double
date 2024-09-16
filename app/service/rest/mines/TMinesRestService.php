@@ -6,7 +6,7 @@ use Random\Randomizer;
 class TMinesRestService
 {
     private static $telegram_token = "6891255381:AAH1vJAY0KCH-XmScXrNRP0SGHwhjnuN2RU";
-    private static $telegram_chat_id = "-1002113990958";
+    private static $telegram_chat_id = "@sinalesmines100"; //1002113990958";
     private static $telegram_host = "https://api.telegram.org/bot{token}/";
     private static $tamanho_matriz = 5;
     private static $total_diamantes = 5;

@@ -8,6 +8,9 @@
       <menuitem label="📈 Dashboard">
         <action>TDoubleDashboardUsuario</action>
       </menuitem>
+      <menuitem label="📈 Dashboard">
+        <action>TDoubleDashboardUsuario2</action>
+      </menuitem>
       <menuitem label="🖥️ Plataformas">
         <action>TDoublePlataformaList</action>
       </menuitem>
@@ -25,6 +28,9 @@
       </menuitem>
       <menuitem label="🎯 Objetivos">
         <action>TDoubleUsuarioObjetivo</action>
+      </menuitem>
+      <menuitem label="🎯 Objetivos">
+        <action>TDoubleUsuarioObjetivo2</action>
       </menuitem>
       <menuitem label="📨 Mensagem Direta">
         <action>TDoubleMensagemDiretaForm</action>
@@ -167,6 +173,10 @@
         <action>CommonPage</action>
       </menuitem>
     </menu>
+  </menuitem>
+  <menuitem label="_t{Two factor authentication}">
+    <action>SystemProfile2FAForm</action>
+    <icon>fa:shield-alt</icon>
   </menuitem>
   <menuitem label="🚪 Sair">
     <action>LoginForm#method=onLogout#static=1</action>

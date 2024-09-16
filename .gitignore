@@ -3,3 +3,6 @@
 app/config/
 phinx.php
 app/images/recuperacao
+python/double_ia/venv/
+python/double_ia/__pycache__/
+logs/

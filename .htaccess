@@ -234,6 +234,10 @@ RewriteRule ^api/cronjob/([A-Za-z-_0-9]*)$ rest.php?call_method=GET&auth=None&cl
 
 RewriteRule ^api/webhook/([A-Za-z-_0-9]*)$ rest.php?call_method=POST&auth=None&class=TDoubleWebhook&method=processar&origem=$1&%{QUERY_STRING} [NC]
 
+RewriteRule ^api/dashboard/usuario/notificacoes$ engine.php?class=SseNotificacoes&method=run&%{QUERY_STRING} [NC]
+
+RewriteRule ^api/dashboard/usuario/([A-Za-z-_0-9]*)$ rest.php?call_method=GET&auth=None&class=TDoubleDashboardUsuario&method=$1&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-api/dashboard/usuario/([A-Za-z-_0-9]*)$ rest.php?call_method=GET&auth=None&class=TDoubleDashboardUsuario&method=$1&%{QUERY_STRING} [NC]
 
 RewriteRule ^double-dashboard$ index.php?class=TDoubleDashboard&%{QUERY_STRING} [NC]
 RewriteRule ^xhr-double-dashboard$ engine.php?class=TDoubleDashboard&%{QUERY_STRING} [NC]

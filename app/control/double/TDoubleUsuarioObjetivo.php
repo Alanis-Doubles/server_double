@@ -210,6 +210,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                     'database' => 'double',
                     'key' => 'id', 
                     'display' => '[{plataforma->idioma}] {plataforma->nome} - {nome}',
+                    // 'defaultOption' => false,
                     'width' => '100%',
                     'criteria' => $usuarioCriteria,
                     'required' => true
@@ -226,7 +227,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                 [
                     'name' => 'percentual_entrada',
                     'label' => $label,
-                    'decimals' => 2,
+                    'decimals' => 3,
                     'decimalsSeparator' => ',',
                     'thousandSeparator' => '.',
                     'width' => '100%',
@@ -234,7 +235,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                     'required' => true
                 ],
                 function ($object) use ($label){
-                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,01']);
+                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,001']);
                 }
             )],
             [$label = $this->makeTLabel(['value' => '🐓 Gales'])],
@@ -261,7 +262,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                 [
                     'name' => 'percentual_stop_win',
                     'label' => $label,
-                    'decimals' => 2,
+                    'decimals' => 3,
                     'decimalsSeparator' => ',',
                     'thousandSeparator' => '.',
                     'width' => '100%',
@@ -269,7 +270,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                     'required' => true
                 ],
                 function ($object) use ($label){
-                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,01']);
+                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,001']);
                 }
             )],
             [$label = $this->makeTLabel(['value' => '❌ Stop LOSS (%)'])],
@@ -277,7 +278,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                 [
                     'name' => 'percentual_stop_loss',
                     'label' => $label,
-                    'decimals' => 2,
+                    'decimals' => 3,
                     'decimalsSeparator' => ',',
                     'thousandSeparator' => '.',
                     'width' => '100%',
@@ -285,7 +286,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
                     'required' => true
                 ],
                 function ($object) use ($label){
-                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,01']);
+                    $object->addValidation((string) '<b>' . $label->getValue() . '</b>', new TMinValueValidator, ['0,001']);
                 }
             )]
         );
@@ -365,6 +366,15 @@ class TDoubleUsuarioObjetivo extends TStandardList
             )],
         );
 
+        $sinais = new TElement('div');
+        $sinais->id = 'campo_sinais';
+        $sinais->style = 'border: 1px solid #ccc; padding: 5px; padding-left: 5px; min-height: 50px; width: 100%; background: #fff;';
+        
+        $container_sinais = new TElement('div');
+        $container_sinais->add('<b>Últimos Sinais</b>');
+        $container_sinais->style = 'margin-bottom: 14px; margin-top: 0px; min-height: 50px; width: 100%;';
+        $container_sinais->add($sinais);
+
         $session_data = TSession::getValue(get_class($this) . '_filter_data');
         if ($session_data && $session_data->search_canal_id) {
             $this->form->setData( $session_data );
@@ -378,11 +388,18 @@ class TDoubleUsuarioObjetivo extends TStandardList
         $container->style = 'width: 100%';
         $container->add(new TXMLBreadCrumb('menu.xml', get_class($this)));
         $container->add($this->form);
+        $container->add($container_sinais);
         $container->add($panel);
         
         parent::add($container);
 
-        TScript::create($this->getJavaScript());
+        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        if ($use_redis == 'Y') {
+            TScript::create($this->getJavaScriptRedisWS());
+            // TScript::create($this->getJavaScriptRedis());
+        }
+        else
+            TScript::create($this->getJavaScript());
     }
 
     public function beforeStaticLoadPage($param)
@@ -675,19 +692,19 @@ class TDoubleUsuarioObjetivo extends TStandardList
     public static function execucoesJS($param) {
         $expression = TSession::getValue('DoubleUsuarioObjetivoExecucao_filter_0');
         
-        // $lista = TUtils::openFakeConnection('double', function() use ($expression){
-        //     $criteria = TCriteria::create([1 => 2]);
-        //     $criteria->Add(new TFilter('status', '=', 'EXECUTANDO'), TCriteria::OR_OPERATOR);
-        //     if ($expression)
-        //         $criteria->add($expression, TCriteria::AND_OPERATOR);
+        $lista = TUtils::openFakeConnection('double', function() use ($expression){
+            $criteria = TCriteria::create([1 => 2]);
+            $criteria->Add(new TFilter('status', '=', 'EXECUTANDO'), TCriteria::OR_OPERATOR);
+            if ($expression)
+                $criteria->add($expression, TCriteria::AND_OPERATOR);
             
-        //     $repository = new TRepository('DoubleUsuarioObjetivoExecucao');
-        //     return $repository->load($criteria, FALSE);
-        // });
+            $repository = new TRepository('DoubleUsuarioObjetivoExecucao');
+            return $repository->load($criteria, FALSE);
+        });
 
-        // foreach ($lista as $execucao) {
-        //     $execucao->atualizar_progresso();
-        // }
+        foreach ($lista as $execucao) {
+            $execucao->atualizar_progresso();
+        }
 
         $lista = TUtils::openFakeConnection('double', function() use ($expression){
             $criteria = TCriteria::create([1 => 2]);
@@ -722,7 +739,8 @@ class TDoubleUsuarioObjetivo extends TStandardList
         var interval_execucoes = null;  
         var fetchingData_execucoes = false;
 
-        function atualiza_status() {
+        function atualiza_status() 
+        {
                 if (fetchingData_status) {
                     return;
                 }
@@ -870,13 +888,149 @@ class TDoubleUsuarioObjetivo extends TStandardList
 
             startUpdating();
 
-        JAVASCRIPT;
+JAVASCRIPT;
     }
 
-    private function getJavaScriptRedis()
+    private function getJavaScriptRedisWS()
     {
+        $chat_id = TSession::getValue('usercustomcode');
+        $take = $this->isMobile() ? 21 : 25;
+        $servidor_ws = DoubleConfiguracao::getConfiguracao('servidor_ws');
+
         return <<<JAVASCRIPT
-        
-        JAVASCRIPT;
+            var socket = null;
+            
+            function atualiza_sinais() {
+                if (!document.getElementsByName('search_canal_id'))
+                    return;
+
+                canal_id = document.getElementsByName('search_canal_id')[0].value;
+                if (canal_id == '')
+                  return;
+
+                __adianti_ajax_exec('api/dashboard/usuario/sinaisJs?canal_id=' + canal_id + '&take={$take}', function(mensagem) {
+                    var campoSinais = document.getElementById('campo_sinais');
+                    campoSinais.innerHTML = mensagem.data;
+                }, false);
+            }
+
+            function atualiza_status() {
+                if (!document.getElementsByName('search_canal_id')[0])
+                    return;
+
+                canal_id = document.getElementsByName('search_canal_id')[0].value;
+
+                if (canal_id == "")
+                {
+                    document.querySelector('#btn_iniciar').style.display = 'none';
+                    document.querySelector('#btn_parar').style.display = 'none';
+                    return;
+                }
+
+                __adianti_ajax_exec('api/dashboard/usuario/statusJs?canal_id=' + canal_id + '&chat_id={$chat_id}', function(mensagem) {
+                    var data = JSON.parse(mensagem.data);
+
+                    if (data.status_objetivo == 'EXECUTANDO') {
+                        document.querySelector('#btn_iniciar').style.display = 'none';
+                        document.querySelector('#btn_parar').style.display = 'inline';
+
+                        tcombo_disable_field('form_search_TDoubleUsuarioObjetivo', 'search_canal_id');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_entrada');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_stop_win');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_stop_loss');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'protecoes');
+                        tradiogroup_disable_field('form_search_TDoubleUsuarioObjetivo', 'protecao_branco');
+                        tradiogroup_disable_field('form_search_TDoubleUsuarioObjetivo', 'modo_treinamento');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'total_execucoes');
+                        tradiogroup_disable_field('form_search_TDoubleUsuarioObjetivo', 'tipo_periodicidade');
+                        tfield_disable_field('form_search_TDoubleUsuarioObjetivo', 'valor_periodicidade');
+                        tbutton_disable_field('form_search_TDoubleUsuarioObjetivo', 'btn_salvar');
+                    }
+                    else {
+                        if (data.execucao_status_parado == 'Y')
+                        {
+                            document.querySelector('#btn_iniciar').style.display = 'none';
+                            document.querySelector('#btn_parar').style.display = 'none';
+                        }
+                        else 
+                        {
+                            document.querySelector('#btn_iniciar').style.display = 'inline';
+                            document.querySelector('#btn_parar').style.display = 'none';   
+                        }
+
+                        tcombo_enable_field('form_search_TDoubleUsuarioObjetivo', 'search_canal_id');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_entrada');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_stop_win');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'percentual_stop_loss');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'protecoes');
+                        tradiogroup_enable_field('form_search_TDoubleUsuarioObjetivo', 'protecao_branco');
+                        tradiogroup_enable_field('form_search_TDoubleUsuarioObjetivo', 'modo_treinamento');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'total_execucoes');
+                        tradiogroup_enable_field('form_search_TDoubleUsuarioObjetivo', 'tipo_periodicidade');
+                        tfield_enable_field('form_search_TDoubleUsuarioObjetivo', 'valor_periodicidade');
+                        tbutton_enable_field('form_search_TDoubleUsuarioObjetivo', 'btn_salvar');
+                    }
+                }, false);
+            }
+
+            function atualiza_execucoes() {
+                if (!$("#datagridExecucao"))
+                    return;
+
+                __adianti_ajax_exec('class=TDoubleUsuarioObjetivo&method=execucoesJS', function(data) {
+                    fetchingData_execucoes = false;
+                    $("#datagridExecucao tbody").remove();
+                    $("#datagridExecucao").append(data);
+                }, false);
+            }
+
+            function inicializarEventSource() {
+                if (!document.getElementsByName('search_canal_id'))
+                    return;
+
+                canal_id = document.getElementsByName('search_canal_id')[0].value;
+                if (canal_id == '')
+                  return;
+                socket = new WebSocket('{$servidor_ws}/ws?canal_id=' + canal_id + '&chat_id={$chat_id}');
+
+                socket.onopen = function(event) {
+                    console.log('Conexão WebSocket estabelecida.');
+                    atualiza_sinais();
+                    atualiza_status();
+                    atualiza_execucoes();
+                };
+
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    if (data.channel == 'atualiza_sinais') {
+                        atualiza_sinais();
+                    } else if (data.channel == 'historico_usuario') {
+                        atualiza_status();
+                        atualiza_execucoes();
+                    } 
+                };
+
+                socket.onerror = function(error) {
+                    console.error('Erro na conexão WebSocket:', error);
+                };
+
+                socket.onclose = function(event) {
+                    console.log('Conexão WebSocket fechada.');
+                };
+            }
+
+            function finalizarEventSource() {
+                if (socket) {
+                    socket.close(1000, 'Fechamento pelo usuário');
+                    socket = null;
+                }
+            }
+
+            window.addEventListener('beforeunload', function() {
+                finalizarEventSource();
+            });
+
+            inicializarEventSource();
+JAVASCRIPT;
     }
 }

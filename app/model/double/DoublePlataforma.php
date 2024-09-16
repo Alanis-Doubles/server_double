@@ -75,6 +75,8 @@ class DoublePlataforma extends DoubleRecord
             return new TWeplay;
         else if (TBrabet::nome() == $this->nome)
             return new TBrabet;
+        else if (TDoubleVegas::nome() == $this->nome)
+                return new TDoubleVegas;
         else
             throw new Exception("Plataforma '{$this->nome}' não suportada.");
     }

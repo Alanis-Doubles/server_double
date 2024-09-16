@@ -13,7 +13,11 @@ class DoubleConfiguracao extends DoubleRecord
     public function __construct($id = NULL, $callObjectLoad = TRUE)
     {
         parent::__construct($id, $callObjectLoad);
-        $this->loadAttributes('double');
+        // $this->loadAttributes('double');
+        parent::addAttribute('nome');
+        parent::addAttribute('valor');
+        parent::addAttribute('created_at');
+        parent::addAttribute('updated_at');
     }
 
     public static function getConfiguracao($nome)

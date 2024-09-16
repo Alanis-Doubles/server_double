@@ -43,21 +43,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
     }
 
     private function gerar_entrada($usuario) {
-        // $dir_double_python_ia = DoubleConfiguracao::getConfiguracao('dir_double_python_ia');
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');
-
-        // if (substr(php_uname(), 0, 7) == "Windows") {
-        //     $command = "$dir_double_python_ia/venv/Scripts/python $dir_double_python_ia/main.py $server_name {$usuario->id}";
-        // } else {
-        //     $command = "$dir_double_python_ia/venv/bin/python $dir_double_python_ia/main.py $server_name {$usuario->id}";
-        // }
-        // if (substr(php_uname(), 0, 7) == "Windows") 
-        //     $command = str_replace(['/'], ['\\'], $command);
-        // $command = escapeshellcmd($command);  
-        // $output = trim(shell_exec($command));
-        // // echo "python: {$output}\n";
-        // // DoubleErros::registrar(1, 'canal', 'run', 'python', $output);
-
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -144,14 +130,6 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'usuario_id' => $usuario->id
                         ];
                         $this->notificar_consumidores($output);
-
-                        // TRedisUtils::sendMessage(
-                        //     $canal->channel_id,
-                        //     $canal->telegram_token,
-                        //     $object->cor == 'white' ? $plataforma->translate->MSG_SINAIS_WIN_BRANCO : $plataforma->translate->MSG_SINAIS_WIN,
-                        //     []
-                        // );
-
                         break;
                     } elseif ($canal->protecoes == $protecao) {
                         $object->entrada_id = $entrada_id;
@@ -169,18 +147,6 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'usuario_id' => $usuario->id
                         ];
                         $this->notificar_consumidores($output);
-
-                        // TRedisUtils::sendMessage(
-                        //     $canal->channel_id,
-                        //     $canal->telegram_token,
-                        //     str_replace(
-                        //         ["{cor_retornada}"],
-                        //         [TRedisUtils::getCor($object->cor, $plataforma->translate)],
-                        //         $plataforma->translate->MSG_SINAIS_LOSS,
-                        //     ),
-                        //     [],
-                        // );
-
                         break;
                     } else {
                         $object->entrada_id = $entrada_id;
@@ -198,32 +164,17 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'usuario_id' => $usuario->id
                         ];
                         $this->notificar_consumidores($output);
-
-                        $gales = ['primeira', 'segunda', 'terceira', 'quarta', 'quinta', 'sexta'];
-
-                        // TRedisUtils::sendMessage(
-                        //     $canal->channel_id,
-                        //     $canal->telegram_token,
-                        //     str_replace(
-                        //         ['{protecao}', '{n_protecao}'],
-                        //         [$gales[$protecao], $protecao + 1],
-                        //         $plataforma->translate->MSG_SINAIS_GALE,
-                        //     ),
-                        //     [],
-                        //     true
-                        // );
-
                         $protecao += 1;
                     } 
-                } 
+                } else {
+                    break;
+                }
             }
         }
     }
 
     private function gerar_sinais($usuario){
         $canal = $usuario->canal;
-        // $plataforma = $canal->plataforma;
-
         $output = $this->gerar_entrada($usuario);
         // echo "Tipo: {$output['tipo']}\n";
         if ($output) {
@@ -236,39 +187,6 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
             $cor = $output['cor'];
             DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
             $canal = DoubleCanal::identificar($canal->id);
-
-            // $botao = [];
-            // if ($plataforma->url_grupo_vip)
-            //     $botao[] = [["text" => $plataforma->translate->BOTAO_GRUPO_VIP,  "url" => $plataforma->url_grupo_vip]];
-            // if ($plataforma->url_cadastro)
-            //     $botao[] = [["text" => $plataforma->translate->MSG_SINAIS_CADASTRO,  "url" => $plataforma->url_cadastro]];
-            // if ($plataforma->url_tutorial)
-            //     $botao[] = [["text" => str_replace(['{plataforma}'], [$plataforma->nome], $plataforma->translate->MSG_SINAIS_TUTORIAL),  "url" => $plataforma->url_tutorial]];
-            // if ($plataforma->url_suporte)
-            //     $botao[] = [["text" => $plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $plataforma->url_suporte]];
-            // if ($plataforma->url_robo)
-            //     $botao[] = [["text" => $plataforma->translate->MSG_ROBO_AUTOMATICO,  "url" => $plataforma->url_robo]];
-
-            // TRedisUtils::sendMessage(
-            //     $canal->channel_id,
-            //     $canal->telegram_token,
-            //     str_replace(
-            //         ['{estrategia}', '{cor}', '{ultimo_numero}', '{ultima_cor}', '{informacao}', '{protecoes}'],
-            //         [
-            //             TRedisUtils::buscarNomeEstrategia(isset($output['estrategia_id']) ? $output['estrategia_id'] : ''), 
-            //             TRedisUtils::getCor($cor, $plataforma->translate), 
-            //             $output['numero'], 
-            //             TRedisUtils::getCor($cor, $plataforma->translate, false), 
-            //             isset($output['informacao']) ? $output['informacao'] : '',
-            //             $canal->protecoes
-            //         ],
-            //         $plataforma->translate->MSG_SINAIS_ENTRADA_CONFIRMADA,
-            //     ), 
-            //     [
-            //         "resize_keyboard" => true, 
-            //         "inline_keyboard" => $botao
-            //     ]
-            // );
 
             $this->processar_sinais($usuario, $cor, $entrada_id, $estrategia_id);
         }
@@ -284,40 +202,116 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         $this->pubsub = $redis->pubSubLoop();
         $this->pubsub->subscribe($channel_name);
 
-        while (true)
-        {
-            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'roboStatus', $usuario->roboStatus);
-            if ($usuario->roboStatus !== 'EXECUTANDO') {
-                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'sair');
-                break;
+        // $manutencao_chat_ids = DoubleConfiguracao::getConfiguracao('manutencao_chat_ids');
+        // if (in_array($usuario->chat_id, explode(',', $manutencao_chat_ids)))
+        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        if (substr(php_uname(), 0, 7) != "Windows")
+        {   // Novo fluxo
+            while (true) {
+                $output = shell_exec("supervisorctl status {$server_name}_usuario_{$usuario->id}_sinais_consumer");
+                echo "output: {$output}\n";
+                // Usa expressão regular para extrair o PID
+                preg_match('/pid (\d+)/', $output, $matches);
+                if (isset($matches[1])) 
+                    break;
             }
+            echo "output: {$output}\n";
+            // Usa expressão regular para extrair o PID
+            preg_match('/pid (\d+)/', $output, $matches);
+
+            // Verifica se o PID foi encontrado
+            if (isset($matches[1])) {
+                $pid_supervidor = $matches[1];
+                echo "O PID extraído é: {$pid_supervidor} \n";
+
+                // Processo que será procurado
+                $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}&server_name={$this->serverName()}";
+
+                // Comando para obter todos os PIDs do processo
+                $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\'';
+
+                // Executa o comando e captura os PIDs
+                $output = shell_exec($command);
+
+                // Remove espaços em branco e transforma a saída em um array
+                $pids = array_filter(explode("\n", trim($output)));
+
+                // Verifica e mata os PIDs que não são 123
+                foreach ($pids as $pid) {
+                    // Remove espaços em branco ao redor do PID e verifica se não é vazio
+                    $pid = trim($pid);
+                    
+                    // Verifica se o PID é válido e diferente de 123
+                    if ($pid && $pid != $pid_supervidor) {
+                        // Executa o comando kill para o PID válido
+                        shell_exec('kill -9 ' . escapeshellarg($pid));
+                        echo "Processo com PID $pid foi encerrado.\n";
+                    } else {
+                        echo "Processo com PID $pid não foi encerrado.\n";
+                    }
+                }
+            } else {
+                echo "PID não encontrado.\n";
+            }
+            // $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
+            // $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
+            // shell_exec($command);
 
             try {
                 foreach ($this->pubsub as $message) {
                     $message = (object) $message;
         
                     if ($message->kind === 'message') {
-                        DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $message->kind, $usuario->roboStatus);
                         if ($usuario->roboStatus == 'EXECUTANDO')  {
-                            // echo "received message: {$message->channel} - {$message->payload}\n";
+                            echo "received message: {$message->channel} - {$message->payload}\n";
                             $this->gerar_sinais($usuario);
-                        } else {
-                            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saindo');
-                            $this->pubsub->unsubscribe(($channel_name));
-                            break;
-                        }
+                        } 
                     }
-                    // break;
                 }    
             } catch (\Throwable $th) {
-                $trace = ''; //json_encode($th->getTrace());
-                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $th->getMessage(), $trace);
-
-                $redis = new Client();
-                $this->pubsub = $redis->pubSubLoop();
-                $this->pubsub->subscribe($channel_name);
+                $this->pubsub->unsubscribe(($channel_name));
+                
+                $trace = $th->getTrace();
+                $message = $th->getMessage();
+                echo "---\n$message\n---\n$trace\n---\n";
             }
-        }    
-        DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saiu');
+        } else 
+        {
+            while (true)
+            {
+                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'roboStatus', $usuario->roboStatus);
+                if ($usuario->roboStatus !== 'EXECUTANDO') {
+                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'sair');
+                    break;
+                }
+
+                try {
+                    foreach ($this->pubsub as $message) {
+                        $message = (object) $message;
+            
+                        if ($message->kind === 'message') {
+                            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $message->kind, $usuario->roboStatus);
+                            if ($usuario->roboStatus == 'EXECUTANDO')  {
+                                // echo "received message: {$message->channel} - {$message->payload}\n";
+                                $this->gerar_sinais($usuario);
+                            } else {
+                                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saindo');
+                                $this->pubsub->unsubscribe(($channel_name));
+                                break;
+                            }
+                        }
+                        // break;
+                    }    
+                } catch (\Throwable $th) {
+                    $trace = ''; //json_encode($th->getTrace());
+                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $th->getMessage(), $trace);
+
+                    $redis = new Client();
+                    $this->pubsub = $redis->pubSubLoop();
+                    $this->pubsub->subscribe($channel_name);
+                }
+            }    
+            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saiu');
+        }
     }
 } 

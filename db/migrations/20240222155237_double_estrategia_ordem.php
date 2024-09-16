@@ -21,7 +21,7 @@ final class DoubleEstrategiaOrdem extends AbstractMigration
 
         if ($this->isMigratingUp()) {
             $this->table('double_usuario')
-                ->changeColumn('entrada_automatica', 'enum', ['values' => ['Y', 'N', 'A'], 'default' => 'N', 'null' => false])
+                ->changeColumn('entrada_automatica', 'enum', ['values' => ['Y', 'N', 'A', 'B'], 'default' => 'N', 'null' => false])
                 ->addColumn('entrada_automatica_total_loss', 'integer', ['default' => 1, 'null' => false])
                 ->addColumn('entrada_automatica_qtd_loss', 'integer', ['default' => 0, 'null' => false])
                 ->save();
