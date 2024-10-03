@@ -103,7 +103,7 @@ class DoubleUsuarioObjetivo extends DoubleRecord
             ->update();
     }
 
-    public function atualizar_progresso($cron = false)
+    public function atualizar_progresso()
     {
         $retorno = false;
 
@@ -112,7 +112,7 @@ class DoubleUsuarioObjetivo extends DoubleRecord
             foreach ($execucoes as $execucao) {
                 if ($execucao->status == 'EXECUTANDO')
                 {
-                    $retorno = $execucao->atualizar_progresso($cron);
+                    $retorno = $execucao->atualizar_progresso();
                     break;
                 }
             }
@@ -129,8 +129,7 @@ class DoubleUsuarioObjetivo extends DoubleRecord
             foreach ($execucoes as $execucao) {
                 if ($execucao->status == 'EXECUTANDO')
                 {
-                    $lucro_previsto = number_format($execucao->valor_stop_win, 2, ',', '.');
-                    $retorno = "🎯 Objetivo {$execucao->execucao} de {$this->total_execucoes}\n\n💲 Lucro previsto: R$ {$lucro_previsto}";
+                    $retorno = "🎯 Objetivo {$execucao->execucao} de {$this->total_execucoes}";
                     break;
                 }
             }

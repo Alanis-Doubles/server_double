@@ -166,6 +166,7 @@ class TDoubleEstrategiaForm  extends TStandardForm
 
             if ($param['tipo'] == 'NUMERO') {
                 $options = [
+                    '0'  => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => ''],
                     '1'  => ['image' => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'), 'title' => ''],
                     '2'  => ['image' => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'), 'title' => ''],
                     '3'  => ['image' => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'), 'title' => ''],
@@ -271,6 +272,7 @@ class TDoubleEstrategiaForm  extends TStandardForm
             'white' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'),
             'other' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'),
             'break' => (file_exists($path_bet . 'break.png') ? $path_bet . 'break.png' : $path . 'break.png'),
+            '0'     => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'),
             '1'     => (file_exists($path_bet . '1.png') ? $path_bet . '1.png' : $path . '1.png'),
             '2'     => (file_exists($path_bet . '2.png') ? $path_bet . '2.png' : $path . '2.png'),
             '3'     => (file_exists($path_bet . '3.png') ? $path_bet . '3.png' : $path . '3.png'),

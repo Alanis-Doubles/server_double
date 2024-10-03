@@ -21,7 +21,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $redis->publish($channel_notify, json_encode($historico));
 
         $payload = json_encode($historico);
-        echo "$channel_notify - $payload\n";
+        // echo "$channel_notify - $payload\n";
     }
 
     private function aguardar_entrada()
@@ -170,7 +170,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     $pubsub_entrada->subscribe($this->channel_entrada);
                     foreach ($pubsub_entrada as $message) {
                         $message = (object) $message;
-                        // echo "received message: {$message->channel} - {$message->payload}\n";
+                        echo "received message: {$message->channel} - {$message->payload}\n";
                         if ($message->kind === 'message' ) {
                             $pubsub_entrada->subscribe($this->channel_entrada);
                             break;
@@ -181,6 +181,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     if ($usuario->ultimo_saldo + $lucro < $valor) {
                         $retornoJogada = 'saldo_insuficiente';
                     } else {
+                        sleep(1);
+                        echo "fazer jogada\n";
                         $retornoJogada = $service->jogar($usuario, $historico['cor'], $valor);
                     }
 
@@ -231,6 +233,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                                 ],
                                 $usuario->plataforma->translate->MSG_OPERACAO_MARTINGALE,
                             );
+
+                        echo "Jogou Gale {$protecao} - valor: $valor - cor: {$historico['cor']}\n";
 
                         TRedisUtils::sendMessage(
                             $usuario->chat_id, 
@@ -305,11 +309,14 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                         }
                         continue;
                     }
-
+                    echo "{$message_sinais->channel} - {$message_sinais->payload}\n";
                     $object = json_decode($message_sinais->payload, true); 
                     $cor_retornada = $object['cor'];
 
                     $win = $historico['cor'] == $cor_retornada;
+
+                    echo "Cor esperada: {$historico['cor']} - Cor retornada: $cor_retornada\n";
+
                     if (!$win and $usuario->protecao_branco == 'Y')
                         $win = $cor_retornada == 'white';
 
@@ -329,7 +336,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
                             $lucro = number_format($lucro, 2, ',', '.');
                         } else {
-                            sleep(15);
+                            sleep(10);
                             $lucro += $valor;
                             $saldo = $usuario->plataforma->service->saldo($usuario);
                             $banca = number_format($saldo, 2, ',', '.');
@@ -511,10 +518,10 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
 
                     $protecao += 1;
 
-                    if (isset($historico['estrategia']))
+                    if (isset($historico['estrategia_id']))
                     {
                         $estrategia = TUtils::openFakeConnection('double', function() use ($historico){
-                            return new DoubleEstrategia($historico['estrategia'], false);
+                            return new DoubleEstrategia($historico['estrategia_id'], false);
                         });
 
                         if ($estrategia and $estrategia->incrementa_valor_entrada == 'A_CADA_GALE') {
@@ -643,7 +650,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                 $this->pubsub->unsubscribe($this->channel_historico);
                 $this->pubsub->unsubscribe($this->usuario_historico);
                 
-                $trace = $th->getTrace();
+                $trace = json_encode($th->getTrace());
                 $message = $th->getMessage();
                 echo "---\n$message\n---\n$trace\n---\n";
             } 
@@ -670,8 +677,14 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
             // php cmd.php "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id=7"
             TUtils::cmd_run('TDoubleUsuarioSinaisConsumer', 'run', $redis_param);
          
-
-            $redis = new Client();
+            $options = [
+                'scheme' => 'tcp',
+                'host'   => '127.0.0.1',
+                'port'   => 6379,
+                'persistent' => true,
+                'read_write_timeout' => 0
+            ];
+            $redis = new Client($options);
             $this->pubsub = $redis->pubSubLoop();
             $this->pubsub->subscribe($this->channel_historico);
             $this->pubsub->subscribe($this->usuario_historico);

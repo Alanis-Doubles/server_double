@@ -20,15 +20,15 @@ class DoubleUsuarioObjetivoExecucao extends DoubleRecord
         $this->loadAttributes('double');
     }
 
-    public function atualizar_progresso()
+    public function atualizar_progresso($cron = false)
     {
         $retorno = false;
 
-        DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 2', $this->status);
+        // DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 2', $this->status);
 
         if ($this->status == 'EXECUTANDO')
         {
-            $retorno = TUtils::openConnection('double', function(){
+            $retorno = TUtils::openConnection('double', function() use ($cron) {
                 $retorno = false;
 
                 $objetivo = $this->usuario_objetivo;
@@ -43,7 +43,7 @@ class DoubleUsuarioObjetivoExecucao extends DoubleRecord
                     return $valor ?? 0;
                 });
 
-                DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 1', $usuario->id, "{$this->valor_lucro_prejuizo}  -{$this->valor_stop_loss} - {$this->valor_stop_win}");
+                // DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 1', $usuario->id, "{$this->valor_lucro_prejuizo}  -{$this->valor_stop_loss} - {$this->valor_stop_win}");
 
                 $ocorreu_stop_loss = -round($this->valor_stop_loss, 2) >= round($this->valor_lucro_prejuizo, 2);
                 $ocorreu_stop_win = round($this->valor_stop_win, 2) <= round($this->valor_lucro_prejuizo, 2);
@@ -61,15 +61,22 @@ class DoubleUsuarioObjetivoExecucao extends DoubleRecord
                     $usuario->robo_status = 'PARADO';
                     $usuario->save();
 
-                    $telegram = $usuario->canal->telegram;
-                    $telegram->sendMessage($usuario->chat_id, 'Execução do objetivo encerrada');
-                    if ($ocorreu_stop_win)
-                        $telegram->sendMessage($usuario->chat_id, 'Parabéns... Mais um objetivo conquistado.');
-                    else
-                        $telegram->sendMessage($usuario->chat_id, 'Não foi desta vez, não desanime vamos buscar a vitória.');
+                    if (!$cron)
+                    {
+                        $telegram = $usuario->canal->telegram;
+                        $telegram->sendMessage($usuario->chat_id, 'Execução do objetivo encerrada');
+                        if ($ocorreu_stop_win)
+                            $telegram->sendMessage($usuario->chat_id, 'Parabéns... Mais um objetivo conquistado.');
+                        else
+                            $telegram->sendMessage($usuario->chat_id, 'Não foi desta vez, não desanime vamos buscar a vitória.');
 
-                    if ($this->execucao < $objetivo->total_execucoes)
-                        $telegram->sendMessage($usuario->chat_id, "Faremos uma nova execução às {$d_prox->format('d/m/Y H:i:00')}");
+                        if ($this->execucao < $objetivo->total_execucoes)
+                            $telegram->sendMessage($usuario->chat_id, "Faremos uma nova execução às {$d_prox->format('d/m/Y H:i:00')}");
+                        else {
+                            $objetivo->usuario_objetivo->status = 'PARADO';
+                            $objetivo->usuario_objetivo->save();
+                        }
+                    }
 
                     $retorno = true;
                 }

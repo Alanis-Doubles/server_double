@@ -51,6 +51,7 @@ class DoubleIA:
         else:
             query += "   AND e.usuario_id IS NULL"
 
+        query += " ORDER BY ordem"
         try:
             rules_df = pd.read_sql_query(query, engine)
         except:

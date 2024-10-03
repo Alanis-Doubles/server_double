@@ -22,8 +22,8 @@ class TBlaze implements IDoublePlataforma
         $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'GET',
-            'https://blaze.com/api/roulette_games/current',
-            
+            // 'https://blaze.com/api/roulette_games/current',
+            'https://blaze.com/api/singleplayer-originals/originals/roulette_games/current/1',
             [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -52,8 +52,8 @@ class TBlaze implements IDoublePlataforma
         {
             $response = $client->request(
                 'GET',
-                'https://blaze.com/api/roulette_games/current',
-                
+                // 'https://blaze.com/api/roulette_games/current',
+                'https://blaze.com/api/singleplayer-originals/originals/roulette_games/current/1',
                 [
                     'headers' => [
                         'Content-Type' => 'application/json',
@@ -209,7 +209,8 @@ class TBlaze implements IDoublePlataforma
         {
             $response = $client->request(
                 'GET',
-                'https://blaze.com/api/roulette_games/current',
+                // 'https://blaze.com/api/roulette_games/current',
+                'https://blaze.com/api/singleplayer-originals/originals/roulette_games/current/1',
                 [
                     'headers' => [
                         'Content-Type' => 'application/json',
@@ -233,8 +234,25 @@ class TBlaze implements IDoublePlataforma
         if ($usuario->modo_treinamento == 'Y') 
             return '';
 
-
         $token_plataforma = self::getToken($usuario);
+
+        $response = $client->request(
+            'GET',
+            'https://blaze.com/api/users/me',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '. $token_plataforma
+                ]
+            ]
+        );
+
+        $content = json_decode($response->getBody()->getContents());
+        if ($response->getStatusCode() != 200) {
+            return $content->error->message;
+        } 
+        $user_name = $content->username;
 
         $response = $client->request(
             'GET',
@@ -256,13 +274,19 @@ class TBlaze implements IDoublePlataforma
         $payload = [
             'amount' => $valor,
             'color' => ['red' => 1, 'black' => 2, 'white' => 0][$cor],
+            'currency_type' => $content[0]->currency_type,
             'free_bet' => false,
-            'wallet_id' => $content[0]->id
+            'room_id' => 1,
+            'wallet_id' => $content[0]->id,
+            'user_name' => $user_name
         ];
 
+        $json_payload = json_encode($payload);
+        echo "url: https://blaze.com/api/singleplayer-originals/originals/roulette_bets\npayload: {$json_payload}\n";
         $response = $client->request(
             'POST',
-            'https://blaze.com/api/roulette_bets',
+            // 'https://blaze.com/api/roulette_bets',
+            'https://blaze.com/api/singleplayer-originals/originals/roulette_bets',
             [
                 'json' => $payload,
                 'headers' => [
@@ -275,9 +299,9 @@ class TBlaze implements IDoublePlataforma
 
         if ($response->getStatusCode() != 200) {
             $content = json_decode($response->getBody()->getContents());
-            if ($content->error->code == '1010') 
+            /*if ($content->error->code == '1010') 
                 return 'saldo_insuficiente';
-            elseif ($content->error->code == '1005') 
+            else*/if ($content->error->code == '1005') 
                 return 'saldo_insuficiente';
             else 
                 return $content->error->message;
@@ -287,14 +311,14 @@ class TBlaze implements IDoublePlataforma
     }
 
     public function buscar_sinais($param){
-        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
-        $serverName = DoubleConfiguracao::getConfiguracao('server_name');
-        $queue = strtolower("{$serverName}_{$plataforma->nome}_{$plataforma->idioma}_buscar_sinais");
+        // $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        // $serverName = DoubleConfiguracao::getConfiguracao('server_name');
+        // $queue = strtolower("{$serverName}_{$plataforma->nome}_{$plataforma->idioma}_buscar_sinais");
 
-        $redis = new RedisClient();
+        // $redis = new RedisClient();
 
         try {
-            $client = new WebSocketClient("wss://api-v2.blaze1.space/replication/?EIO=3&transport=websocket");
+            $client = new WebSocketClient("wss://api-gaming.blaze1.space/replication/?EIO=3&transport=websocket");
         
             $count_waiting = 0;
             $is_roll = false;
@@ -322,7 +346,7 @@ class TBlaze implements IDoublePlataforma
                                     continue;
                                 }
 
-                                $redis->publish($queue, 'Fazer entrada');
+                                // $redis->publish($queue, 'Fazer entrada');
 
                                 echo "Fazer entrada\n";
                                 $count_waiting += 1;
@@ -345,7 +369,7 @@ class TBlaze implements IDoublePlataforma
                                     'roll'  => $roll,
                                     'color' => $color
                                 ];
-                                $redis->publish($queue, json_encode($payload));
+                                // $redis->publish($queue, json_encode($payload));
 
                                 // Tratar os valores (exemplo: exibir no terminal)
                                 echo "\nId: $id\n";

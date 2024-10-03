@@ -224,6 +224,8 @@ class TDoubleCanalConsumer extends TDoubleRedis
             $canal = DoubleCanal::identificar($canal->id);
 
             $botao = [];
+            if ($plataforma->url_double)
+                $botao[] = [["text" => "Acessar Double",  "url" => $plataforma->url_double]];
             if ($plataforma->url_grupo_vip)
                 $botao[] = [["text" => $plataforma->translate->BOTAO_GRUPO_VIP,  "url" => $plataforma->url_grupo_vip]];
             if ($plataforma->url_cadastro)

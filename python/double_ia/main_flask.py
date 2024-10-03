@@ -7,6 +7,7 @@ app = Flask(__name__)
 def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping):
     double_ia = DoubleIA(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping)
 
+    estrategia_id_ant = estrategia_id
     last_number, last_color, next_color, pattern, estrategia_id = double_ia.prever()
     if last_number is None:
         return {"tipo": "NENHUM"}
@@ -16,7 +17,7 @@ def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuar
     if next_color == 'break':
         return {"tipo": "BREAK"}
 
-    if next_color == 'white':
+    if next_color == 'white' and estrategia_id == estrategia_id_ant:
         return {"tipo": "NENHUM"}
 
     payload_json = {
@@ -51,7 +52,15 @@ dados = {
         'estrategia_id': 197,
         'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
                           11: 'black', 12: 'black', 13: 'black', 14: 'black'}
-    }
+    },
+    'jonbet_doublerobo': {
+        "plataforma_id": 1,
+        'channel_id': -1002392375330,
+        'url_connection': 'mysql+mysqlconnector://jonbet_db_usr:A8bHtaT65PNXEjav@31.220.73.132/jonbet_db',
+        'estrategia_id': 1,
+        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
+                          11: 'black', 12: 'black', 13: 'black', 14: 'black'}
+    },
 }
 
 

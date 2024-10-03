@@ -262,10 +262,10 @@ class TDoubleCron
                 return DoubleUsuarioObjetivoExecucao::where('status', '=', 'EXECUTANDO')->load();
             });
 
-            DoubleErros::registrar(1, 'TDoubleCron', 'atualizar_objetivos 1', count($lista));
+            // DoubleErros::registrar(1, 'TDoubleCron', 'atualizar_objetivos 1', count($lista));
             // echo "Total de execuções ativas: " . count($lista) . "\n";
             foreach ($lista as $execucao) {
-                $execucao->atualizar_progresso();
+                $execucao->atualizar_progresso(true);
             }
 
             // inicia nova execução

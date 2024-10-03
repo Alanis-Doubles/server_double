@@ -6,46 +6,20 @@ use Ramsey\Uuid\Type\Integer;
 class TDoubleSinaisPublisher extends TDoubleRedis
 {
     private $ultimo_id = '';
-    private $queue;
     private $fazer_entrada;
-    private $pubsub;
 
     public function buscar_sinais(Int $plataforma_id, IDoublePlataforma $service)
     {
         try {
-            // $response = $service->sinalCorrente();
-            // $sinal = $response['data'];
-            // // echo "{$response['status_code']}\n" ;
-            // if ($response['status_code'] == 200) {
-            //     if ($sinal->status == 'rolling') {
-            //         if ($this->ultimo_id !== $sinal->id)
-            //         {
-            //             $this->ultimo_id = $sinal->id;
-            //             $json = [
-            //                 'plataforma_id' => $plataforma_id,
-            //                 'numero' => $sinal->roll,
-            //                 'cor' => $service->cores()[$sinal->roll],
-            //                 'id_referencia' => $sinal->id,
-            //                 'created_at' => (new DateTime())->format('Y-m-d H:i:s')
-            //             ];
-            //             return json_encode($json);
-            //         }
-            //     } elseif ($sinal->status == 'waiting') {
-            //         return 'fazer_entrada';
-            //     }
-            // }
-
-            foreach ($this->pubsub as $message) {
-                $message = (object) $message;
-    
-                if ($message->kind === 'message') {
-                    echo "received message: {$message->channel} - {$message->payload}\n";
-
-                    // Se houver uma nova notificação, adiciona à lista
-                    if ($message->payload === 'Fazer entrada') 
-                        return 'fazer_entrada';
-                    else {
-                        $sinal = json_decode($message->payload);
+            echo "Aguardando sinal corrente\n";
+            $response = $service->sinalCorrente();
+            $sinal = $response['data'];
+            $jon_response = json_encode($response);
+            echo "{$jon_response}\n" ;
+            if ($response['status_code'] == 200) {
+                if ($sinal->status == 'rolling') {
+                    if ($this->ultimo_id !== $sinal->id)
+                    {
                         $this->ultimo_id = $sinal->id;
                         $json = [
                             'plataforma_id' => $plataforma_id,
@@ -56,9 +30,15 @@ class TDoubleSinaisPublisher extends TDoubleRedis
                         ];
                         return json_encode($json);
                     }
+                } elseif ($sinal->status == 'waiting') {
+                    return 'fazer_entrada';
                 }
             }
         } catch (\Throwable $th) {
+            $message_erro = $th->getMessage();
+            $trace = $th->getTraceAsString();
+            echo "Error:  {$message_erro}\n";
+            echo "Trace:  {$trace}\n";
             DoubleErros::registrar($plataforma_id, 'TDoubleSinaisPublisher', 'buscar_sinais', $th->getMessage());
         }
         return null;
@@ -96,24 +76,18 @@ class TDoubleSinaisPublisher extends TDoubleRedis
         $redis->set($this->fazer_entrada, $value);
         if ($value) {
             $redis->publish($channel_name, json_encode(['fazer_entrada' => true]));
-            // echo "Fazer entrada\n";
+            echo "Fazer entrada\n";
         }
     }
 
     public function run($param){
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
         $service = $plataforma->service;
-        $this->queue = strtolower("{$this->serverName()}_{$plataforma->nome}_{$plataforma->idioma}_buscar_sinais");
         $this->fazer_entrada = strtolower("{$this->serverName()}_{$plataforma->nome}_{$plataforma->idioma}_fazer_entrada");
-
-        $redis = new Client();
-        $this->pubsub = $redis->pubSubLoop();
 
         $plataforma->statusSinais = 'INICIANDO';
         sleep(5);
         $plataforma->statusSinais = 'EXECUTANDO';
-
-        $this->pubsub->subscribe($this->queue);
 
         while ($plataforma->statusSinais == 'EXECUTANDO') {
             $sinais = $this->buscar_sinais($plataforma->id, $service);

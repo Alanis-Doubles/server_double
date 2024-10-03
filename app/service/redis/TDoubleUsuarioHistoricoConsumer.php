@@ -1,6 +1,7 @@
 <?php
 
 use Predis\Client;
+use GuzzleHttp\Client as GuzzleClient;
 
 class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
 {
@@ -43,7 +44,32 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 $cor_result = TRedisUtils::getCor($object->cor, $usuario->plataforma->translate);
                 $lucro = $object->lucro;
                 $banca = $object->banca;
+
+                // $lucro = $usuario->lucro;
+                // if ($object->tipo == 'WIN')
+                //     $valor = $object->valor;
+                // else
+                //     $valor = -1 * ($object->valor + $object->valor_branco);
+
+                // if ($usuario->modo_treinamento == 'Y') {
+                //     $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                //         return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                //             ->where('created_at', '>=', $usuario->robo_inicio)
+                //             ->sumBy('valor', 'total');
+                //     }) ?? 0;
         
+                //     $lucro += $valor;
+                //     // DoubleErros::registrar(1, 'usuario', 'lucro', $lucro);
+                //     $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
+                //     $lucro = number_format($lucro, 2, ',', '.');
+                // } else {
+                //     sleep(10);
+                //     $lucro += $valor;
+                //     $saldo = $usuario->plataforma->service->saldo($usuario);
+                //     $banca = number_format($saldo, 2, ',', '.');
+                //     $lucro = number_format($lucro, 2, ',', '.');
+                // }
+
                 $botao = [];
                 if ($usuario->plataforma->url_sala_sinais)
                     $botao[] = [["text" => $usuario->plataforma->translate->BOTAO_SALA_SINAIS,  "url" => $usuario->plataforma->url_sala_sinais]];
@@ -54,19 +80,69 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 if ($usuario->plataforma->url_suporte)
                     $botao[] = [["text" => $usuario->plataforma->translate->MSG_SINAIS_SUPORTE,  "url" => $usuario->plataforma->url_suporte]];
                 
+                $dados_resumo = TUtils::openConnection('double', function() use ($usuario) {
+                    return TDashboardUsuarioService::getStatusUsuario($usuario);
+                });
+                
+                $dados_resumo = json_decode($dados_resumo);
+                $assertividade = number_format($dados_resumo->total_win / ($dados_resumo->total_win + $dados_resumo->total_loss) * 100, 2, ',', '.');
+                $msg_resumo = "\n\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n\n📈 Assertividade: {$assertividade}%\n\n⬆ Maior Entrada R$ {$dados_resumo->maior_entrada}";
+                
+                if ($usuario->status_objetivo == 'EXECUTANDO') {
+                    $msg_resumo .= "\n\n" . $usuario->usuario_objetivo->progresso;
+                }
+                echo "$msg_resumo\n";
+
+                $mensagem = str_replace(
+                    ['{cor}', '{lucro}', '{banca}'],
+                    [$cor_result, $lucro, $banca],
+                    $usuario->plataforma->translate->MSG_BET_10 . $msg_resumo
+                );
+
                 TRedisUtils::sendMessage(
                     $usuario->chat_id, 
                     $usuario->canal->telegram_token, 
-                    str_replace(
-                        ['{cor}', '{lucro}', '{banca}'],
-                        [$cor_result, $lucro, $banca],
-                        $usuario->plataforma->translate->MSG_BET_10
-                    ),
+                    $mensagem,
                     [
                         "resize_keyboard" => true, 
                         "inline_keyboard" => $botao
                     ]
                 );
+
+                if ($usuario->webhook)
+                {
+                    if ($object->tipo === 'WIN')
+                        $mensagem = "✅ Win\n\n$mensagem";
+                    else
+                        $mensagem = "❌ Loss\n\n$mensagem";
+
+                    $client = new GuzzleClient();
+                    $client->post(
+                        $usuario->webhook,
+                        [
+                            'json' => json_encode(
+                                [
+                                    'plataforma' => $usuario->canal->plataforma->nome,
+                                    'mensagem' => $mensagem
+                                ]
+                            )
+                        ]
+                    );
+                }
+
+                // $dados_resumo = TUtils::openConnection('double', function() use ($usuario) {
+                //     return TDashboardUsuarioService::getStatusUsuario($usuario);
+                // });
+                
+                // $dados_resumo = json_decode($dados_resumo);
+                // $msg_resumo = "Resumo\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n⬆ Maior Entrada R$ {$dados_resumo->maior_entrada}";
+                // echo "$msg_resumo\n";
+
+                // TRedisUtils::sendMessage(
+                //     $usuario->chat_id, 
+                //     $usuario->canal->telegram_token, 
+                //     $msg_resumo
+                // );
             }
         };
 
@@ -76,7 +152,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
         //         $callback($message);
         //     }
         // } 
-         
+        echo "iniciando\n";
         while (true) {
             try {
                 $message = $redis->brpop($channel_name, 0); 

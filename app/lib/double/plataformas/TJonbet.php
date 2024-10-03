@@ -205,6 +205,24 @@ class TJonbet implements IDoublePlataforma
 
         $response = $client->request(
             'GET',
+            'https://jon.bet/api/users/me',
+            [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                    'Authorization' => 'Bearer '. $token_plataforma
+                ]
+            ]
+        );
+
+        $content = json_decode($response->getBody()->getContents());
+        if ($response->getStatusCode() != 200) {
+            return $content->error->message;
+        } 
+        $user_name = $content->username;
+
+        $response = $client->request(
+            'GET',
             'https://jon.bet/api/wallets',
             [
                 'headers' => [
@@ -226,9 +244,12 @@ class TJonbet implements IDoublePlataforma
             'currency_type' => $content[0]->currency_type,
             'free_bet' => false,
             'room_id' => 1,
-            'wallet_id' => $content[0]->id
+            'wallet_id' => $content[0]->id,
+            'user_name' => $user_name
         ];
 
+        $json_payload = json_encode($payload);
+        echo "url: https://jon.bet/api/singleplayer-originals/originals/roulette_bets\npayload: {$json_payload}\n";
         $response = $client->request(
             'POST',
             'https://jon.bet/api/singleplayer-originals/originals/roulette_bets',

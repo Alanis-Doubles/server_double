@@ -58,12 +58,13 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         ));
 
         $response = curl_exec($curl);
-        // echo "python: {$response}\n";
+        echo "python: {$response}\n";
         $http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         curl_close($curl);
 
         if ($http_status == 200) {
+            echo "python: {$response}\n";
             $historico = json_decode($response);
 
             $json = null;
@@ -100,6 +101,9 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
     private function processar_sinais($usuario, $cor_esperada, $entrada_id, $estrategia_id) {
         $canal = $usuario->canal;
         $plataforma = $canal->plataforma;
+        $estrategia = TUtils::openFakeConnection('double', function() use ($estrategia_id){
+            return new DoubleEstrategia($estrategia_id, false);
+        });
         $protecao = 0;
         foreach ($this->pubsub as $message) {
             $message = (object) $message;
@@ -131,7 +135,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                         ];
                         $this->notificar_consumidores($output);
                         break;
-                    } elseif ($canal->protecoes == $protecao) {
+                    } elseif ($estrategia->protecoes == $protecao) {
                         $object->entrada_id = $entrada_id;
                         $object->tipo = 'LOSS';
                         $object->protecao = $protecao;
@@ -176,7 +180,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
     private function gerar_sinais($usuario){
         $canal = $usuario->canal;
         $output = $this->gerar_entrada($usuario);
-        // echo "Tipo: {$output['tipo']}\n";
+        echo "Tipo: {$output['tipo']}\n";
         if ($output) {
             if ($output['tipo'] !== 'ENTRADA')
                 return;
@@ -197,7 +201,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         $usuario = DoubleUsuario::identificarPorId($param['usuario_id']);
 
         $channel_name = strtolower("{$this->serverName()}_{$usuario->canal->plataforma->nome}_{$usuario->canal->plataforma->idioma}_sinais");
-
+        
         $redis = new Client();
         $this->pubsub = $redis->pubSubLoop();
         $this->pubsub->subscribe($channel_name);
@@ -225,17 +229,20 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                 echo "O PID extraído é: {$pid_supervidor} \n";
 
                 // Processo que será procurado
-                $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}&server_name={$this->serverName()}";
+                $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
 
                 // Comando para obter todos os PIDs do processo
                 $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\'';
 
                 // Executa o comando e captura os PIDs
                 $output = shell_exec($command);
-
-                // Remove espaços em branco e transforma a saída em um array
-                $pids = array_filter(explode("\n", trim($output)));
-
+                
+                if (empty($output))
+                    $pids = [];
+                else
+                    // Remove espaços em branco e transforma a saída em um array
+                    $pids = array_filter(explode("\n", trim($output)));
+                
                 // Verifica e mata os PIDs que não são 123
                 foreach ($pids as $pid) {
                     // Remove espaços em branco ao redor do PID e verifica se não é vazio
@@ -260,6 +267,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
             try {
                 foreach ($this->pubsub as $message) {
                     $message = (object) $message;
+                    echo "received message: {$message->channel} - {$message->payload}\n";
         
                     if ($message->kind === 'message') {
                         if ($usuario->roboStatus == 'EXECUTANDO')  {

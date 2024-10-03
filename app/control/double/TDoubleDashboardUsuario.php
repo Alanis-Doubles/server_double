@@ -370,7 +370,7 @@ class TDoubleDashboardUsuario extends TPage
             ]
         );
 
-        $btn = $this->form->addAction('💾 Salvar', new TAction([$this, 'onSave'], $param), '');
+        $btn = $this->form->addAction('💾 Salvar', new TAction([$this, 'questionaSalvar'], $param), '');
         $btn->class = 'btn btn-sm btn-primary';
 
         $dropdown = new TDropDown('🚀 Iniciar Robô');
@@ -382,7 +382,7 @@ class TDoubleDashboardUsuario extends TPage
         $dropdown->addAction( '🚀 Iniciar Após STOP WIN ou STOP LOSS', $this->serilizeAction([$this, 'onIniciarRobo'], ['apos_loss' => 1]) );
         $this->form->addFooterWidget( $dropdown );
 
-        $btn = $this->form->addAction('⏹️ Parar Robô', new TAction([$this, 'onPararRobo']), '');
+        $btn = $this->form->addAction('⏹️ Parar Robô', new TAction([$this, 'questionaParar']), '');
         $btn->id = 'btn_parar';
         $btn->style = 'display: none';
         $btn->class = 'btn btn-sm btn-danger';
@@ -472,6 +472,21 @@ class TDoubleDashboardUsuario extends TPage
 
         // TScript::create('atualiza_configuracao()', TRUE, 1000);
     }
+
+    public function questionaSalvar($param) {
+        $message = 'Tem certeza que deseja salvar a configuração?';
+        $action = new TAction([$this, 'onSave'], $param);
+        
+        new TQuestion($message, $action);
+    }
+
+    public function questionaParar($param) {
+        $message = 'Tem certeza que deseja parar a execução?';
+        $action = new TAction([$this, 'onPararRobo']);
+        
+        new TQuestion($message, $action);
+    }
+
 
     public function doCopiarEstrategia($param) {
         try {
