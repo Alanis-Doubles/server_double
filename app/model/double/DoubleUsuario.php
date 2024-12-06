@@ -96,6 +96,7 @@ class DoubleUsuario extends DoubleRecord
         unset($this->nome);
         unset($this->nome_usuario);
         unset($this->nome_email);
+        unset($this->email);
         
         parent::store();
     }
@@ -284,47 +285,74 @@ class DoubleUsuario extends DoubleRecord
     public function valorJogada($estrategia_id)
     {
         $valor = $this->valor;
-        if ($this->metas == 'Y' and $this->usuario_meta)
-            $valor = $this->usuario_meta->valor_real_entrada;
-
+        // if ($this->metas == 'Y' and $this->usuario_meta)
+        //     $valor = $this->usuario_meta->valor_real_entrada;
 
         if ($this->ciclo != 'N') {
             $result = TUtils::openFakeConnection('double', function () {
                 return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                     ->where('sequencia', '=', $this->robo_sequencia)
                     ->where('tipo', 'IN', ['WIN', 'LOSS'])
-                    ->select(['valor', 'created_at'])
+                    ->select(['valor', 'created_at', 'valor_entrada'])
                     ->last();
             });
 
             if ($result)
                 if ($result->valor < 0) {
-                    if ($this->protecao_branco == 'N')
-                        $fator_multiplicador = $this->fator_multiplicador;
-                    else 
-                        $fator_multiplicador = 2.5 * 0.83333;
+                    // if ($this->protecao_branco == 'N')
+                    $fator_multiplicador = $this->fator_multiplicador;
+                    // else 
+                    //     $fator_multiplicador = 2.5 * 0.83333;
 
-                    if ($estrategia_id) {
-                        $estrategia = TUtils::openFakeConnection('double', function() use ($estrategia_id){
-                            return new DoubleEstrategia($estrategia_id, false);
-                        });
+                    // if ($estrategia_id) {
+                    //     $estrategia = TUtils::openFakeConnection('double', function() use ($estrategia_id){
+                    //         return new DoubleEstrategia($estrategia_id, false);
+                    //     });
 
-                        if ($estrategia and $estrategia->resetar_valor_entrada == 'A_CADA_HORA') {
-                            $date = date_create_from_format('Y-m-d H:i:s', $result->created_at);
-                            $now = new DateTime();
+                    //     if ($estrategia and $estrategia->resetar_valor_entrada == 'A_CADA_HORA') {
+                    //         $date = date_create_from_format('Y-m-d H:i:s', $result->created_at);
+                    //         $now = new DateTime();
 
-                            if ($now->format('H') > $date->format('H'))
-                                $valor_novo = $valor;
-                            else
-                                $valor_novo = round($result->valor * -$fator_multiplicador, 2);
-                        }
-                        elseif ($estrategia and $estrategia->resetar_valor_entrada == 'SEMPRE')
-                            $valor_novo = $valor;
-                        else
-                            $valor_novo = round($result->valor * -$fator_multiplicador, 2);
-                    }    
-                    else
-                        $valor_novo = round($result->valor * -$fator_multiplicador, 2);
+                    //         if ($now->format('H') > $date->format('H'))
+                    //             $valor_novo = $valor;
+                    //         else
+                    //             $valor_novo = round($result->valor_entrada * $fator_multiplicador, 2);
+                    //     }
+                    //     elseif ($estrategia and $estrategia->resetar_valor_entrada == 'SEMPRE')
+                    //         $valor_novo = $valor;
+                    //     else
+                    //         $valor_novo = round($result->valor_entrada * $fator_multiplicador, 2);
+                    // }    
+                    // else
+                    $valor_novo = round($result->valor_entrada * $fator_multiplicador, 2);
+
+                    return $valor_novo;
+                }
+                else
+                    return $valor;
+            else
+                return $valor;
+        } else
+            return $valor;
+    }
+
+    public function valorJogadaBranco()
+    {
+        $valor = $this->valor_branco;
+
+        if ($this->ciclo != 'N') {
+            $result = TUtils::openFakeConnection('double', function () {
+                return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
+                    ->where('sequencia', '=', $this->robo_sequencia)
+                    ->where('tipo', 'IN', ['WIN', 'LOSS'])
+                    ->select(['valor', 'created_at', 'valor_branco'])
+                    ->last();
+            });
+
+            if ($result)
+                if ($result->valor < 0) {
+                    $fator_multiplicador = $this->fator_multiplicador_branco;
+                    $valor_novo = round($result->valor_branco * $fator_multiplicador, 2);
 
                     return $valor_novo;
                 }
@@ -340,7 +368,8 @@ class DoubleUsuario extends DoubleRecord
     {
         $result = TUtils::openFakeConnection('double', function() {
             return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
-                ->where('sequencia', '=', $this->robo_sequencia)
+                // ->where('sequencia', '=', $this->robo_sequencia)
+                ->where('created_at', '>=', $this->robo_inicio)
                 ->sumBy('valor', 'total');
         });
         

@@ -11,6 +11,7 @@ class TDoubleSinaisPublisher extends TDoubleRedis
     public function buscar_sinais(Int $plataforma_id, IDoublePlataforma $service)
     {
         try {
+            sleep(1);
             echo "Aguardando sinal corrente\n";
             $response = $service->sinalCorrente();
             $sinal = $response['data'];
@@ -26,7 +27,9 @@ class TDoubleSinaisPublisher extends TDoubleRedis
                             'numero' => $sinal->roll,
                             'cor' => $service->cores()[$sinal->roll],
                             'id_referencia' => $sinal->id,
-                            'created_at' => (new DateTime())->format('Y-m-d H:i:s')
+                            'created_at' => (new DateTime())->format('Y-m-d H:i:s'),
+                            'fator' => $sinal->factor,
+                            'dice' => $sinal->dice
                         ];
                         return json_encode($json);
                     }
@@ -55,6 +58,8 @@ class TDoubleSinaisPublisher extends TDoubleRedis
             $sinal->numero = $object->numero;
             $sinal->cor = $object->cor;
             $sinal->id_referencia = $object->id_referencia;
+            $sinal->fator = $object->fator;
+            $sinal->dice = $object->dice;
             $sinal->save();
 
             return json_encode($sinal->toArray());
@@ -100,7 +105,7 @@ class TDoubleSinaisPublisher extends TDoubleRedis
             } else {
                 $this->notificar_fazer_entrada(false, $plataforma);
             }
-            sleep(2); 
+            // sleep(2); 
         }
         $this->notificar_consumidores($plataforma, '');
 

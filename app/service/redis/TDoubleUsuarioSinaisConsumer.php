@@ -28,6 +28,12 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                 $object->entrada_id = $historico['entrada_id'];
             if (isset($historico['gale']))
                 $object->gale = $historico['gale'];
+
+            if (isset($historico['fator']))
+                $object->fator = $historico['fator'];
+            if (isset($historico['dice']))
+                $object->dice = $historico['dice'];
+            
             $object->save();
 
             return $object->toArray();
@@ -42,7 +48,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         return $historico_canal;
     }
 
-    private function gerar_entrada($usuario) {
+    private function gerar_entrada($usuario, $sinal) {
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');
         $curl = curl_init();
 
@@ -63,14 +69,18 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
 
         curl_close($curl);
 
+        $json = null;
+
         if ($http_status == 200) {
-            echo "python: {$response}\n";
+            // echo "python: {$response}\n";
             $historico = json_decode($response);
 
-            $json = null;
             if (json_last_error() === JSON_ERROR_NONE) {
                 if ($historico->tipo == 'ENTRADA')
                 {
+                    if (!$historico->cor)
+                        return null;
+
                     $json = [
                         'plataforma_id' => $usuario->canal->plataforma->id,
                         'canal_id' => $usuario->canal->id,
@@ -80,6 +90,8 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                         'tipo' => 'ENTRADA',
                         'numero' => $historico->numero,
                         'usuario_id' => $usuario->id,
+                        'fator' => $sinal->fator,
+                        'dice' => $sinal->dice
                     ];
                 } else 
                 {
@@ -116,7 +128,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                     $object->estrategia_id = $estrategia_id;
                     $win = $object->cor == $cor_esperada;
 
-                    if (!$win and $canal->protecao_branco == 'Y')
+                    if (!$win and $estrategia->protecao_branco == 'Y')
                         $win = $object->cor == 'white';
                     if ($win) {
                         $object->entrada_id = $entrada_id;
@@ -131,7 +143,9 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'gale' => $object->protecao,
                             'entrada_id' => $object->entrada_id,
                             'estrategia_id' => $object->estrategia_id,
-                            'usuario_id' => $usuario->id
+                            'usuario_id' => $usuario->id,
+                            'fator' => $object->fator,
+                            'dice' => $object->dice
                         ];
                         $this->notificar_consumidores($output);
                         break;
@@ -148,7 +162,9 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'gale' => $object->protecao,
                             'entrada_id' => $object->entrada_id,
                             'estrategia_id' => $object->estrategia_id,
-                            'usuario_id' => $usuario->id
+                            'usuario_id' => $usuario->id,
+                            'fator' => $object->fator,
+                            'dice' => $object->dice
                         ];
                         $this->notificar_consumidores($output);
                         break;
@@ -165,7 +181,9 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                             'gale' => $object->protecao,
                             'entrada_id' => $object->entrada_id,
                             'estrategia_id' => $object->estrategia_id,
-                            'usuario_id' => $usuario->id
+                            'usuario_id' => $usuario->id,
+                            'fator' => $object->fator,
+                            'dice' => $object->dice
                         ];
                         $this->notificar_consumidores($output);
                         $protecao += 1;
@@ -177,11 +195,12 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
         }
     }
 
-    private function gerar_sinais($usuario){
+    private function gerar_sinais($usuario, $sinal){
         $canal = $usuario->canal;
-        $output = $this->gerar_entrada($usuario);
-        echo "Tipo: {$output['tipo']}\n";
+        $output = $this->gerar_entrada($usuario, $sinal);
+        
         if ($output) {
+            echo "Tipo: {$output['tipo']}\n";
             if ($output['tipo'] !== 'ENTRADA')
                 return;
 
@@ -202,7 +221,10 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
 
         $channel_name = strtolower("{$this->serverName()}_{$usuario->canal->plataforma->nome}_{$usuario->canal->plataforma->idioma}_sinais");
         
-        $redis = new Client();
+        $redis = new Client([
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         $this->pubsub = $redis->pubSubLoop();
         $this->pubsub->subscribe($channel_name);
 
@@ -272,7 +294,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
                     if ($message->kind === 'message') {
                         if ($usuario->roboStatus == 'EXECUTANDO')  {
                             echo "received message: {$message->channel} - {$message->payload}\n";
-                            $this->gerar_sinais($usuario);
+                            $this->gerar_sinais($usuario, json_decode($message->payload));
                         } 
                     }
                 }    
@@ -285,41 +307,30 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
             }
         } else 
         {
-            while (true)
-            {
-                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'roboStatus', $usuario->roboStatus);
-                if ($usuario->roboStatus !== 'EXECUTANDO') {
-                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'sair');
-                    break;
-                }
-
-                try {
-                    foreach ($this->pubsub as $message) {
-                        $message = (object) $message;
-            
-                        if ($message->kind === 'message') {
-                            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $message->kind, $usuario->roboStatus);
-                            if ($usuario->roboStatus == 'EXECUTANDO')  {
-                                // echo "received message: {$message->channel} - {$message->payload}\n";
-                                $this->gerar_sinais($usuario);
-                            } else {
-                                DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saindo');
-                                $this->pubsub->unsubscribe(($channel_name));
-                                break;
-                            }
+            try {
+                foreach ($this->pubsub as $message) {
+                    $message = (object) $message;
+        
+                    if ($message->kind === 'message') {
+                        if ($usuario->roboStatus == 'EXECUTANDO')  {
+                            echo "received message: {$message->channel} - {$message->payload}\n";
+                            $this->gerar_sinais($usuario, json_decode($message->payload));
+                        } else {
+                            $this->pubsub->unsubscribe(($channel_name));
+                            break;
                         }
-                        // break;
-                    }    
-                } catch (\Throwable $th) {
-                    $trace = ''; //json_encode($th->getTrace());
-                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', $th->getMessage(), $trace);
-
-                    $redis = new Client();
-                    $this->pubsub = $redis->pubSubLoop();
-                    $this->pubsub->subscribe($channel_name);
-                }
-            }    
-            DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioSinaisConsumer', 'run', 'saiu');
+                    }
+                    // break;
+                }    
+            } catch (\Throwable $th) {
+                $trace = ''; //json_encode($th->getTrace());
+                $redis = new Client([
+                    'persistent' => true,
+                    'read_write_timeout' => -1
+                ]);
+                $this->pubsub = $redis->pubSubLoop();
+                $this->pubsub->subscribe($channel_name);
+            }
         }
     }
 } 

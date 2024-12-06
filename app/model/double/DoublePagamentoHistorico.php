@@ -73,7 +73,7 @@ class DoublePagamentoHistorico extends DoubleRecord
                 $plataforma = $usuario->plataforma;
 
                 if ($usuario->status == 'INATIVO') {
-                    $telegram = $plataforma->telegram;
+                    $telegram = $usuario->canal->telegram;
                     $telegram->sendMessage(
                         $usuario->chat_id,
                         str_replace(
@@ -108,7 +108,7 @@ class DoublePagamentoHistorico extends DoubleRecord
                                 ] 
                             ];
 
-                    $telegram = $plataforma->telegram;
+                    $telegram = $usuario->canal->telegram;
                     $telegram->sendMessage(
                         $usuario->chat_id,
                         str_replace(
@@ -166,7 +166,7 @@ class DoublePagamentoHistorico extends DoubleRecord
                             ] 
                         ];
 
-                $telegram = $plataforma->telegram;
+                $telegram = $usuario->canal->telegram;
                 $telegram->sendMessage(
                     $usuario->chat_id,
                     str_replace(
@@ -182,7 +182,7 @@ class DoublePagamentoHistorico extends DoubleRecord
                 $usuario->save();
 
                 $plataforma = $usuario->plataforma;
-                $telegram = $plataforma->telegram;
+                $telegram = $usuario->canal->telegram;
                 $telegram->sendMessage(
                     $usuario->chat_id,
                     str_replace(

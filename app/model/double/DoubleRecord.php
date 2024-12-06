@@ -1,6 +1,7 @@
 <?php
 
 use Adianti\Database\TRecord;
+use Adianti\Database\TTransaction;
 
 class DoubleRecord extends TRecord
 {
@@ -64,11 +65,16 @@ class DoubleRecord extends TRecord
 
                 $sql = "UPDATE " . $this->getEntity() . " SET $setPart WHERE $primaryKey = :$primaryKey";
 
-                TUtils::openConnection('double', function() use ($sql, $params){
-                    $conn = TTransaction::get();
+                $conn = TTransaction::get();
+                if ($conn) {
                     $stmt = $conn->prepare($sql);
                     $stmt->execute($params);
-                });
+                } else
+                    TUtils::openConnection('double', function() use ($sql, $params){
+                        $conn = TTransaction::get();
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute($params);
+                    });
                 
             }
         }

@@ -85,7 +85,7 @@ class TDoubleCron
                 $recuperacao->recuperacao_mensagem_id = $value['recuperacao_mensagem_id'];
                 $recuperacao->save();
 
-                $telegram = $usuario->plataforma->telegram;
+                $telegram = $usuario->canal->telegram;
                 $msg = str_replace(
                     ['{usuario}'], 
                     [$usuario->nome], 
@@ -175,7 +175,7 @@ class TDoubleCron
             $id = TUtils::openFakeConnection('double', function() use ($value){
                 $usuario = new DoubleUsuario($value['usuario_id'], false);
 
-                $telegram = $usuario->plataforma->telegram;
+                $telegram = $usuario->canal->telegram;
                 $msg = str_replace(
                     ['{usuario}'], 
                     [$usuario->nome], 

@@ -52,6 +52,15 @@ class DoubleCanal extends DoubleRecord
         });
     }
 
+    public function enviarSinais()
+    {
+        $canal = TUtils::openFakeConnection('double', function() {
+            return  new self($this->id, false);
+        });
+        
+        return $canal->envia_sinais_telegram == 'Y';
+    }
+
     public function get_inicioSinais()
     {
         $canal = TUtils::openFakeConnection('double', function() {

@@ -8,7 +8,10 @@ class TDoubleHistoricoConsumer extends TDoubleRedis
     {
         $channel_name = strtolower("{$this->serverName()}_canal_historico");
        
-        $redis = new Client();
+        $redis = new Client([
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         $pubsub = $redis->pubSubLoop();
 
         $pubsub->subscribe($channel_name);
@@ -84,15 +87,16 @@ class TDoubleHistoricoConsumer extends TDoubleRedis
             if ($total > 0)
                 $percentual = round((($win + $branco) / $total) * 100, 1);
 
-            TRedisUtils::sendMessage(
-                $canal->channel_id,
-                $canal->telegram_token,
-                str_replace(
-                    ['{win}', '{loss}', '{percentual}'],
-                    [$win + $branco, $loss, $percentual],
-                    $canal->plataforma->translate->MSG_SINAIS_PARCIAL_DIA,
-                ),
-            );
+            if ($canal->enviarSinais())
+                TRedisUtils::sendMessage(
+                    $canal->channel_id,
+                    $canal->telegram_token,
+                    str_replace(
+                        ['{win}', '{loss}', '{percentual}'],
+                        [$win + $branco, $loss, $percentual],
+                        $canal->plataforma->translate->MSG_SINAIS_PARCIAL_DIA,
+                    ),
+                );
 
             $acertos = $win - $loss;
             $valor = ($acertos * 20);
@@ -103,15 +107,16 @@ class TDoubleHistoricoConsumer extends TDoubleRedis
             {
                 $valor = number_format($valor, 2, ',', '.');
                 
-                TRedisUtils::sendMessage(
-                    $canal->channel_id,
-                    $canal->telegram_token,
-                    str_replace(
-                        ['{valor}'],
-                        [$valor],
-                        $canal->plataforma->translate->MSG_SINAIS_PROJECAO,
-                    ),
-                );
+                if ($canal->enviarSinais())
+                    TRedisUtils::sendMessage(
+                        $canal->channel_id,
+                        $canal->telegram_token,
+                        str_replace(
+                            ['{valor}'],
+                            [$valor],
+                            $canal->plataforma->translate->MSG_SINAIS_PROJECAO,
+                        ),
+                    );
             }
         }
     }

@@ -46,7 +46,7 @@ class TDoubleCanalList extends TCustomStandardList
                     'name'   => 'nome',
                     'label'  => 'Nome',
                     'widget' => ['class' => 'TEntry', 'operator' => '='],
-                    'column' => ['width' => '50%', 'align' => 'left', 'order' => true]
+                    'column' => ['width' => '45%', 'align' => 'left', 'order' => true]
                 ],
                 [
                     'name'   => 'channel_id',
@@ -67,15 +67,21 @@ class TDoubleCanalList extends TCustomStandardList
                     'column' => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_ativo'])]
                 ],
                 [
-                    'name'   => 'status_sinais',
-                    'label'  => 'Status',
-                    'widget' => ['class'  => 'TCombo', 'operator' => '=', 'items' => $this->status],
-                    'column' => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_status'])]
+                    'name'   => 'envia_sinais_telegram',
+                    'label'  => 'Enviar sinais',
+                    'widget' => ['class'  => 'TCombo', 'operator' => '=', 'items' => ['Y' => 'Sim', 'N' => 'Não']],
+                    'column' => ['width' => '15%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_envia_sinais'])]
                 ],
+                // [
+                //     'name'   => 'status_sinais',
+                //     'label'  => 'Status',
+                //     'widget' => ['class'  => 'TCombo', 'operator' => '=', 'items' => $this->status],
+                //     'column' => ['width' => '10%', 'align' => 'center', 'order' => true, 'transformer' => Closure::fromCallable([$this, 'transform_status'])]
+                // ],
             ],
-            'actions' => [
-                'actExecutar'  => ['label' => 'Executar/Parar serviço', 'image' => 'fas:play-circle red', 'fields' => ['id', '*'], 'action' => [$this, 'doExecutarServico'], 'action_params' =>  ['register_state' => 'false']],
-            ]
+            // 'actions' => [
+            //     'actExecutar'  => ['label' => 'Executar/Parar serviço', 'image' => 'fas:play-circle red', 'fields' => ['id', '*'], 'action' => [$this, 'doExecutarServico'], 'action_params' =>  ['register_state' => 'false']],
+            // ]
         ]);
         
     }
@@ -111,17 +117,22 @@ class TDoubleCanalList extends TCustomStandardList
         return $this->transform_sim_nao($value, $object, 'ativo', $cell);
     }
 
+    public function transform_envia_sinais($value, $object, $row, $cell)
+    {
+        return $this->transform_sim_nao($value, $object, 'envia_sinais_telegram', $cell);
+    }
+
     public function transform_sim_nao($value, $object, $field, $cell)
     {
         $cell->href = '#';
         $dropdown = new TDropDown(((empty($value) || $value == 'N') ? 'Não' : 'Sim'), '');
         $dropdown->getButton()->style .= ';color:white;border-radius:5px;background:' . ((empty($value) || $value == 'N') ? '#dd4b39' : '#00a65a');
 
-        $addOpcao = function ($id, $nome, $valor, $cor) use ($dropdown)
+        $addOpcao = function ($id, $nome, $valor, $cor) use ($dropdown, $field)
         {
             $params = [
                 'id' => $id,
-                'campo' => 'ativo',
+                'campo' => $field,
                 'valor' => $valor,
                 'offset' => $_REQUEST['offset'] ?? 0,
                 'limit' => $_REQUEST['limit'] ?? 10,

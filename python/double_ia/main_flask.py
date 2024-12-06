@@ -4,8 +4,8 @@ from DoubleIA import DoubleIA
 app = Flask(__name__)
 
 
-def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping):
-    double_ia = DoubleIA(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping)
+def prever_sinal(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping, probabilidade):
+    double_ia = DoubleIA(plataforma_id, channel_id, url_connection, estrategia_id, usuario_id, color_mapping, probabilidade)
 
     estrategia_id_ant = estrategia_id
     last_number, last_color, next_color, pattern, estrategia_id = double_ia.prever()
@@ -38,9 +38,8 @@ dados = {
         'channel_id': -1001908999841,
         'url_connection': 'mysql+mysqlconnector://app_usr:MjXx2QjjlQcua88r@82.112.244.136/app_turbocash',
         'estrategia_id': 1,
-        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'red', 9: 'red', 10: 'red',
-                          11: 'black', 12: 'black', 13: 'black', 14: 'black', 15: 'black', 16: 'black', 17: 'black', 18: 'black', 19: 'black',
-                          20: 'black'}
+        'color_mapping': {0: 'white', 1: 'black', 2: 'red'},
+        'probabilidade': 0.60
     },
     'speed_green': {
         "plataforma_id": 3
@@ -50,8 +49,8 @@ dados = {
         'channel_id': -1002093089587,
         'url_connection': 'mysql+mysqlconnector://root@localhost/double_joao',
         'estrategia_id': 197,
-        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
-                          11: 'black', 12: 'black', 13: 'black', 14: 'black'}
+        'color_mapping': {0: 'white', 1: 'black', 2: 'red'},
+        'probabilidade': 0.60
     },
     'jonbet_doublerobo': {
         "plataforma_id": 1,
@@ -59,8 +58,19 @@ dados = {
         'url_connection': 'mysql+mysqlconnector://jonbet_db_usr:A8bHtaT65PNXEjav@31.220.73.132/jonbet_db',
         'estrategia_id': 1,
         'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
-                          11: 'black', 12: 'black', 13: 'black', 14: 'black'}
+                          11: 'black', 12: 'black', 13: 'black', 14: 'black'},
+        'probabilidade': 0.60
     },
+    'blaze_doublerobo': {
+        "plataforma_id": 1,
+        'channel_id': -1002465527746,
+        'url_connection': 'mysql+mysqlconnector://blaze_db_usr:K1sMiDLydhr3B4oL@31.220.73.132/blaze_db',
+        'estrategia_id': 1,
+        'color_mapping': {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
+                          11: 'black', 12: 'black', 13: 'black', 14: 'black'},
+        'probabilidade': 0.60
+    },
+
 }
 
 
@@ -75,29 +85,13 @@ def lrange(server_name, usuario_id):
             dados[server_name]['estrategia_id'],
             usuario_id,
             dados[server_name]['color_mapping'],
+            dados[server_name]['probabilidade']
         )
         # print(json.dumps(payload, ensure_ascii=False))
         return jsonify(payload), 200
     else:
         # print(json.dumps({"error": f"Server name '{server_name}' not supported."}, ensure_ascii=False))
         return jsonify({"error": f"Server name '{server_name}' not supported."}), 400
-    # try:
-    #     start = int(start)
-    #     end = int(end)
-    #
-    #     values = r.lrange(key, start, end)
-    #     decoded_values = [json.loads(value.decode('utf-8')) for value in values]
-    #
-    #     if decoded_values:
-    #         result = {
-    #             "result": decoded_values
-    #         }
-    #         return jsonify(result), 200
-    #     else:
-    #         return jsonify({'error': 'Key not found'}), 404
-    #
-    # except redis.exceptions.ResponseError as e:
-    #     return jsonify({'error': str(e)}), 400
 
 
 if __name__ == '__main__':

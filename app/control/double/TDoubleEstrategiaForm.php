@@ -19,7 +19,8 @@ class TDoubleEstrategiaForm  extends TStandardForm
     const DATABASE = 'double';
     const RESULTADOS = [
         '-' => ['red' => 'Vermelho', 'black' => 'Preto', 'white' => 'Branco', 'break' => 'Ignorar entrada'],
-        'Jonbet' => ['red' => 'Verde', 'black' => 'Preto', 'white' => 'Branco', 'break' => 'Ignorar entrada']
+        'Jonbet' => ['red' => 'Verde', 'black' => 'Preto', 'white' => 'Branco', 'break' => 'Ignorar entrada'],
+        'BacboMCGames' => ['red' => 'Banker', 'black' => 'Player', 'white' => 'Empate', 'break' => 'Ignorar entrada']
     ];
 
     protected function onBuild($param)
@@ -158,9 +159,9 @@ class TDoubleEstrategiaForm  extends TStandardForm
             $path_bet = "app/images/regras/{$canal->plataforma->nome}/";
 
             $options = [
-                'red'   => ['image' => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'), 'title' => ''],
-                'black' => ['image' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'), 'title' => ''],
-                'white' => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => ''],
+                'red'   => ['image' => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'), 'title' => 'Banker'],
+                'black' => ['image' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'), 'title' => 'Player'],
+                'white' => ['image' => (file_exists($path_bet . 'white.png') ? $path_bet . 'white.png' : $path . 'white.png'), 'title' => 'Empate'],
                 'other' => ['image' => (file_exists($path_bet . 'other.png') ? $path_bet . 'other.png' : $path . 'other.png'), 'title' => 'Qualquer cor'],
             ];
 
@@ -221,7 +222,7 @@ class TDoubleEstrategiaForm  extends TStandardForm
             $this->form->addFields(
                 [$label = $this->makeTLabel(['value' => 'Proteções'])],
                 [$this->makeTEntry(['name' => 'protecoes', 'label' => $label, 'required' => true, 'mask' => '9!'])],
-                [$label = $this->makeTLabel(['value' => 'Proteção no branco'])],
+                [$label = $this->makeTLabel(['value' => 'Proteção do empate'])],
                 [$this->makeTCombo(['name' => 'protecao_branco', 'label' => $label, 'required' => true, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
             );
         }    

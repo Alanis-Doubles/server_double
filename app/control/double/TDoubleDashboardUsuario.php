@@ -34,7 +34,7 @@ class TNewRanking
             ['name' => 'regra', 'label' => 'Regra', 'width' => '30%', 'align' => 'left', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_regra'])],
             ['name' => 'resultado', 'label' => 'Resultado', 'width' => '15%', 'align' => 'center', 'transformer' => Closure::fromCallable(['TDoubleDashboard', 'transform_resultado'])],
             ['name' => 'protecoes', 'label' => 'Tot. Gale', 'width' => '5%', 'align' => 'center'],
-            ['name' => 'protecao_branco', 'label' => 'Branco', 'width' => '5%', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_sim_nao_transformer'])],
+            ['name' => 'protecao_branco', 'label' => 'Empate', 'width' => '5%', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_sim_nao_transformer'])],
             ['name' => 'win', 'label' => 'Win', 'width' => '5%', 'align' => 'center'],
             ['name' => 'loss', 'label' => 'Loss', 'width' => '5%', 'align' => 'center'],
             ['name' => 'percentual', 'label' => '%', 'width' => '5%', 'align' => 'center'],
@@ -250,21 +250,21 @@ class TDoubleDashboardUsuario extends TPage
                     }
                 )
             ],
-            [
-                $label = $this->makeTLabel(['value' => '⚪ Proteção']),
-                $this->makeTCombo(
-                    [
-                        'name' => 'protecao_branco', 
-                        'label' => $label, 
-                        'defaultOption' => false, 
-                        'width' => '100%',
-                        'items' => ['Y' => 'Sim', 'N' => 'Não']
-                    ], function ($object) {
-                        $object->title = 'Proteção no Branco';
-                    }
-                )
-            ]
-        )->layout = ['col-sm-6', 'col-sm-6'];
+            // [
+            //     $label = $this->makeTLabel(['value' => '⚪ Proteção']),
+            //     $this->makeTCombo(
+            //         [
+            //             'name' => 'protecao_branco', 
+            //             'label' => $label, 
+            //             'defaultOption' => false, 
+            //             'width' => '100%',
+            //             'items' => ['Y' => 'Sim', 'N' => 'Não']
+            //         ], function ($object) {
+            //             $object->title = 'Proteção no Branco';
+            //         }
+            //     )
+            // ]
+        ); //->layout = ['col-sm-6', 'col-sm-6'];
         
         $this->form->addContent([new TFormSeparator('')]);
 
@@ -482,13 +482,13 @@ class TDoubleDashboardUsuario extends TPage
 
     public function questionaParar($param) {
         $message = 'Tem certeza que deseja parar a execução?';
-        $action = new TAction([$this, 'onPararRobo']);
+        $action = new TAction([$this, 'onPararRobo'], $param);
         
         new TQuestion($message, $action);
     }
 
-
     public function doCopiarEstrategia($param) {
+        
         try {
             TUtils::openConnection('double', function() use($param){
                 $chat_id = TSession::getValue('usercustomcode');
@@ -708,7 +708,7 @@ class TDoubleDashboardUsuario extends TPage
             $usuario->tipo_stop_loss                = $object->tipo_stop_loss;
             $usuario->modo_treinamento              = $object->modo_treinamento;
             $usuario->banca_treinamento             = $object->banca_treinamento;
-            $usuario->protecao_branco               = $object->protecao_branco;
+            // $usuario->protecao_branco               = $object->protecao_branco;
             $usuario->entrada_automatica_tipo       = $object->tipo_espera;
             $usuario->entrada_automatica_total_loss = $object->quantidade_espera;
             $usuario->valor_max_ciclo               = $object->valor_max_ciclo;
@@ -1005,7 +1005,8 @@ class TDoubleDashboardUsuario extends TPage
                     document.getElementsByName('tipo_stop_loss')[0].value = data.tipo_stop_loss;
                     document.getElementsByName('modo_treinamento')[0].value = data.modo_treinamento;
                     document.getElementsByName('banca_treinamento')[0].value = data.banca_treinamento;
-                    document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
+                    if (1==2)
+                        document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
                     document.getElementsByName('tipo_espera')[0].value = data.entrada_automatica_tipo;
                     document.getElementsByName('quantidade_espera')[0].value = data.entrada_automatica_total_loss;
                     document.getElementsByName('valor_max_ciclo')[0].value = data.valor_max_ciclo;
@@ -1349,7 +1350,8 @@ JAVASCRIPT;
                 document.getElementsByName('tipo_stop_loss')[0].value = data.tipo_stop_loss;
                 document.getElementsByName('modo_treinamento')[0].value = data.modo_treinamento;
                 document.getElementsByName('banca_treinamento')[0].value = data.banca_treinamento.toLocaleString('pt-br', {minimumFractionDigits: 2});
-                document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
+                if (1==2)
+                    document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
                 document.getElementsByName('tipo_espera')[0].value = data.entrada_automatica_tipo;
                 document.getElementsByName('quantidade_espera')[0].value = data.entrada_automatica_total_loss;
                 document.getElementsByName('valor_max_ciclo')[0].value = data.valor_max_ciclo.toLocaleString('pt-br', {minimumFractionDigits: 2});
@@ -1455,7 +1457,7 @@ JAVASCRIPT;
     private function getJavaScriptRedisWS()
     {
         $chat_id = TSession::getValue('usercustomcode');
-        $take = $this->isMobile() ? 21 : 16;
+        $take = $this->isMobile() ? 70 : 96;
         $servidor_ws = DoubleConfiguracao::getConfiguracao('servidor_ws');
         
         return <<<JAVASCRIPT
@@ -1654,7 +1656,8 @@ JAVASCRIPT;
                     document.getElementsByName('tipo_stop_loss')[0].value = data.tipo_stop_loss;
                     document.getElementsByName('modo_treinamento')[0].value = data.modo_treinamento;
                     document.getElementsByName('banca_treinamento')[0].value = data.banca_treinamento.toLocaleString('pt-br', {minimumFractionDigits: 2});
-                    document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
+                    if (1==2)
+                        document.getElementsByName('protecao_branco')[0].value = data.protecao_branco;
                     document.getElementsByName('tipo_espera')[0].value = data.entrada_automatica_tipo;
                     document.getElementsByName('quantidade_espera')[0].value = data.entrada_automatica_total_loss;
                     document.getElementsByName('valor_max_ciclo')[0].value = data.valor_max_ciclo.toLocaleString('pt-br', {minimumFractionDigits: 2});
@@ -1768,6 +1771,7 @@ JAVASCRIPT;
         $path = 'app/images/regras/';
         $path_bet = "app/images/regras/{$bet_name}/";
 
+        DoubleErros::registrar('1', 'Dashusu', 'add', $bet_name);
         $imageMap = [
             'red'   => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'),
             'black' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'),
@@ -1790,6 +1794,7 @@ JAVASCRIPT;
             '13'    => (file_exists($path_bet . '13.png') ? $path_bet . '13.png' : $path . '13.png'),
             '14'    => (file_exists($path_bet . '14.png') ? $path_bet . '14.png' : $path . '14.png'),
         ];
+
 
         if (isset($imageMap[$param])) {
             $imgTag = new TElement('img');

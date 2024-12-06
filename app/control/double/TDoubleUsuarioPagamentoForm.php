@@ -67,7 +67,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
                 'name' => 'tipo',
                 'label' => $label,
                 'width' => '100%',
-                'items' => ['MENSAL' => 'Mensal', 'TRIMESTRAL' => 'Trimestral', 'SEMESTRAL' => 'Semestral', 'ANUAL' => 'Anual'],
+                'items' => ['VITALICIO' => 'Vitalício', 'MENSAL' => 'Mensal', 'TRIMESTRAL' => 'Trimestral', 'SEMESTRAL' => 'Semestral', 'ANUAL' => 'Anual'],
                 'defaultOption' => false,
                 'required' => true
             ])],
@@ -106,7 +106,7 @@ class TDoubleUsuarioPagamentoForm  extends TStandardForm
         $data = new stdClass;
         $data->usuario_id = $usuario->id;
         $data->plataforma_pagamento = 'PIX';
-        $data->tipo = 'MENSAL';
+        $data->tipo = 'VITALICIO';
         $data->tipo_entrada = 'MANUAL';
         $data->tipo_evento = 'PAGAMENTO';
         $data->plataforma_pagamento = 'PIX';

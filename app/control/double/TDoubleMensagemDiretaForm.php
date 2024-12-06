@@ -21,7 +21,7 @@ class TDoubleMensagemDiretaForm  extends TStandardForm
             [$this->makeTHidden(['name' => 'mensagem_direta', 'value' => 'Y'])],
         );
 
-        $status = ['NOVO' => 'Novo', 'ATIVO' => 'Ativo']; 
+        $status = ['NOVO' => 'Novo', 'ATIVO' => 'Ativo', 'DEMO' => 'Demo']; 
         // $tipo_tempo = ['HORA' => 'Hora', 'MINUTO' => 'minuto'];
 
         $this->form->addFields(

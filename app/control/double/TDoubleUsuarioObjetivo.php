@@ -29,8 +29,8 @@ class TExecucoes
             ['name' => 'valor_banca', 'label' => 'Banca', 'width' => '15%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'moedaTransformer'])],
             ['name' => 'valor_entrada', 'label' => 'Entrada', 'width' => '10%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'moedaTransformer'])],
             ['name' => 'valor_stop_win', 'label' => 'Stop WIN', 'width' => '10%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'moedaTransformer'])],
-            ['name' => 'valor_stop_loss', 'label' => 'Stop LOSS', 'width' => '10%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'moedaTransformer'])],
-            ['name' => 'status', 'label' => 'Staus', 'width' => '10%', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_transformer'])],
+            ['name' => 'valor_stop_loss', 'label' => 'Stop LOSS', 'width' => '11%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'moedaTransformer'])],
+            ['name' => 'status', 'label' => 'Status', 'width' => '8%', 'align' => 'center', 'transformer' => Closure::fromCallable([$this, 'status_transformer'])],
             ['name' => 'valor_lucro_prejuizo', 'label' => 'Lucro/Prejuízo', 'width' => '10%', 'align' => 'right', 'data_property' => ['name' => 'style', 'value' => 'font-weight: bold'], 'transformer' => Closure::fromCallable([$this, 'lucroprejuizoTransformer'])],
             ['name' => '0', 'label' => 'Previsto', 'width' => '15%', 'align' => 'right', 'transformer' => Closure::fromCallable([$this, 'previstoTransformer'])],
             ['name' => '0', 'label' => 'Realizado', 'width' => '15%', 'align' => 'right', 'data_property' => ['name' => 'style', 'value' => 'font-weight: bold'], 'transformer' => Closure::fromCallable([$this, 'realizadoTransformer'])],
@@ -200,6 +200,11 @@ class TDoubleUsuarioObjetivo extends TStandardList
         
         $usuarioCriteria->add(  new TFilter( 'ativo', '=', 'Y') );
 
+        
+        $this->form->addFields(
+            [$this->makeTHidden(['name' => 'protecao_branco', 'value' => 'N'])],
+        );
+
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Canal'])],
             [$this->makeTDBCombo(
@@ -292,17 +297,17 @@ class TDoubleUsuarioObjetivo extends TStandardList
         );
 
         $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => '⚪ Prot. Branco'])],
-            [$this->makeTRadioGroup(
-                [
-                    'name' => 'protecao_branco',
-                    'label' => $label,
-                    'items' => ['Y' => 'Sim', 'N' => 'Não'],
-                    'value' => 'N',
-                    'useButton' => true,
-                    'layout' => 'horizontal'
-                ]
-            )],
+            // [$label = $this->makeTLabel(['value' => '⚪ Prot. Branco'])],
+            // [$this->makeTRadioGroup(
+            //     [
+            //         'name' => 'protecao_branco',
+            //         'label' => $label,
+            //         'items' => ['Y' => 'Sim', 'N' => 'Não'],
+            //         'value' => 'N',
+            //         'useButton' => true,
+            //         'layout' => 'horizontal'
+            //     ]
+            // )],
             [$label = $this->makeTLabel(['value' => 'Modo'])],
             [$this->makeTRadioGroup(
                 [
@@ -313,7 +318,8 @@ class TDoubleUsuarioObjetivo extends TStandardList
                     'useButton' => true,
                     'layout' => 'horizontal'
                 ]
-            )]
+            )],
+            [], []
         );
 
         $this->form->addFields(
@@ -894,7 +900,7 @@ JAVASCRIPT;
     private function getJavaScriptRedisWS()
     {
         $chat_id = TSession::getValue('usercustomcode');
-        $take = $this->isMobile() ? 21 : 25;
+        $take = $this->isMobile() ? 21 : 100;
         $servidor_ws = DoubleConfiguracao::getConfiguracao('servidor_ws');
 
         return <<<JAVASCRIPT

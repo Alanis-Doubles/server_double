@@ -1,23 +1,28 @@
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sqlalchemy import create_engine
 import warnings
+from colorama import Fore, Style, init
+
+# Inicializar o colorama
+init(autoreset=True)
+
 warnings.filterwarnings('ignore')
 
 
 class DoubleIA:
-    def __init__(self, plataforma_id, channel_id, url_connection, estrategia_id=None, usuario_id=None, color_mapping=None):
+    def __init__(self, plataforma_id, channel_id, url_connection, estrategia_id=None, usuario_id=None, color_mapping=None, probabilidade=0.60):
         self.plataforma_id = plataforma_id
         self.channel_id = channel_id
         self.url_connection = url_connection
         self.estrategia_id = estrategia_id
         self.usuario_id = usuario_id
+        self.probabilidade = probabilidade
 
         # Mapeamento das cores
-        # self.color_mapping = {0: 'white', 1: 'red', 2: 'red', 3: 'red', 4: 'red', 5: 'red', 6: 'red', 7: 'red', 8: 'black', 9: 'black', 10: 'black',
-        #                       11: 'black', 12: 'black', 13: 'black', 14: 'black'}
         self.color_mapping = color_mapping
         self.color_to_code = {'white': 0, 'red': 1, 'black': 2}
 
@@ -27,13 +32,17 @@ class DoubleIA:
         query = ("SELECT * "
                  "FROM double_sinal "
                  f"WHERE plataforma_id = {self.plataforma_id} "
-                 " AND DATE(created_at) >= DATE_ADD(CURDATE(), INTERVAL -1 DAY)"
+                 " AND DATE(created_at) >= DATE_ADD(CURDATE(), INTERVAL -3 DAY)"
                  "ORDER BY created_at")
 
         try:
-            rules_df = pd.read_sql_query(query, engine)
+            # rules_df = pd.read_sql_query(query, engine)
+            df = pd.read_sql(query, engine)
+            lista_cores = df['cor'].tolist()
+            ultimo_numero = df['numero'].iloc[-1]  # Obtém o último valor da coluna 'numero'
+            return lista_cores, ultimo_numero  # Retorna a lista de cores e o último número
         except:
-            rules_df = pd.DataFrame()  # Retorna um DataFrame vazio se a consulta falhar
+            rules_df = [] # pd.DataFrame()  # Retorna um DataFrame vazio se a consulta falhar
         return rules_df
 
     def fetch_rules(self):
@@ -117,15 +126,12 @@ class DoubleIA:
                         # for j in range(len(regra_split)):
                         if regra_split[i] == 'other':
                             continue
-                        if regra_split[i] != data.iloc[len(data) - len(regra_split) + i]['cor']:
+                        if regra_split[i] != data[len(data) - len(regra_split) + i]:
                             match = False
                             break
 
                     if match:
                         # Calcular a probabilidade de sucesso da regra
-                        # success_rate = self.calculate_rule_success_rate(data, regra, resultado, tipo)
-                        # if success_rate > highest_success_rate:
-                        #     highest_success_rate = success_rate
                         best_rule = regra
                         best_id = id
                         next_color = resultado
@@ -135,8 +141,6 @@ class DoubleIA:
                 last_number = data.iloc[-1]['numero']
                 if str(last_number) == regra:
                     # success_rate = self.calculate_rule_success_rate(data, regra, resultado, tipo)
-                    # if success_rate > highest_success_rate:
-                    #     highest_success_rate = success_rate
                     best_rule = regra
                     best_id = id
                     next_color = resultado
@@ -153,8 +157,6 @@ class DoubleIA:
                     else:
                         continue
                     # success_rate = self.calculate_rule_success_rate(data, regra, result, tipo)
-                    # if success_rate > highest_success_rate:
-                    #     highest_success_rate = success_rate
                     best_rule = regra
                     best_id = id
                     next_color = result
@@ -192,7 +194,7 @@ class DoubleIA:
                         successful_matches += 1
 
         elif tipo == 'SOMA':
-            for i in range(2, len(data)-1):
+            for i in range(2, len(data) - 1):
                 calc_result = data.iloc[i - 1]['numero'] + data.iloc[i - 2]['numero'] - data.iloc[i]['numero']
                 if 1 <= calc_result <= 7:
                     expected_result = 'red'
@@ -209,22 +211,54 @@ class DoubleIA:
             return 0
         return successful_matches / total_matches
 
+    # Função para construir uma matriz de transição de Markov de Ordem 2
+    def construir_matriz_markov_ordem2(self, historico):
+        estados = ['white', 'red', 'black']
+        transicoes = {(e1, e2): {estado: 0 for estado in estados} for e1 in estados for e2 in estados}
+        ponderacao = 1  # Fator inicial de ponderação para os eventos mais recentes
+        fator_decaimento = 0.95  # Decaimento exponencial para eventos mais antigos
+
+        for i in range(2, len(historico)):
+            estado_2_anteriores = (historico[i - 2], historico[i - 1])
+            estado_atual = historico[i]
+            transicoes[estado_2_anteriores][estado_atual] += ponderacao
+            ponderacao *= fator_decaimento  # Decrescendo peso para sinais antigos
+
+        matriz = np.zeros((len(estados), len(estados), len(estados)))
+        for i, e1 in enumerate(estados):
+            for j, e2 in enumerate(estados):
+                total_transicoes = sum(transicoes[(e1, e2)].values())
+                if total_transicoes > 0:
+                    for k, prox_estado in enumerate(estados):
+                        matriz[i, j, k] = transicoes[(e1, e2)][prox_estado] / total_transicoes
+
+        return matriz, estados
+
+    # Função para prever a próxima cor com base em 2 estados anteriores
+    def prever_proxima_cor_ordem2(self, historico, matriz, estados):
+        estado_2_anteriores = (historico[-2], historico[-1])  # Últimos dois estados (cores)
+        idx1 = estados.index(estado_2_anteriores[0])
+        idx2 = estados.index(estado_2_anteriores[1])
+
+        probabilidades = matriz[idx1, idx2]
+
+        # Verifica se a maior probabilidade excede 90%
+        max_probabilidade = np.max(probabilidades)
+        # if max_probabilidade >= 0.90:
+        idx_proxima_cor = np.argmax(probabilidades)
+        return estados[idx_proxima_cor], max_probabilidade
+
     def prever(self):
-        data = self.fetch_data()
-        if not data.empty:
+        data, last_number = self.fetch_data()
+        # if not data.empty:
+        if len(data) > 2:
             rules_df = self.fetch_rules()
 
             color_names = {0: 'white', 1: 'red', 2: 'black'}
-
-            x, y = self.prepare_data(data)
-            model = self.train_model(x, y)
-            next_color, last_number, last_colors = self.predict_next_color(model, data)
+            next_color, last_colors = None, None
             estrategia_id = self.estrategia_id
-            last_colors_names = [color_names[color] for color in last_colors]
-            pattern = " - ".join(last_colors_names)
-
-            # ia_success_rate = self.calculate_rule_success_rate(data, pattern, next_color, 'COR')
-            # print(f'IA Success Rate: {ia_success_rate:.2f}')
+            last_colors_names = None
+            pattern = None
 
             if not rules_df.empty:
                 rule_result, best_rule, best_id, rules_success_rate = self.apply_rules(rules_df, data)
@@ -237,9 +271,40 @@ class DoubleIA:
                 else:
                     if self.usuario_id:
                         last_number, next_color, pattern, estrategia_id = (None, None, None, None)
+            else:
+                # IA Antiga
+                # x, y = self.prepare_data(data)
+                # model = self.train_model(x, y)
+                # next_color, last_number, last_colors = self.predict_next_color(model, data)
+                # estrategia_id = self.estrategia_id
+                # last_colors_names = [color_names[color] for color in last_colors]
+                # pattern = " - ".join(last_colors_names)
+
+                # IA Nova
+                # Busca os dados do histórico
+                historico = data
+
+                # Análise Markoviana de ordem 2
+                matriz, estados = self.construir_matriz_markov_ordem2(historico)
+                proxima_cor_ordem_2, probabilidade_ordem_2 = self.prever_proxima_cor_ordem2(historico, matriz, estados)
+
+                proxima_cor = None
+                probabilidade = None
+
+                if probabilidade_ordem_2 >= self.probabilidade:
+                    print(f"{Style.BRIGHT}{Fore.GREEN}Após {last_number} - Jogue na cor {proxima_cor_ordem_2} (Probabilidade:"
+                          f" {probabilidade_ordem_2 * 100:.2f}%)")
+                    # proxima_cor = proxima_cor_ordem_2
+                    # probabilidade = probabilidade_ordem_2
+                    next_color = proxima_cor_ordem_2
+                else:
+                    print(f"Nenhuma cor sugerida. Probabilidade é de ordem 2 {probabilidade_ordem_2 * 100:.2f}%, não excede 60%.")
+                    return None, None, None, None, None
+                # return proxima_cor, probabilidade
 
             # if last_number:
             #     color_name = color_names[last_colors[0]]
-            return last_number, color_names[last_colors[0]], next_color, pattern, estrategia_id
+            last_colors = data[-1]
+            return last_number, last_colors, next_color, pattern, estrategia_id
         else:
             return None, None, None, None, None

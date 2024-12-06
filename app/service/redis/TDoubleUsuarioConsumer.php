@@ -10,6 +10,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
     private $channel_historico;
     private $usuario_historico;
     private $channel_entrada;
+    private $usuario;
 
     private function notificar_usuario_historico_consumidores($historico)
     {
@@ -26,9 +27,36 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
 
     private function aguardar_entrada()
     {
-        $redis = new Client();
-        while (!$redis->get($this->fazer_entrada)) {
-            sleep(2);
+        $redis_entrada = new Client([
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
+
+        if (substr($this->usuario->plataforma->nome, 0, 5) == "Bacbo") {
+            // $fazer_entrada = $this->fazer_entrada . "_{$this->usuario_id}";
+
+            // $pubsub = $redis->pubSubLoop();
+            // $pubsub->subscribe($fazer_entrada);
+            // foreach ($this->pubsub as $message) {
+            //     $message = (object) $message;
+            //     if ($message->kind === 'message' ) 
+            //     {
+            //         $pubsub->unsubscribe($fazer_entrada);
+            //         return;
+            //     }
+            // }
+            // sleep(6);
+        } else {
+            $pubsub_entrada = $redis_entrada->pubSubLoop();
+            $pubsub_entrada->subscribe($this->channel_entrada);
+            foreach ($pubsub_entrada as $message) {
+                $message = (object) $message;
+                echo "received message: {$message->channel} - {$message->payload}\n";
+                if ($message->kind === 'message' ) {
+                    $pubsub_entrada->subscribe($this->channel_entrada);
+                    break;
+                }
+            }
         }
     }
 
@@ -72,6 +100,20 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                 ] 
             ];
 
+        if ($usuario->modo_treinamento == 'Y') {
+            $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                    ->where('created_at', '>=', $usuario->robo_inicio)
+                    ->sumBy('valor', 'total');
+            }) ?? 0;
+
+            $usuario->ultimo_saldo = $usuario->banca_treinamento + $lucro;
+        } else {
+            $saldo = $usuario->plataforma->service->saldo($usuario);
+            $usuario->ultimo_saldo = $saldo;
+        }
+
+
         $iniciar_apos = $usuario->plataforma->translate->BOTAO_INICIAR_LOSS;
         if ($usuario->entrada_automatica_tipo == 'WIN')
             $iniciar_apos = $usuario->plataforma->translate->BOTAO_INICIAR_WIN;
@@ -89,7 +131,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     [["text" => $usuario->plataforma->translate->BOTAO_CONFIGURAR]],
                     [["text" => $modo_treinamento], ["text" => $modo_real]], 
                     [["text" => $usuario->plataforma->translate->BOTAO_INICIAR], ["text" => $iniciar_apos]], 
-                    [["text" => $usuario->plataforma->translate->BOTAO_GERAR_ACESSO_APP]]
+                    // [["text" => $usuario->plataforma->translate->BOTAO_GERAR_ACESSO_APP]]
                 ] 
             ];
 
@@ -141,6 +183,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                 );
 
                 $valor = $usuario->valorJogada($object['estrategia_id']);
+                $valor_branco = $usuario->valorJogadaBranco();
 
                 $historico = $object;
                 $protecao = 0;
@@ -165,18 +208,21 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     if ($max_valor > 0 and $valor > $max_valor)
                         $valor = $valor_usuario;
 
-                    $redis_entrada = new Client();
-                    $pubsub_entrada = $redis_entrada->pubSubLoop();
-                    $pubsub_entrada->subscribe($this->channel_entrada);
-                    foreach ($pubsub_entrada as $message) {
-                        $message = (object) $message;
-                        echo "received message: {$message->channel} - {$message->payload}\n";
-                        if ($message->kind === 'message' ) {
-                            $pubsub_entrada->subscribe($this->channel_entrada);
-                            break;
-                        }
-                    }
-                    // $this->aguardar_entrada();
+                    // $redis_entrada = new Client([
+                    //     'persistent' => true,
+                    //     'read_write_timeout' => -1
+                    // ]);
+                    // $pubsub_entrada = $redis_entrada->pubSubLoop();
+                    // $pubsub_entrada->subscribe($this->channel_entrada);
+                    // foreach ($pubsub_entrada as $message) {
+                    //     $message = (object) $message;
+                    //     echo "received message: {$message->channel} - {$message->payload}\n";
+                    //     if ($message->kind === 'message' ) {
+                    //         $pubsub_entrada->subscribe($this->channel_entrada);
+                    //         break;
+                    //     }
+                    // }
+                    $this->aguardar_entrada();
 
                     if ($usuario->ultimo_saldo + $lucro < $valor) {
                         $retornoJogada = 'saldo_insuficiente';
@@ -188,7 +234,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
 
                     $retornoJogadaBranco = '';
                     if ($retornoJogada == '' and $usuario->protecao_branco == 'Y') {
-                        $valor_branco = round($valor * 0.2, 2);
+                        // $valor_branco = round($valor * 0.2, 2);
+                        // $valor_branco = $usuario->valorJogadaBranco();
                         $retornoJogadaBranco = $service->jogar($usuario, 'white', $valor_branco);
                         if ($retornoJogadaBranco <> '')
                             $valor_branco = 0;
@@ -235,6 +282,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             );
 
                         echo "Jogou Gale {$protecao} - valor: $valor - cor: {$historico['cor']}\n";
+                        if ($valor_branco > 0)
+                            echo "Jogou Gale {$protecao} - valor: $valor_branco - cor: white\n";
 
                         TRedisUtils::sendMessage(
                             $usuario->chat_id, 
@@ -285,6 +334,9 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     return $retornoJogada;
                 };
 
+                $usuario->quantidade_loss = 0;
+                $usuario->saveInTransaction();
+                
                 foreach ($this->pubsub as $message_sinais)
                 {
                     if ($usuario->roboStatus !== 'EXECUTANDO') 
@@ -302,6 +354,7 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     {
                         $first = false;
                         $valor = $usuario->valorJogada($object['estrategia_id']);
+                        $valor_branco = $usuario->valorJogadaBranco();
                         $retorno = $callback_jogar();
                         if ($retorno !== '') {
                             $this->pubsub->unsubscribe($channel_sinais);
@@ -312,6 +365,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     echo "{$message_sinais->channel} - {$message_sinais->payload}\n";
                     $object = json_decode($message_sinais->payload, true); 
                     $cor_retornada = $object['cor'];
+                    $fator = $object['fator'];
+                    $dice = $object['dice'];
 
                     $win = $historico['cor'] == $cor_retornada;
 
@@ -322,30 +377,37 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
 
                     $banca = 0;
 
-                    $callback_lucro = function ($valor) use ($usuario, &$banca) {
+                    $callback_lucro = function ($valor, $tempo = 0) use ($usuario, &$banca) {
                         $lucro = $usuario->lucro;
-                        if ($usuario->modo_treinamento == 'Y') {
-                            $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
-                                return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
-                                    ->where('created_at', '>=', $usuario->robo_inicio)
-                                    ->sumBy('valor', 'total');
-                            }) ?? 0;
+                        // echo "lucro: {$lucro} - valor: {$valor}\n";
+                        // if ($usuario->modo_treinamento == 'Y') {
+                        //     $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                        //         return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                        //             ->where('created_at', '>=', $usuario->robo_inicio)
+                        //             ->sumBy('valor', 'total');
+                        //     }) ?? 0;
                 
+                        //     $lucro += $valor;
+                        //     // DoubleErros::registrar(1, 'usuario', 'lucro', $lucro);
+                        //     $banca = $usuario->banca_treinamento + $lucro;
+                        //     $lucro = number_format($lucro, 2, ',', '.');
+                        // } else {
+                            sleep($tempo);
                             $lucro += $valor;
-                            // DoubleErros::registrar(1, 'usuario', 'lucro', $lucro);
-                            $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
-                            $lucro = number_format($lucro, 2, ',', '.');
-                        } else {
-                            sleep(10);
-                            $lucro += $valor;
+                            echo "lucro: {$lucro}\n";
                             $saldo = $usuario->plataforma->service->saldo($usuario);
-                            $banca = number_format($saldo, 2, ',', '.');
+                            $banca = $saldo;
+                            if ($usuario->modo_treinamento == 'Y') {
+                                $banca = $usuario->banca_treinamento + $lucro;
+                            }
                             $lucro = number_format($lucro, 2, ',', '.');
-                        }
+                            // echo "lucro: {$lucro}\n";
+                        // }
 
                         return $lucro;
                     };
 
+                    $espera = substr($this->usuario->plataforma->nome, 0, 5) == "Bacbo" ? 5 : 10;
                     if ($win) {
                         TRedisUtils::sendMessage(
                             $usuario->chat_id, 
@@ -354,10 +416,17 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             $botao
                         );
                         if ($cor_retornada == 'white') {
-                            if ($usuario->protecao_branco == 'Y') 
-                                $valor_calc = ($valor_branco * 14) - $valor;
-                            else
-                                $valor_calc = ($valor * 14);
+                            if ($usuario->protecao_branco == 'Y') {
+                                $valor_calc = ($valor_branco * $fator);
+                                if (substr($this->usuario->plataforma->nome, 0, 5) == "Bacbo") 
+                                    $valor_calc += ($valor * 0.9);
+                                else
+                                    $valor_calc -= $valor;
+                                // $valor_calc = ($valor_branco * 14) - $valor;
+                            }
+                            else 
+                                $valor_calc = ($valor * $fator);
+                                // $valor_calc = ($valor * 14);
                         }
                         else
                             $valor_calc = $valor - $valor_branco;
@@ -374,11 +443,14 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             'cor'  => $cor_retornada,
                             'robo_inicio' => $usuario->robo_inicio,
                             'configuracao' => $usuario->configuracao_texto,
-                            'lucro' => $callback_lucro($valor_calc),
-                            'banca' => $banca
+                            'lucro' => $callback_lucro($valor_calc, $espera),
+                            'banca' => $banca,
+                            'fator' => $fator,
+                            'dice' => $dice
                         ]);
 
                         $usuario->quantidade_loss = 0;
+                        $usuario->ultimo_saldo = $banca;
                         $usuario->saveInTransaction();
 
                         $this->pubsub->subscribe($this->channel_historico);
@@ -388,7 +460,13 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                         $usuario->quantidade_loss += 1;
                         $usuario->saveInTransaction();
 
-                        $valor_calc = -1 * ($valor + $valor_branco);
+                        if (substr($this->usuario->plataforma->nome, 0, 5) == "Bacbo") {
+                            if ($cor_retornada == 'white')
+                                $valor_calc = (($valor * 0.9) - $valor + $valor_branco);
+                            else
+                                $valor_calc = -1 * ($valor + $valor_branco);
+                        } else
+                            $valor_calc = -1 * ($valor + $valor_branco);
 
                         $this->notificar_usuario_historico_consumidores([
                             'sequencia' => $usuario->robo_sequencia,
@@ -402,12 +480,23 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                             'cor'  => $cor_retornada,
                             'robo_inicio' => $usuario->robo_inicio,
                             'configuracao' => $usuario->configuracao_texto,
-                            'lucro' => $callback_lucro(-1 * ($valor + $valor_branco)),
-                            'banca' => $banca
+                            'lucro' => $callback_lucro(
+                                $valor_calc, 
+                                ($protecao == $usuario->protecao ? $espera : 0)
+                            ),
+                            'banca' => $banca,
+                            'fator' => $fator,
+                            'dice' => $dice
                         ]);
                     }
 
-                    $lucro = $usuario->lucro;
+                    $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                            return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                                ->where('sequencia', '=', $usuario->robo_sequencia)
+                                ->sumBy('valor', 'total');
+                        }) ?? 0;
+                    // $lucro = $usuario->lucro;
+                    echo "Lucro...: {$lucro}\n";
 
                     if ($usuario->status_objetivo == 'EXECUTANDO') {
                         if ($usuario->usuario_objetivo->atualizar_progresso()) {
@@ -518,28 +607,29 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
 
                     $protecao += 1;
 
-                    if (isset($historico['estrategia_id']))
-                    {
-                        $estrategia = TUtils::openFakeConnection('double', function() use ($historico){
-                            return new DoubleEstrategia($historico['estrategia_id'], false);
-                        });
+                    // if (isset($historico['estrategia_id']))
+                    // {
+                    //     $estrategia = TUtils::openFakeConnection('double', function() use ($historico){
+                    //         return new DoubleEstrategia($historico['estrategia_id'], false);
+                    //     });
 
-                        if ($estrategia and $estrategia->incrementa_valor_entrada == 'A_CADA_GALE') {
-                            if ($usuario->protecao_branco == 'N')
-                                $valor *= round($usuario->fator_multiplicador, 2);
-                            else {
-                                $valor = round($valor * 2.5, 2);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if ($usuario->protecao_branco == 'N')
-                            $valor *= round($usuario->fator_multiplicador,2);
-                        else {
-                            $valor = round($valor * 2.5, 2);
-                        }
-                    }
+                    //     if ($estrategia and $estrategia->incrementa_valor_entrada == 'A_CADA_GALE') {
+                    //         if ($usuario->protecao_branco == 'N')
+                    //             $valor *= round($usuario->fator_multiplicador, 2);
+                    //         else {
+                    //             $valor = round($valor * 2.5, 2);
+                    //         }
+                    //     }
+                    // }
+                    // else
+                    // {
+                        // if ($usuario->protecao_branco == 'N')
+                        $valor *= round($usuario->fator_multiplicador,2);
+                        $valor_branco *= round($usuario->fator_multiplicador,2);
+                        // else {
+                            // $valor = round($valor * 2.5, 2);
+                        // }
+                    // }
 
                     $retorno= $callback_jogar();
                     if ($retorno !== '') {
@@ -548,8 +638,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     }
                 }
 
-                $usuario->quantidade_loss = 0;
-                $usuario->saveInTransaction();
+                // $usuario->quantidade_loss = 0;
+                // $usuario->saveInTransaction();
                 // echo "quantidade loss: {$usuario->quantidade_loss}\n";
             }
         }
@@ -558,8 +648,9 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
     public function run($param) 
     {
         $usuario = DoubleUsuario::identificarPorId($param['usuario_id']);
-        $canal = $usuario->canal;
+        $canal = $usuario->canal; 
 
+        $this->usuario = $usuario;
         $this->channel_historico = strtolower("{$this->serverName()}_{$canal->channel_id}_usuario_historico");
         $this->usuario_historico = strtolower("{$this->serverName()}_{$usuario->id}_usuario_historico");
         $this->fazer_entrada = strtolower("{$this->serverName()}_{$canal->plataforma->nome}_{$canal->plataforma->idioma}_fazer_entrada");
@@ -570,7 +661,10 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');
         if (substr(php_uname(), 0, 7) != "Windows")
         {   // Novo fluxo
-            $redis = new Client();
+            $redis = new Client([
+                'persistent' => true,
+                'read_write_timeout' => -1
+            ]);
             $this->pubsub = $redis->pubSubLoop();
             $this->pubsub->subscribe($this->channel_historico);
             $this->pubsub->subscribe($this->usuario_historico);
@@ -627,6 +721,8 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                     $message = (object) $message;
                     if ($message->kind === 'message' ) 
                     {
+                        echo "Status: {$usuario->roboStatus}\n";
+
                         if ($usuario->roboStatus == 'EXECUTANDO') 
                         {
                             $usuario = DoubleUsuario::identificarPorId($usuario->id);
@@ -643,6 +739,26 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         
                             echo "received message: {$message->channel} - {$message->payload}\n";
                             $this->processar_sinais($usuario, $message);
+                        } else {
+                            echo "Parando consumer\n";
+                            
+                            $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+                            $usuario_id = $usuario->id;
+                    
+                            $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
+                            if (file_exists($filename))
+                                unlink($filename);
+                    
+                            $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+                            $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+                            
+                            $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log";
+                            if (file_exists($filename))
+                                unlink($filename);
+                    
+                            $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log";
+                            if (file_exists($filename))
+                                unlink($filename); 
                         }
                     }
                 } 
@@ -656,44 +772,36 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
             } 
         } else
         {
-            $usuario->roboStatus = 'PARADO';
-            sleep(5);
-            $usuario->roboStatus = 'EXECUTANDO';
+            // $usuario->roboStatus = 'PARADO';
+            // sleep(5);
+            // $usuario->roboStatus = 'EXECUTANDO';
 
-            $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
-            if (substr(php_uname(), 0, 7) == "Windows") 
-            {
-                $command = 'powershell.exe -Command "Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match \''. $processo . '\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"';
-            }
-            else 
-            {
-                $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
-            }
-            shell_exec($command);
+            // $processo = "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario->id}";
+            // if (substr(php_uname(), 0, 7) == "Windows") 
+            // {
+            //     $command = 'powershell.exe -Command "Get-WmiObject Win32_Process | Where-Object { $_.CommandLine -match \''. $processo . '\' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }"';
+            // }
+            // else 
+            // {
+            //     $command = 'ps aux | grep -E ".*' . $processo . '$" | awk \'{print $2}\' | xargs kill -9';
+            // }
+            // shell_exec($command);
 
-            $redis_param = [
-                'usuario_id' => $usuario->id
-            ];
-            // php cmd.php "class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id=7"
-            TUtils::cmd_run('TDoubleUsuarioSinaisConsumer', 'run', $redis_param);
+            // $redis_param = [
+            //     'usuario_id' => $usuario->id
+            // ];
+            
+            // TUtils::cmd_run('TDoubleUsuarioSinaisConsumer', 'run', $redis_param);
          
-            $options = [
-                'scheme' => 'tcp',
-                'host'   => '127.0.0.1',
-                'port'   => 6379,
+            $redis = new Client([
                 'persistent' => true,
-                'read_write_timeout' => 0
-            ];
-            $redis = new Client($options);
+                'read_write_timeout' => -1
+            ]);
             $this->pubsub = $redis->pubSubLoop();
             $this->pubsub->subscribe($this->channel_historico);
             $this->pubsub->subscribe($this->usuario_historico);
             
-            while (true) 
-            {
-                if ($usuario->roboStatus !== 'EXECUTANDO')
-                    break;
-
+            while (true)
                 try {
                     foreach ($this->pubsub as $message) {
                         $message = (object) $message;
@@ -723,25 +831,27 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                                     $this->pubsub->unsubscribe($this->channel_historico);
                                     $this->pubsub->unsubscribe($this->usuario_historico);
                                 }
-                            } else 
-                            {
-                                $this->pubsub->unsubscribe($this->channel_historico);
-                                $this->pubsub->unsubscribe($this->usuario_historico);
-                                break;
+                            // } else 
+                            // {
+                            //     $this->pubsub->unsubscribe($this->channel_historico);
+                            //     $this->pubsub->unsubscribe($this->usuario_historico);
+                            //     break;
                             }
                         }
                     } 
                 } catch (\Throwable $th) {
                     $trace = ''; // json_encode($th->getTrace());
-                    DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioConsumer', 'run', $th->getMessage(), $trace);
+                    // DoubleErros::registrar($usuario->plataforma->id, 'TDoubleUsuarioConsumer', 'run', $th->getMessage(), $trace);
+                    echo $th->getMessage();
 
-                    $redis = new Client();
+                    $redis = new Client([
+                        'persistent' => true,
+                        'read_write_timeout' => -1
+                    ]);
                     $this->pubsub = $redis->pubSubLoop();
                     $this->pubsub->subscribe($this->channel_historico);
                     $this->pubsub->subscribe($this->usuario_historico);
                 } 
-            }
-            
         }
     }
 }

@@ -9,7 +9,10 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
     {
         $channel_name = strtolower("{$this->serverName()}_usuario_historico");
 
-        $redis = new Client();
+        $redis = new Client([
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         // $pubsub = $redis->pubSubLoop();
 
         // $pubsub->subscribe($channel_name);
@@ -35,6 +38,11 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                     $bet->tipo = $object->tipo;
                     $bet->robo_inicio = $object->robo_inicio;
                     $bet->configuracao = $object->configuracao;
+                    
+                    if (isset($object->fator))
+                        $bet->fator = $object->fator;
+                    if (isset($object->dice))
+                        $bet->dice = $object->dice;
                     $bet->save();
                 });
             }
@@ -42,33 +50,16 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
             if (in_array($object->tipo, ['WIN', 'LOSS'])) 
             {
                 $cor_result = TRedisUtils::getCor($object->cor, $usuario->plataforma->translate);
-                $lucro = $object->lucro;
-                $banca = $object->banca;
+                if ($usuario->status_objetivo == 'EXECUTANDO') {
+                    $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                        return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                            ->where('sequencia', '=', $usuario->robo_sequencia)
+                            ->sumBy('valor', 'total');
+                    }) ?? 0;
+                } else
+                    $lucro = $object->lucro;
 
-                // $lucro = $usuario->lucro;
-                // if ($object->tipo == 'WIN')
-                //     $valor = $object->valor;
-                // else
-                //     $valor = -1 * ($object->valor + $object->valor_branco);
-
-                // if ($usuario->modo_treinamento == 'Y') {
-                //     $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
-                //         return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
-                //             ->where('created_at', '>=', $usuario->robo_inicio)
-                //             ->sumBy('valor', 'total');
-                //     }) ?? 0;
-        
-                //     $lucro += $valor;
-                //     // DoubleErros::registrar(1, 'usuario', 'lucro', $lucro);
-                //     $banca = number_format($usuario->ultimo_saldo + $lucro, 2, ',', '.');
-                //     $lucro = number_format($lucro, 2, ',', '.');
-                // } else {
-                //     sleep(10);
-                //     $lucro += $valor;
-                //     $saldo = $usuario->plataforma->service->saldo($usuario);
-                //     $banca = number_format($saldo, 2, ',', '.');
-                //     $lucro = number_format($lucro, 2, ',', '.');
-                // }
+                $banca = number_format($object->banca, 2, ',', '.');
 
                 $botao = [];
                 if ($usuario->plataforma->url_sala_sinais)
@@ -86,7 +77,8 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 
                 $dados_resumo = json_decode($dados_resumo);
                 $assertividade = number_format($dados_resumo->total_win / ($dados_resumo->total_win + $dados_resumo->total_loss) * 100, 2, ',', '.');
-                $msg_resumo = "\n\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n\n📈 Assertividade: {$assertividade}%\n\n⬆ Maior Entrada R$ {$dados_resumo->maior_entrada}";
+                $ultima_entrada = number_format($object->valor_entrada, 2, ',', '.');
+                $msg_resumo = "\n\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n\n📈 Assertividade: {$assertividade}%\n\n⬆ Última Entrada R$ {$ultima_entrada}";
                 
                 if ($usuario->status_objetivo == 'EXECUTANDO') {
                     $msg_resumo .= "\n\n" . $usuario->usuario_objetivo->progresso;
