@@ -81,7 +81,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
         if ($http_status == 200) {
             // $output = trim(shell_exec($command));
             // echo "python: {$output}\n";
-            // DoubleErros::registrar(1, 'canal', 'run', 'python', $output);
+            ////  DoubleErros::registrar(1, 'canal', 'run', 'python', $output);
 
             echo "python: {$response}\n";
             $historico = json_decode($response);
@@ -113,7 +113,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
             } else 
             {
                 echo json_last_error_msg();
-                DoubleErros::registrar($canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
+               //  DoubleErros::registrar($canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
             }
         }
         return $json;
@@ -243,7 +243,7 @@ class TDoubleCanalConsumer extends TDoubleRedis
                 return;
             
             $cor = $output['cor'];
-            // DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
+            ////  DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
             $canal = DoubleCanal::identificar($canal->id);
 
             $botao = [];

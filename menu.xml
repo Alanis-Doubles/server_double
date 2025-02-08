@@ -8,9 +8,6 @@
       <menuitem label="📈 Dashboard">
         <action>TDoubleDashboardUsuario</action>
       </menuitem>
-      <menuitem label="📈 Dashboard">
-        <action>TDoubleDashboardUsuario2</action>
-      </menuitem>
       <menuitem label="🖥️ Plataformas">
         <action>TDoublePlataformaList</action>
       </menuitem>
@@ -29,11 +26,11 @@
       <menuitem label="🎯 Objetivos">
         <action>TDoubleUsuarioObjetivo</action>
       </menuitem>
-      <menuitem label="🎯 Objetivos">
-        <action>TDoubleUsuarioObjetivo2</action>
-      </menuitem>
       <menuitem label="📨 Mensagem Direta">
         <action>TDoubleMensagemDiretaForm</action>
+      </menuitem>
+      <menuitem label="📆 Histórico">
+        <action>TDoubleHistoricoUsuario</action>
       </menuitem>
     </menu>
   </menuitem>

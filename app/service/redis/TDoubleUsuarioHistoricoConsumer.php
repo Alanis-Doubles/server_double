@@ -10,6 +10,9 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
         $channel_name = strtolower("{$this->serverName()}_usuario_historico");
 
         $redis = new Client([
+            'scheme' => 'tcp',
+            'host'   => '180.149.34.86', // IP do seu Redis
+            'port'   => 6379, // Porta padrão do Redis
             'persistent' => true,
             'read_write_timeout' => -1
         ]);
@@ -42,7 +45,9 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                     if (isset($object->fator))
                         $bet->fator = $object->fator;
                     if (isset($object->dice))
-                        $bet->dice = $object->dice;
+                        $bet->ticker = $object->dice;
+                    if (isset($object->dice))
+                        $bet->ticker = $object->ticker;
                     $bet->save();
                 });
             }
@@ -85,11 +90,19 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 }
                 echo "$msg_resumo\n";
 
+                $lucro_atual = TUtils::openFakeConnection('double', function() use($usuario, $object) {
+                    return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                        ->where('entrada_id', '=', $object->entrada_id)
+                        ->sumBy('valor', 'total');
+                }) ?? 0;
+
+                echo $usuario->plataforma->translate->MSG_BET_10 . $msg_resumo . "\n";
                 $mensagem = str_replace(
-                    ['{cor}', '{lucro}', '{banca}'],
-                    [$cor_result, $lucro, $banca],
+                    ['{cor}', '{lucro}', '{banca}', '{lucro_atual}'],
+                    [$cor_result, number_format($lucro, 2, ",", "."), $banca, number_format($lucro_atual, 2, ",", ".")],
                     $usuario->plataforma->translate->MSG_BET_10 . $msg_resumo
                 );
+                echo "$mensagem\n";
 
                 TRedisUtils::sendMessage(
                     $usuario->chat_id, 
@@ -157,12 +170,6 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 }
             } catch (\Throwable $th) {
                 echo "$th\n";
-                DoubleErros::registrar(
-                    1, 
-                    'TDoubleUsuarioHistoricoConsumer', 
-                    'run', 
-                    $th->getMessage()
-                ); 
                 $redis = new Client();
             }
         }

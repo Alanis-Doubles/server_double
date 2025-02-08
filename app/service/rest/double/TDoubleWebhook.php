@@ -64,7 +64,7 @@ class TDoubleWebhook
                     return $pagamento;
                 });    
             } catch (\Throwable $e) {
-                DoubleErros::registrar(1, 'TDoubleWebhook', 'processar', json_encode($param), $e->getMessage());
+               //  DoubleErros::registrar(1, 'TDoubleWebhook', 'processar', json_encode($param), $e->getMessage());
                 throw new Exception("Pagamento não suportado.");
             } 
         }

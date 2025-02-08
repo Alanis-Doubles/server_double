@@ -102,7 +102,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
             } else 
             {
                 // echo json_last_error_msg();
-                DoubleErros::registrar($usuario->canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
+               //  DoubleErros::registrar($usuario->canal->plataforma->id, 'TDoubleHistoricoConsumer', 'callback', json_last_error_msg(), $response);
             }
             $payload = json_encode($json);
         }
@@ -208,7 +208,7 @@ class TDoubleUsuarioSinaisConsumer extends TDoubleRedis
             $entrada_id = $historico['id'];
             $estrategia_id = $historico['estrategia_id'];
             $cor = $output['cor'];
-            DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
+           //  DoubleErros::registrar(1, 'canal', 'run', 'cor', $cor);
             $canal = DoubleCanal::identificar($canal->id);
 
             $this->processar_sinais($usuario, $cor, $entrada_id, $estrategia_id);

@@ -4,7 +4,7 @@ use GuzzleHttp\Client;
 use WSSC\WebSocketClient;
 use WSSC\Components\ClientConfig;
 
-class TArbety implements IDoublePlataforma
+class TArbety extends TDoublePlataforma
 {
     private $ultimo_sinal;
 
@@ -434,4 +434,10 @@ class TArbety implements IDoublePlataforma
     public function sinalCorrente() {
         return '';
     }
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+    
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 }

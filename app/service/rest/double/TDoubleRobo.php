@@ -12,7 +12,7 @@ class TDoubleRobo
         'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
         'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo', 'metas',
         'usuario_meta', 'valor_max_ciclo', 'protecao_branco', 'modo_treinamento', 'banca_treinamento', 'status_objetivo', 'robo_status',
-        'fator_multiplicador', 'fator_multiplicador_branco', 'valor_branco'
+        'fator_multiplicador', 'fator_multiplicador_branco', 'valor_branco', 'expiration'
     ];
 
     public function carregar($param)
@@ -82,6 +82,7 @@ class TDoubleRobo
     {
         $object = TUtils::openConnection('double', function () use ($param) {
             $object = DoubleUsuario::identificar($param['chat_id'], $param['plataforma']->id, $param['canal']->id);
+            $service = $object->plataforma->service;
 
             if (!$object) {
                 $object = new DoubleUsuario();
@@ -114,6 +115,11 @@ class TDoubleRobo
                 $object->store();
             }
 
+            if (isset($param['modo_treinamento']) and $param['modo_treinamento'] == 'Y' and $service->possuiBancaTreinamento()) {
+                $object->banca_treinamento = $param['plataforma']->service->saldo($object);
+                $object->store();
+            }
+
             if (isset($param['email']))
                 $object->email = $param['email'];
     
@@ -138,6 +144,25 @@ class TDoubleRobo
                     $object->telefone
                 );
             }
+
+            return $object;
+        });
+        return $object->toArray(static::ATTRIBUTES);
+    }
+
+    public function resetar_saldo_treinamento($param) 
+    {
+        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
+
+        if (empty($param['chat_id']))
+            throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
+
+        $object = TUtils::openConnection('double', function () use ($param, $plataforma, $canal) {
+            $object = DoubleUsuario::identificar($param['chat_id'], $plataforma->id, $canal->id);
+            $object->banca_treinamento = $plataforma->service->resetarBancaTreinamento($object);
+
+            $object->save();
 
             return $object;
         });
@@ -311,43 +336,48 @@ class TDoubleRobo
             return $object;
         });
 
-        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
-        if ($use_redis == 'Y') {
-            $object->robo_status = 'EXECUTANDO';
-            if (!isset($param['nao_reseta_inicio']))
-                $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
-            $object->saveInTransaction();
+        // $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        // if ($use_redis == 'Y') {
+        //     $object->robo_status = 'EXECUTANDO';
+        //     if (!isset($param['nao_reseta_inicio']))
+        //         $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+        //     $object->saveInTransaction();
 
-            $redis_param = [
-                'usuario_id' => $object->id
-            ];
+        //     $redis_param = [
+        //         'usuario_id' => $object->id
+        //     ];
 
-            if (substr(php_uname(), 0, 7) == "Windows") 
-            {
-                // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
-                TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
-                if (substr($object->plataforma->nome, 0, 5) == "Bacbo") {
-                    $bacbo_plataforma = strtolower(substr($object->plataforma->nome, 5));
-                    $caminho = "C:/Users/edson/Downloads/bacbo/sala_bacbo-main";
-                    $arquivo = "{$bacbo_plataforma}/{$bacbo_plataforma}_bacbo_usuario.py";
-                    $command = "{$caminho}/venv/Scripts/python {$caminho}/{$arquivo} {$object->id}";
+        //     if (substr(php_uname(), 0, 7) == "Windows") 
+        //     {
+        //         // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+        //         TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+        //         if (substr($object->plataforma->nome, 0, 5) == "Bacbo") {
+        //             $bacbo_plataforma = strtolower(substr($object->plataforma->nome, 5));
+        //             $caminho = "C:/Users/edson/Downloads/bacbo/sala_bacbo-main";
+        //             $arquivo = "{$bacbo_plataforma}/{$bacbo_plataforma}_bacbo_usuario.py";
+        //             $command = "{$caminho}/venv/Scripts/python {$caminho}/{$arquivo} {$object->id}";
 
-                    // pclose(popen("start /B " . $command, "r"));
-                }
-            } else 
-            {
-                self::removerArquivoSupervisor($object);
-                $programa = self::configurarArquivoSupervisor($object);
-                // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
-            }
-        } else {
-            $data = new stdClass;
-            $data->usuario_id = $object->id;
-            $data->plataforma_id = $plataforma->id;
-            $data->tipo = 'cmd';
-            $data->inicio = true;
-            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
-        }
+        //             // pclose(popen("start /B " . $command, "r"));
+        //         }
+        //     } else 
+        //     {
+        //         // self::removerArquivoSupervisor($object);
+        //         // $object = self::configurarArquivoSuperviobjectsor($object);
+        //         // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
+        //     }
+        // } else {
+        //     $data = new stdClass;
+        //     $data->usuario_id = $object->id;
+        //     $data->plataforma_id = $plataforma->id;
+        //     $data->tipo = 'cmd';
+        //     $data->inicio = true;
+        //     TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        // }
+
+        $object->plataforma->service->finalizar($object);
+        $object->plataforma->service->iniciar($object);
+
+        ////  DoubleErros::registrar('1', 'TDoubleRobo', 'iniciar 1', $object->toArray(static::ATTRIBUTES));
 
         return $object->toArray(static::ATTRIBUTES);
     }
@@ -387,37 +417,40 @@ class TDoubleRobo
             return $object;
         });
         
-        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
-        if ($use_redis == 'Y') {
-            $object->robo_status = 'EXECUTANDO';
-            if (!isset($param['nao_reseta_inicio']))
-                $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
-            $object->saveInTransaction();
+        // $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        // if ($use_redis == 'Y') {
+        //     $object->robo_status = 'EXECUTANDO';
+        //     if (!isset($param['nao_reseta_inicio']))
+        //         $object->roboInicio = (new DateTime())->format('Y-m-d H:i:s');
+        //     $object->saveInTransaction();
 
-            $redis_param = [
-                'usuario_id' => $object->id
-            ];
+        //     $redis_param = [
+        //         'usuario_id' => $object->id
+        //     ];
             
-            if (substr(php_uname(), 0, 7) == "Windows") 
-            {
-                // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
-                TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
-            } else 
-            {
-                self::removerArquivoSupervisor($object);
-                $programa = self::configurarArquivoSupervisor($object);
-                // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
-            }
-        } else {
-            $data = new stdClass;
-            $data->usuario_id = $object->id;
-            $data->plataforma_id = $plataforma->id;
-            $data->tipo = 'cmd';
-            $data->inicio = true;
-            if (isset($param['nao_reseta_inicio']))
-                $data->nao_reseta_inicio = 'Y';
-            TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
-        }
+        //     if (substr(php_uname(), 0, 7) == "Windows") 
+        //     {
+        //         // php cmd.php "class=TDoubleUsuarioConsumer&method=run&usuario_id=7"
+        //         TUtils::cmd_run('TDoubleUsuarioConsumer', 'run', $redis_param);
+        //     } else 
+        //     {
+        //         self::removerArquivoSupervisor($object);
+        //         $programa = self::configurarArquivoSupervisor($object);
+        //         // TUtils::cmd_run('TDoubleRobo', 'supervisor', ['id' => $object->id, 'comando' => 'start']);
+        //     }
+        // } else {
+        //     $data = new stdClass;
+        //     $data->usuario_id = $object->id;
+        //     $data->plataforma_id = $plataforma->id;
+        //     $data->tipo = 'cmd';
+        //     $data->inicio = true;
+        //     if (isset($param['nao_reseta_inicio']))
+        //         $data->nao_reseta_inicio = 'Y';
+        //     TDoubleUtils::cmd_run('TDoubleSinais', 'executar_usuario', $data);
+        // }
+
+        $object->plataforma->service->finalizar($object);
+        $object->plataforma->service->iniciar($object);
 
         return $object->toArray(static::ATTRIBUTES);
     }
@@ -437,7 +470,7 @@ class TDoubleRobo
             $object->robo_iniciar = 'N';
             $object->robo_iniciar_apos_loss = 'N';
             $object->robo_processando_jogada = 'N';
-            $object->ultimo_saldo = $plataforma->service->saldo($object);
+            $object->ultimo_saldo = $plataforma->service->saldo($object) ?? 0;
             $object->save();
 
             if ($object->metas == 'Y' and $object->usuario_meta)
@@ -454,98 +487,101 @@ class TDoubleRobo
             return $object;
         });
 
-        $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
-        if ($use_redis == 'Y') {
-            if (substr(php_uname(), 0, 7) != "Windows") {
-                self::removerArquivoSupervisor($object);
-            }
-        }
+        $object->plataforma->service->finalizar($object);
+
+        // $use_redis = DoubleConfiguracao::getConfiguracao('use_redis');
+        // if ($use_redis == 'Y') {
+        //     if (substr(php_uname(), 0, 7) != "Windows") {
+        //         self::removerArquivoSupervisor($object);
+        //     }
+        // }
         return $object->toArray(static::ATTRIBUTES);
     }
 
-    public static function removerArquivoSupervisor($usuario)
-    {
-        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
-        $usuario_id = $usuario->id;
+    // public static function removerArquivoSupervisor($usuario)
+    // {
+        // $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        // $usuario_id = $usuario->id;
 
-        $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
-        if (file_exists($filename))
-            unlink($filename);
+        // $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
+        // if (file_exists($filename))
+        //     unlink($filename);
 
-        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
-        $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+        // $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        // $server_root = DoubleConfiguracao::getConfiguracao('server_root');
         
-        $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log";
-        if (file_exists($filename))
-            unlink($filename);
+        // $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log";
+        // if (file_exists($filename))
+        //     unlink($filename);
 
-        $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log";
-        if (file_exists($filename))
-            unlink($filename);    
+        // $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log";
+        // if (file_exists($filename))
+        //     unlink($filename);    
 
-        if (substr($usuario->plataforma->nome, 0, 5) == "Bacbo") {
-            if ($usuario->modo_treinamento == 'N' and $usuario->servidor_conectado)
-            {            
-                $client = new Client(['http_errors' => false]);
-                $response = $client->request(
-                    'GET',
-                    "http://{$usuario->servidor_conectado}:5001/usuario/{$usuario_id}/parar"
-                );
-                $usuario->servidor_conectado = null;
-                $usuario->saveInTransaction();
-            }
-        }
-    }
+        // if (substr($usuario->plataforma->nome, 0, 5) == "Bacbo") {
+        //     if ($usuario->modo_treinamento == 'N' and $usuario->servidor_conectado)
+        //     {            
+        //         $client = new Client(['http_errors' => false]);
+        //         $response = $client->request(
+        //             'GET',
+        //             "http://{$usuario->servidor_conectado}:5001/usuario/{$usuario_id}/parar"
+        //         );
+        //         $usuario->servidor_conectado = null;
+        //         $usuario->saveInTransaction();
+        //     }
+        // }
+//    }
 
     public static function configurarArquivoSupervisor($usuario)
     {
-        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
-        $usuario_id = $usuario->id;
+        // $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        // $usuario_id = $usuario->id;
 
-        $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
-        if (file_exists($filename))
-            return "{$server_name}_usuario_{$usuario_id}_";
+        // $filename = "/etc/supervisor/conf.d/{$server_name}_usuario_{$usuario_id}.conf";
+        // if (file_exists($filename))
+        //     return "{$server_name}_usuario_{$usuario_id}_";
 
-        $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+        // $server_root = DoubleConfiguracao::getConfiguracao('server_root');
 
-        $usuarioConfig = "[program:{$server_name}_usuario_{$usuario_id}_consumer]\n";
-        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
-        $usuarioConfig .= "autostart=true\n";
-        $usuarioConfig .= "autorestart=true\n";
-        $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log\n";
-        $usuarioConfig .= "numprocs=1\n";
-        $usuarioConfig .= "\n";
-        $usuarioConfig .= "[program:{$server_name}_usuario_{$usuario_id}_sinais_consumer]\n";
-        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario_id}'\n";
-        $usuarioConfig .= "autostart=true\n";
-        $usuarioConfig .= "autorestart=true\n";
-        $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log\n";
-        $usuarioConfig .= "numprocs=1\n";
-        $usuarioConfig .= "\n";
+        // $usuarioConfig = "[program:{$server_name}_usuario_{$usuario_id}_consumer]\n";
+        // $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
+        // $usuarioConfig .= "autostart=true\n";
+        // $usuarioConfig .= "autorestart=true\n";
+        // $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_consumer.out.log\n";
+        // $usuarioConfig .= "numprocs=1\n";
+        // $usuarioConfig .= "\n";
+        // $usuarioConfig .= "[program:{$server_name}_usuario_{$usuario_id}_sinais_consumer]\n";
+        // $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TDoubleUsuarioSinaisConsumer&method=run&usuario_id={$usuario_id}'\n";
+        // $usuarioConfig .= "autostart=true\n";
+        // $usuarioConfig .= "autorestart=true\n";
+        // $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log\n";
+        // $usuarioConfig .= "numprocs=1\n";
+        // $usuarioConfig .= "\n";
 
-        if (substr($usuario->plataforma->nome, 0, 5) == "Bacbo") {
-            if ($usuario->modo_treinamento == 'N')
-            {
-                $client = new Client(['http_errors' => false]);
-                $response = $client->request(
-                    'GET',
-                    "http://213.136.76.198/usuario/{$usuario_id}/iniciar"
-                );
+        // if (substr($usuario->plataforma->nome, 0, 5) == "Bacbo") {
+        //     if ($usuario->modo_treinamento == 'N')
+        //     {
+        //         $client = new Client(['http_errors' => false]);
+        //         $response = $client->request(
+        //             'GET',
+        //             "http://180.149.34.85:5001/usuario/{$usuario_id}/iniciar"
+        //         );
             
-                if ($response->getStatusCode() == 200) {    
-                    $content = json_decode($response->getBody()->getContents());
+        //         if ($response->getStatusCode() == 200) {    
+        //             $content = json_decode($response->getBody()->getContents());
                 
-                    $usuario->servidor_conectado = $content->server;
-                    $usuario->saveInTransaction();
-                } else {
-                    $content = json_decode($response->getBody()->getContents());
-                    DoubleErros::registrar('1', 'TDoubleRobo', 'iniciar', $response->getStatusCode(), "servidor: {$content->server}");
-                }
-            }
-        }
+        //             $usuario->servidor_conectado = $content->server;
+        //             $usuario->saveInTransaction();
+        //         } else {
+        //             $content = json_decode($response->getBody()->getContents());
+        //            //  DoubleErros::registrar('1', 'TDoubleRobo', 'iniciar', $response->getStatusCode(), "servidor: {$content->server}");
+        //         }
+        //     }
+        // }
 
-        $criado = file_put_contents($filename, $usuarioConfig);
-        return '';
+        // $criado = file_put_contents($filename, $usuarioConfig);
+        // return '';
+        return $usuario->plataforma->service->iniciar($usuario);
     }
 
     public function gerar_acesso($param)

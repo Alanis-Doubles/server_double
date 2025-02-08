@@ -1771,7 +1771,7 @@ JAVASCRIPT;
         $path = 'app/images/regras/';
         $path_bet = "app/images/regras/{$bet_name}/";
 
-        DoubleErros::registrar('1', 'Dashusu', 'add', $bet_name);
+       //  DoubleErros::registrar('1', 'Dashusu', 'add', $bet_name);
         $imageMap = [
             'red'   => (file_exists($path_bet . 'red.png') ? $path_bet . 'red.png' : $path . 'red.png'),
             'black' => (file_exists($path_bet . 'black.png') ? $path_bet . 'black.png' : $path . 'black.png'),
@@ -1872,6 +1872,10 @@ JAVASCRIPT;
                 ->where('chat_id', '=', $param['chat_id'])
                 ->first();
         });
+
+        $nao_mostra_treinamento = DoubleConfiguracao::getConfiguracao('nao_mostra_treinamento');
+        if (in_array($usuario->chat_id, explode(',', $nao_mostra_treinamento)))
+            $usuario->banca_treinamento = 0.00;
 
         return json_encode($usuario->toArray());
     }   

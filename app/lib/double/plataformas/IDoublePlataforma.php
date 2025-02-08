@@ -21,4 +21,14 @@ interface IDoublePlataforma
     public function jogar(DoubleUsuario $usuario, string $cor, float $valor);
 
     public function sinalCorrente();
+
+    public function possuiBancaTreinamento();
+
+    public function resetarBancaTreinamento(DoubleUsuario $usuario);
+
+    public function jogarAPI(DoubleUsuario $usuario, $params);
+
+    public function iniciar($usuario);
+
+    public function finalizar($usuario);
 }

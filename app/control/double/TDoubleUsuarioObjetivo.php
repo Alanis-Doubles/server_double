@@ -729,7 +729,7 @@ class TDoubleUsuarioObjetivo extends TStandardList
         $datagrid = $raking->datagrid;
 
         foreach ($lista as $key => $value) {
-            // DoubleErros::registrar(1, 'TDoubleUsuarioObjetivo', 'execucoesJS', TSession::getValue('usercustomcode'), json_encode((array) $value));
+            ////  DoubleErros::registrar(1, 'TDoubleUsuarioObjetivo', 'execucoesJS', TSession::getValue('usercustomcode'), json_encode((array) $value));
             $datagrid->addItem( (object) $value);
         }
         echo $datagrid->getBody();

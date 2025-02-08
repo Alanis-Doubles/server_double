@@ -61,7 +61,7 @@ class TelegramRest
         if ($http_status == 200)
             $contents = json_decode($output);
         else
-            DoubleErros::registrar(1, 'DoubleErros', 'sendMessage', $location . 'sendMessage', json_encode($payload) );
+           //  DoubleErros::registrar(1, 'DoubleErros', 'sendMessage', $location . 'sendMessage', json_encode($payload) );
         return $contents;
     }
 

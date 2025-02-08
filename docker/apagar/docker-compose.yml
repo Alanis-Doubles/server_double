@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+
+  apache_php:
+    build:
+      dockerfile: adianti_debian11_php8.1.Dockerfile
+      context: /root/php/profit
+    image: jrvidotti/adianti_debian11_php8.1:latest
+    container_name: adianti_debian11_php8.1
+    restart: always
+    networks:
+      - ProfitNet
+    volumes:
+      #- ./000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - /root/php/profit/php.ini:/etc/php/8.1/apache2/php.ini
+      - /root/php/profit/www:/var/www/html:rw
+      - /root/php/profit/logs:/var/log/apache2:rw
+      # - /root/php/supervisor/conf.d:/etc/supervisor/conf.d  # Configurações do Supervisor
+      # - /root/php/supervisor/logs:/var/log/supervisor  # Logs do Supervisor
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.php.rule=Host(`app.profitbot.digital`)
+      - traefik.http.routers.php.entrypoints=websecure
+      - traefik.http.routers.php.tls=true
+      - traefik.http.routers.php.tls.certresolver=letsencryptresolver
+      - traefik.http.services.php.loadbalancer.server.port=80
+      - traefik.http.services.php.loadbalancer.sticky=true
+    # command: >
+    #  bash -c "apt-get update && apt-get install -y supervisor && chmod +x /etc/supervisor/conf.d/atualizar_supervisor.sh && service supervisor start && tail -f /dev/null"
+    environment:
+      - TZ=America/Sao_Paulo
+  
+  supervisor:
+    image: php:8.1-cli
+    container_name: php_supervisor
+    volumes:
+      - /root/php/profit/www:/var/www/html:rw  # Código PHP
+      - /root/php/supervisor/conf.d/atualizar_supervisor.sh:/etc/supervisor/conf.d/atualizar_supervisor.sh  
+      - /root/php/supervisor/logs:/var/log/supervisor  # Logs do Supervisor
+    deploy:
+      replicas: 1  # Apenas uma instância do Supervisor
+    command: >
+      bash -c "chmod +x /etc/supervisor/conf.d/atualizar_supervisor.sh && tail -f /dev/null"
+    environment:
+      - TZ=America/Sao_Paulo
+    networks:
+      - ProfitNet
+
+networks:
+  ProfitNet: ## Nome da rede interna
+    external: true
+    name: ProfitNet

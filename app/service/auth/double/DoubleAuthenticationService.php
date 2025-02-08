@@ -8,7 +8,7 @@ class DoubleAuthenticationService
         if (!$usuario->password)
             throw new Exception('Não é possível realizar o login, gere uma nova senha no Robô do Telegram');
 
-        // DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $usuario->password, "{$user} - {$usuario->login} - {$password}");
+        ////  DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $usuario->password, "{$user} - {$usuario->login} - {$password}");
         if (!$usuario->login) {
             $usuario->login = $user;
             $usuario->save();
@@ -21,7 +21,7 @@ class DoubleAuthenticationService
         if ($double_usuario and $double_usuario->status !== 'ATIVO')
             throw new Exception('O acesso é permitido apenas para usuários ativos.');
 
-        // DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $usuario->password, "{$user} - {$usuario->login} - {$password}");
+        ////  DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $usuario->password, "{$user} - {$usuario->login} - {$password}");
 
         if ($usuario and SystemUser::authenticate($usuario->login, $password)) {
             return true;

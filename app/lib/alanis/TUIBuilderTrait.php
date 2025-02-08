@@ -1218,7 +1218,11 @@ trait TUIBuilderTrait
             }
 
         if (isset($properties->{'groupColumn'}))
-            $widget->setGroupColumn($properties->{'groupColumn'}['name'], $properties->{'groupColumn'}['mask']);
+            $widget->setGroupColumn(
+                $properties->{'groupColumn'}['name'], 
+                $properties->{'groupColumn'}['mask'],
+                isset($properties->{'groupColumn'}['transformer']) ? $properties->{'groupColumn'}['transformer'] : null
+            );
         
         $widget->createModel();
         

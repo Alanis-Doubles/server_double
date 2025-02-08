@@ -2,7 +2,7 @@
 
 use GuzzleHttp\Client;
 
-class TMCGames implements IDoublePlataforma
+class TMCGames extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
@@ -45,7 +45,7 @@ class TMCGames implements IDoublePlataforma
             $client = new Client();
             $response = $client->request(
                 'POST',
-                'https://mcgames.bet/api/auth/login',
+                'https://mcgames.bet.br/api/auth/login',
                 [
                     'json' => $payload_mc,
                     'headers' => [
@@ -81,7 +81,7 @@ class TMCGames implements IDoublePlataforma
             $client = new Client(['http_errors' => false]);
             $response = $client->request(
                 'GET',
-                'https://mcgames.bet/api/auth/me',
+                'https://mcgames.bet.br/api/auth/me',
                 [
                     'headers' => [
                         'Content-Type' => 'application/json',
@@ -109,7 +109,7 @@ class TMCGames implements IDoublePlataforma
         $client = new Client();
         $response = $client->request(
             'POST',
-            'https://mcgames.bet/api/auth/login',
+            'https://mcgames.bet.br/api/auth/login',
             [
                 'json' => $payload,
                 'headers' => [
@@ -152,4 +152,10 @@ class TMCGames implements IDoublePlataforma
     {
         return '';
     }
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+    
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 }

@@ -4,9 +4,15 @@ use GuzzleHttp\Client;
 use Predis\Client as RedisClient;
 use WebSocket\Client as WebSocketClient;
 
-class TBlaze implements IDoublePlataforma
+class TBlaze extends TDoublePlataforma
 {
     private static $ultimo_sinal;
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 
     public static function validate(string $nome)
     {
@@ -65,7 +71,7 @@ class TBlaze implements IDoublePlataforma
             );
 
             $json = $response->getBody()->getContents();
-            // DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', $response->getStatusCode(), $json);
+            ////  DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', $response->getStatusCode(), $json);
 
             if ($response->getStatusCode() == 200) {
                 $content = json_decode($json);
@@ -83,7 +89,7 @@ class TBlaze implements IDoublePlataforma
                     // sleep(1);
                 }
             } else {
-                DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
+               //  DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
                 $client = new Client(['http_errors' => false]);
                 sleep(1);
             }

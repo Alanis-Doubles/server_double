@@ -450,7 +450,7 @@ JAVASCRIPT;
                 }
                 echo $datagrid->getBody();
             } catch (\Throwable $e) {
-                DoubleErros::registrar(1, 'TDoubleDashboard', doConsultarRanking, e->getMessage());
+               //  DoubleErros::registrar(1, 'TDoubleDashboard', doConsultarRanking, e->getMessage());
             }
         } 
         else 
@@ -479,7 +479,7 @@ JAVASCRIPT;
         if ($object->data_fim)
             $object->data_fim = TDate::convertToMask($object->data_fim, 'dd/mm/yyyy', 'yyyy-mm-dd');
 
-        // DoubleErros::registrar(3, 'dashboard', 'dash', json_encode($object));
+        ////  DoubleErros::registrar(3, 'dashboard', 'dash', json_encode($object));
         $dados = TUtils::openFakeConnection('double', function() use ($object){
             $usuariosTotal       = DoubleUsuario::where(1, '=', 1);
             // $usuariosAtivos      = DoubleUsuario::where('robo_status', '=', 'EXECUTANDO');

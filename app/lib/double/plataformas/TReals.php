@@ -5,7 +5,7 @@ use WSSC\WebSocketClient;
 use GuzzleHttp\Cookie\CookieJar;
 use WSSC\Components\ClientConfig;
 
-class TReals implements IDoublePlataforma
+class TReals extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
@@ -14,6 +14,12 @@ class TReals implements IDoublePlataforma
         return 'Reals';
     }
 
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
+    
     public function teste()
     {
         // $this->logar('edson.alanis@gmail.com', 'Da2403vi@');

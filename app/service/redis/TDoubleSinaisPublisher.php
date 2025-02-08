@@ -42,7 +42,7 @@ class TDoubleSinaisPublisher extends TDoubleRedis
             $trace = $th->getTraceAsString();
             echo "Error:  {$message_erro}\n";
             echo "Trace:  {$trace}\n";
-            DoubleErros::registrar($plataforma_id, 'TDoubleSinaisPublisher', 'buscar_sinais', $th->getMessage());
+           //  DoubleErros::registrar($plataforma_id, 'TDoubleSinaisPublisher', 'buscar_sinais', $th->getMessage());
         }
         return null;
     }    

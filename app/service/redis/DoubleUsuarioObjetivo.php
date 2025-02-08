@@ -53,7 +53,7 @@ class DoubleUsuarioObjetivo extends DoubleRecord
             $usuario->modo_treinamento = $this->modo_treinamento;
             $banca = $usuario->plataforma->service->saldo($usuario);
             $valor_minimo = $this->protecao_branco == 'Y' ? $usuario->plataforma->valor_minimo_protecao : $usuario->plataforma->valor_minimo;
-            // DoubleErros::registrar('1', 'DoubleUsuarioObjetivo', 'store', $valor_minimo, "{$this->protecao_branco} ? {$usuario->plataforma->valor_minimo_protecao} : {$usuario->plataforma->valor_minimo}");
+            ////  DoubleErros::registrar('1', 'DoubleUsuarioObjetivo', 'store', $valor_minimo, "{$this->protecao_branco} ? {$usuario->plataforma->valor_minimo_protecao} : {$usuario->plataforma->valor_minimo}");
             DoubleUsuarioObjetivoExecucao::where('usuario_objetivo_id', '=', $this->id)->delete();
             for ($i=0; $i < $this->total_execucoes; $i++) { 
                 $execucao = new DoubleUsuarioObjetivoExecucao();

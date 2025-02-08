@@ -2,7 +2,7 @@
 
 use GuzzleHttp\Client;
 
-class TJonbet implements IDoublePlataforma
+class TJonbet extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
@@ -11,9 +11,15 @@ class TJonbet implements IDoublePlataforma
         return substr($nome, 0, 6) == 'Jonbet';
     }
 
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
+
     public static function nome()
     {
         return 'Jonbet';
+    }
+
+    public function possuiBancaTreinamento() {
+        return false;
     }
 
     public function sinalCorrente() {
@@ -60,7 +66,7 @@ class TJonbet implements IDoublePlataforma
                     }
                 }
             } else {
-                DoubleErros::registrar(1, 'TJonbet', 'aguardarSinal', 'Tentando reinniciar', json_encode($content));
+               //  DoubleErros::registrar(1, 'TJonbet', 'aguardarSinal', 'Tentando reinniciar', json_encode($content));
                 $client = new Client(['http_errors' => false]);
                 sleep(1);
             }

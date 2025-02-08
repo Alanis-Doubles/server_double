@@ -4,7 +4,7 @@ use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 
-class TWebDriverPlataforma implements IDoublePlataforma
+class TWebDriverPlataforma extends TDoublePlataforma
 {
     protected RemoteWebDriver $webDriver;
 
@@ -30,6 +30,11 @@ class TWebDriverPlataforma implements IDoublePlataforma
         $this->webDriver->close();
         $this->webDriver->quit();
     }
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 
     public static function nome(){}
     public function aguardarSinal($ultimo_sinal){}

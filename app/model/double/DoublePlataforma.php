@@ -61,26 +61,29 @@ class DoublePlataforma extends DoubleRecord
 
     public function get_service()
     {
-        if (TBrazabet::nome() == $this->nome)
-            return new TBrazabet;
-        else if (TBlaze::validate($this->nome))
-            return new TBlaze;
-        else if (TJonbet::validate($this->nome))
-            return new TJonbet;
-        else if (TBlaze::nome() == $this->nome)
-            return new TBlaze;
-        else if (TArbety::nome() == $this->nome)
-            return new TArbety;
-        else if (TWeplay::nome() == $this->nome)
-            return new TWeplay;
-        else if (TBrabet::nome() == $this->nome)
-            return new TBrabet;
-        else if (TDoubleVegas::nome() == $this->nome)
-                return new TDoubleVegas;
-        else if (TBacboJonbet::nome() == $this->nome)
-                return new TBacboJonbet;
-        else if (TBacboMCGames::nome() == $this->nome)
-                return new TBacboMCGames;
+        // if (TBrazabet::nome() == $this->nome)
+        //     return new TBrazabet;
+        // else if (TBlaze::validate($this->nome))
+        //     return new TBlaze;
+        // else if (TJonbet::validate($this->nome))
+        //     return new TJonbet;
+        // else if (TBlaze::nome() == $this->nome)
+        //     return new TBlaze;
+        // else if (TArbety::nome() == $this->nome)
+        //     return new TArbety;
+        // else if (TWeplay::nome() == $this->nome)
+        //     return new TWeplay;
+        // else if (TBrabet::nome() == $this->nome)
+        //     return new TBrabet;
+        // else if (TDoubleVegas::nome() == $this->nome)
+        //         return new TDoubleVegas;
+        // else if (TBacboJonbet::nome() == $this->nome)
+        //         return new TBacboJonbet;
+        // else 
+        if (TBacboMCGames::nome() == $this->nome)
+            return new TBacboMCGames;
+        else if (TAvalon::validate($this->nome))
+            return new TAvalon;
         else
             throw new Exception("Plataforma '{$this->nome}' não suportada.");
     }

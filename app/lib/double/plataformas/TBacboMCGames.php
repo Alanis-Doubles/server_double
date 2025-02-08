@@ -15,6 +15,8 @@ class TBacboMCGames extends TMCGames
         return 'BacboMCGames';
     }
 
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
+
     public function sinalCorrente() {
         $redis = new Client([
             'persistent' => true,
@@ -77,14 +79,20 @@ class TBacboMCGames extends TMCGames
 
         $chave = "{$usuario->plataforma->nome}_{$usuario->plataforma->idioma}_{$usuario->canal->nome}_{$usuario->id}_jogar";
 
+        if ($cor == "white")
+            $chave += "_branco";
+
         $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => $usuario->servidor_conectado, // IP do Redis
+            'host'   => "localhost", // IP do Redis
             'port'   => 6379,             // Porta padrão do Redis
         ]);
+
+        // $redis->publish($chave, json_encode($payload));
+
         $redis->set(
-            $chave,
-            json_encode($payload), 
+           $chave,
+           json_encode($payload), 
             'EX', 
             10
         );

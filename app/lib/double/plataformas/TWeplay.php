@@ -6,7 +6,7 @@ use GuzzleHttp\Psr7\Request;
 use WSSC\Components\ClientConfig;
 use WSSC\Exceptions\ConnectionException;
 
-class TWeplay implements IDoublePlataforma
+class TWeplay extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
@@ -14,6 +14,11 @@ class TWeplay implements IDoublePlataforma
     {
         return 'Weplay';
     }
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 
     public function teste() {
         $token = $this->logar('edson.alanis@gmail.com', 'Da2403vi@');
@@ -91,7 +96,7 @@ class TWeplay implements IDoublePlataforma
                         sleep(1);
                     }
             } else {
-                DoubleErros::registrar(1, 'TWeplay', 'aguardarSinal', 'Tentando reiniciar', $json);
+               //  DoubleErros::registrar(1, 'TWeplay', 'aguardarSinal', 'Tentando reiniciar', $json);
                 $client = new Client(['http_errors' => false]);
                 sleep(1);
             }
@@ -132,7 +137,7 @@ class TWeplay implements IDoublePlataforma
                 $usuario->saveInTransaction('double');
                 return $content->accessToken;
             } else {
-                DoubleErros::registrar(1, 'TWeply', 'getToken', $json, $usuario->chat_id . ' - ' . $body);
+               //  DoubleErros::registrar(1, 'TWeply', 'getToken', $json, $usuario->chat_id . ' - ' . $body);
             } 
         } else {
             return $usuario->token_plataforma;
@@ -166,7 +171,7 @@ class TWeplay implements IDoublePlataforma
             if ($response->getStatusCode() == 200) {
                 return round($content->currentAccount->total, 2);
             } else {
-                DoubleErros::registrar(1, 'TWeply', 'saldo', $json, $usuario->chat_id);
+               //  DoubleErros::registrar(1, 'TWeply', 'saldo', $json, $usuario->chat_id);
             }
         }
     }

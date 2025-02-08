@@ -408,7 +408,7 @@ class SystemUser extends TRecord
     public static function authenticate($login, $password)
     {
         $user = self::newFromLogin($login);
-        // DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $user->password, "{$login} - {$password}");
+        ////  DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $user->password, "{$login} - {$password}");
         if (substr($user->password, 0, 1) == "$")
         {
             // password_hash generated

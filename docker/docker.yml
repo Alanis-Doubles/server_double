@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+
+  apache_php:
+    image: webdevops/php-apache:8.1
+    container_name: profit_php
+    restart: always
+    networks:
+      - ProfitNet
+    volumes:
+      - /root/php/profit/www:/var/www/html:rw
+      - /root/php/profit/logs:/var/log/apache2:rw
+      - /root/php/supervisor/logs:/var/log/supervisor:rw  # Logs do Supervisor
+      - /root/php/supervisor/conf.d/atualizar_supervisor.sh:/opt/docker/etc/supervisor.d/atualizar_supervisor.sh 
+      - /root/php/supervisor/conf.d/atualizar_supervisor.conf:/opt/docker/etc/supervisor.d/atualizar_supervisor.conf
+      - /root/php/supervisor/conf.d/profit_app.conf:/opt/docker/etc/supervisor.d/profit_app.conf
+    deploy:
+      labels:
+      - traefik.enable=true
+      - traefik.http.routers.php.rule=Host(`app.profitbot.digital`)
+      - traefik.http.routers.php.entrypoints=websecure
+      - traefik.http.routers.php.tls=true
+      - traefik.http.routers.php.tls.certresolver=letsencryptresolver
+      - traefik.http.services.php.loadbalancer.server.port=80
+      - traefik.http.services.php.loadbalancer.sticky=true
+    environment:
+      - TZ=America/Sao_Paulo
+      - WEB_DOCUMENT_ROOT=/var/www/html
+      - DB_HOST=mysql  # Ou o hostname/IP do seu MySQL
+      - DB_DATABASE=profit
+      - DB_USERNAME=app_user
+      - DB_PASSWORD=6q6XlzhN2h48lagJ
+    command: >
+      bash -c "chmod +x /opt/docker/etc/supervisor.d/atualizar_supervisor.sh &&
+      chown -R application:application /opt/docker/etc/supervisor.d &&
+      chmod -R 777 /opt/docker/etc/supervisor.d &&
+      supervisord -c /etc/supervisord.conf &&
+      chown -R root:application /var/log/supervisor &&
+      chmod -R 777 /var/log/supervisor &&
+      tail -f /dev/null"
+
+networks:
+  ProfitNet: ## Nome da rede interna
+    external: true
+    name: ProfitNet

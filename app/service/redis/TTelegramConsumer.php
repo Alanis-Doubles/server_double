@@ -20,7 +20,13 @@ class TTelegramConsumer extends TDoubleRedis
 
         $channel_name = strtolower("{$this->serverName()}_mensagem_{$canal->plataforma->nome}_{$canal->plataforma->idioma}");
 
-        $redis = new Client();
+         $redis = new Client([
+            'scheme' => 'tcp',
+            'host'   => '180.149.34.86', // IP do seu Redis
+            'port'   => 6379, // Porta padrão do Redis
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         // echo "mensagem: ". json_encode(payload) . "\n";
         $mensagem = $payload['message'];
         $mensagem = nl2br($mensagem);// str_replace('\n', '<br>', $mensagem);
@@ -76,7 +82,7 @@ class TTelegramConsumer extends TDoubleRedis
             $error_message = curl_error($ch);
             $error_number = curl_errno($ch);
             $json_erro = json_encode($telegram_payload);
-            // DoubleErros::registrar(
+            ////  DoubleErros::registrar(
             //     1, 
             //     'TTelegramConsumer', 
             //     'sendMessageToTelegram', 
@@ -86,7 +92,13 @@ class TTelegramConsumer extends TDoubleRedis
             echo "cURL error ({$error_number}): {$error_message}\nJSON: $json_erro";
         }
 
-        $redis = new Client();
+         $redis = new Client([
+            'scheme' => 'tcp',
+            'host'   => '180.149.34.86', // IP do seu Redis
+            'port'   => 6379, // Porta padrão do Redis
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');
         $var = "{$server_name}_telegram_delete";
 
@@ -157,23 +169,23 @@ class TTelegramConsumer extends TDoubleRedis
         if ($http_status !== 200) {
             $error_message = curl_error($ch);
             $error_number = curl_errno($ch);
-            DoubleErros::registrar(
-                1, 
-                'TTelegramConsumer', 
-                'deleteMessageToTelegram', 
-                "cURL error ({$error_number}): {$error_message}",
-                json_encode($telegram_payload)
-            );
         }
 
         return $http_status == 200;
     }
 
     public function run($param) {
-        $redis = new Client();
+         $redis = new Client([
+            'scheme' => 'tcp',
+            'host'   => '180.149.34.86', // IP do seu Redis
+            'port'   => 6379, // Porta padrão do Redis
+            'persistent' => true,
+            'read_write_timeout' => -1
+        ]);
         $this->queue = "{$this->serverName()}_telegram_queue";
         // echo "$queue\n";
                 
+        echo "iniciando\n";
         while (true) {
             try {
                 $message = $redis->brpop($this->queue, 0); 
@@ -188,12 +200,7 @@ class TTelegramConsumer extends TDoubleRedis
                     }
                 }
             } catch (\Throwable $th) {
-                DoubleErros::registrar(
-                    1, 
-                    'TTelegramConsumer', 
-                    'run', 
-                    $th->getMessage()
-                ); 
+               
             }
         }
     }

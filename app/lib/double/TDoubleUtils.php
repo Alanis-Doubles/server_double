@@ -38,10 +38,10 @@ class TDoubleUtils
                     break;
                 } catch (\Throwable $e) {
                     $tentativa += 1;
-                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                   //  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
                 } catch (Exception $e){
                     $tentativa += 1;
-                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                   //  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
                 }
             }
         }
@@ -69,7 +69,7 @@ class TDoubleUtils
             if ($response->getStatusCode() == 200) {
                 return $content->id;
             } else {
-                DoubleErros::registrar(1, 'TDoubleUtils', 'enviar_flux', $json, $body);
+               //  DoubleErros::registrar(1, 'TDoubleUtils', 'enviar_flux', $json, $body);
             } 
         }
     }   

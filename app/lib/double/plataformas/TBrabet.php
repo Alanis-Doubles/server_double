@@ -4,7 +4,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use GuzzleHttp\Client;
 
-class TBrabet implements IDoublePlataforma
+class TBrabet extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
@@ -12,6 +12,11 @@ class TBrabet implements IDoublePlataforma
     {
         return 'Brabet';
     }
+
+    public function possuiBancaTreinamento() {
+        return false;
+    }
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
 
     public function aguardarSinal($ultimo_sinal)
     {
@@ -63,7 +68,7 @@ class TBrabet implements IDoublePlataforma
                     sleep(1);
                 }
             } else {
-                DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
+               //  DoubleErros::registrar(1, 'TBlaze', 'aguardarSinal', 'Tentando reinniciar', $json);
                 $client = new Client(['http_errors' => false]);
                 sleep(1);
             }

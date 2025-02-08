@@ -24,7 +24,7 @@ class DoubleUsuarioObjetivoExecucao extends DoubleRecord
     {
         $retorno = false;
 
-        // DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 2', $this->status);
+        ////  DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 2', $this->status);
 
         if ($this->status == 'EXECUTANDO')
         {
@@ -43,7 +43,7 @@ class DoubleUsuarioObjetivoExecucao extends DoubleRecord
                     return $valor ?? 0;
                 });
 
-                // DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 1', $usuario->id, "{$this->valor_lucro_prejuizo}  -{$this->valor_stop_loss} - {$this->valor_stop_win}");
+                ////  DoubleErros::registrar(1, 'DoubleUsuarioObjetivoExecucao', 'atualizar_progresso 1', $usuario->id, "{$this->valor_lucro_prejuizo}  -{$this->valor_stop_loss} - {$this->valor_stop_win}");
 
                 $ocorreu_stop_loss = -round($this->valor_stop_loss, 2) >= round($this->valor_lucro_prejuizo, 2);
                 $ocorreu_stop_win = round($this->valor_stop_win, 2) <= round($this->valor_lucro_prejuizo, 2);

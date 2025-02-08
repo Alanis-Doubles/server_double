@@ -283,22 +283,24 @@ class TUtils
         $param = http_build_query($parms);
         
         $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
-        // DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', $command);
+        ////  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', $command);
         if (substr(php_uname(), 0, 7) == "Windows") {
-            pclose(popen("start /B " . $command, "r"));
+            // pclose(popen("start /B " . $command, "r"));
+            pclose(popen("start " . $command, "r"));
         } else {
             $tentativa = 1;
             while ($tentativa <= 5)
             {
                 try {
+                    // exec($command . " > /dev/null &");
                     exec($command . " > /dev/null &");
                     break;
                 } catch (\Throwable $e) {
                     $tentativa += 1;
-                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                   //  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
                 } catch (Exception $e){
                     $tentativa += 1;
-                    DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
+                   //  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', "Tentativa: $tentativa", $e->getMessage());
                 }
             }
         }

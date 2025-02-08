@@ -225,7 +225,7 @@ class DoubleEstrategia extends DoubleRecord
         
     //         // Ordenar a lista de minutos
     //         sort($minute_list);
-    //         // DoubleErros::registrar(1, 'DoubleEstrategia', 'validrBranco', $row['new_time'], json_encode($minute_list));
+    //         ////  DoubleErros::registrar(1, 'DoubleEstrategia', 'validrBranco', $row['new_time'], json_encode($minute_list));
         
     //         // Exibir a lista de minutos
     //         // echo "Lista de minutos: " . implode(", ", $minute_list) . "\n";
@@ -284,7 +284,7 @@ class DoubleEstrategia extends DoubleRecord
         if ($origem >= 0 and $incremento >  $origem)
             $origem += 60;
 
-        // DoubleErros::registrar(1,'doubleestrategia','validarbranco',$origem,$incremento);
+        ////  DoubleErros::registrar(1,'doubleestrategia','validarbranco',$origem,$incremento);
         
 
         if (!$this->valor_controle) { 
@@ -292,7 +292,7 @@ class DoubleEstrategia extends DoubleRecord
                 $this->valor_controle = $result[0]['origem'] . '|' . $result[0]['minute'];
                 $this->valor_incremento = null;
                 $this->saveInTransaction();
-                // DoubleErros::registrar(1,'doubleestrategia','validarbranco',json_encode($result),$this->valor_controle);
+                ////  DoubleErros::registrar(1,'doubleestrategia','validarbranco',json_encode($result),$this->valor_controle);
             }
 
             return false;
@@ -301,7 +301,7 @@ class DoubleEstrategia extends DoubleRecord
             // $origem = $controle[0];
             $minute = $controle[1];
 
-            DoubleErros::registrar(1,'doubleestrategia','validarbranco',$result[0]['minute'],$minute-1);
+           //  DoubleErros::registrar(1,'doubleestrategia','validarbranco',$result[0]['minute'],$minute-1);
             if ($result[0]['minute'] == $minute-1) {
                 $this->valor_controle = null;
                 $this->valor_incremento = $minute;
@@ -327,7 +327,7 @@ class DoubleEstrategia extends DoubleRecord
                 $this->valor_controle = null;
                 $this->valor_incremento = $minute;
                 $this->saveInTransaction();
-                // DoubleErros::registrar(1,'doubleestrategia','validarbranco','aqui',$this->valor_controle);
+                ////  DoubleErros::registrar(1,'doubleestrategia','validarbranco','aqui',$this->valor_controle);
             }
             
             return $is_near;

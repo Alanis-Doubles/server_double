@@ -31,6 +31,16 @@ trait TTransformationTrait
         }
     }
 
+    public function datetimeCompleteTransformer($value)
+    {
+        if ($value) {
+            $date = new DateTime($value);
+            return $date->format('d/m/Y H:i:s');
+        } else {
+            return '';
+        }
+    }
+
     public function doubleTransformer($value)
     {
         if (is_numeric($value)) {

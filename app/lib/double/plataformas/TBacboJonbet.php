@@ -15,6 +15,8 @@ class TBacboJonbet extends TJonbet
         return 'BacboJonbet';
     }
 
+    public function resetarBancaTreinamento(DoubleUsuario $usuario){}
+
     public function sinalCorrente() {
         $redis = new Client([
             'persistent' => true,

@@ -136,7 +136,7 @@ class TDoubleSinais
                 // $ultimo_sinal = $service->aguardarSinal($ultimo_sinal);
                 $response = $service->sinalCorrente();
                 $content = $response['data'];
-                // DoubleErros::registrar('1', 'TDoubleSinais', 'executar', $response['status_code'], json_encode($response['data']));
+                ////  DoubleErros::registrar('1', 'TDoubleSinais', 'executar', $response['status_code'], json_encode($response['data']));
                 if ($response['status_code'] == 200) {
                     if ($content->status == 'rolling') {
                         if (!isset($ultimo_sinal['id']) or (isset($ultimo_sinal['id']) and $content->id !== $ultimo_sinal['id']))
@@ -2325,7 +2325,7 @@ class TDoubleSinais
         try
         {
             DoubleConfiguracao::setConfiguracao('executando_validar_double_sinais', 'Y');
-            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'entrou');
+           //  DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'entrou');
             TSession::setValue('unit_database', 'double');
             TSession::setValue('login', 'api');
             
@@ -2349,7 +2349,7 @@ class TDoubleSinais
                 $data->plataforma_id = $plataforma->id;
                 $data->tipo = 'cmd';
                 TDoubleUtils::cmd_run('TDoubleSinais', 'executar', $data);
-                DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', " .. Plataforma {$plataforma->nome}");
+               //  DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', " .. Plataforma {$plataforma->nome}");
             }
 
             sleep(20);
@@ -2359,9 +2359,9 @@ class TDoubleSinais
             TDoubleUtils::cmd_run('TDoubleSinais', 'validar_double_sinais', $data);
         } catch (\Throwable $th) {
             DoubleConfiguracao::setConfiguracao('executando_validar_double_sinais', 'N');
-            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', $th->getMessage());
+           //  DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', $th->getMessage());
         } finally {
-            DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'saiu');
+           //  DoubleErros::registrar(1, 'TDoubleCron', 'validar_double_sinais', 'saiu');
         }
     }
 }
