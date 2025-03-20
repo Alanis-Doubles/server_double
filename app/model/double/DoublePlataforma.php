@@ -112,12 +112,12 @@ class DoublePlataforma extends DoubleRecord
     {
         if (!$this->obj_system_group) {
             $this->obj_system_group =  TUtils::openConnection('permission', function () {
-                return SystemGroup::where('name', '=', 'DoubleJogadores')->first();
+                return SystemGroup::where('name', '=', 'ProfitJogadores')->first();
             });
         }
 
         if (!$this->obj_system_group) 
-            throw new Exception("Grupo '". 'DoubleJogadores' . "' não encontrado.");
+            throw new Exception("Grupo '". 'ProfitJogadores' . "' não encontrado.");
         
         return $this->obj_system_group;
     }

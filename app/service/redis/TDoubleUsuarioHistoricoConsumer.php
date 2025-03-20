@@ -11,7 +11,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
 
         $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
             'persistent' => true,
             'read_write_timeout' => -1
@@ -46,8 +46,10 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                         $bet->fator = $object->fator;
                     if (isset($object->dice))
                         $bet->ticker = $object->dice;
-                    if (isset($object->dice))
+                    if (isset($object->ticker))
                         $bet->ticker = $object->ticker;
+                    if (isset($object->banca))
+                        $bet->banca = $object->banca;
                     $bet->save();
                 });
             }
@@ -96,7 +98,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                         ->sumBy('valor', 'total');
                 }) ?? 0;
 
-                echo $usuario->plataforma->translate->MSG_BET_10 . $msg_resumo . "\n";
+                // echo $usuario->plataforma->translate->MSG_BET_10 . $msg_resumo . "\n";
                 $mensagem = str_replace(
                     ['{cor}', '{lucro}', '{banca}', '{lucro_atual}'],
                     [$cor_result, number_format($lucro, 2, ",", "."), $banca, number_format($lucro_atual, 2, ",", ".")],
@@ -170,7 +172,14 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 }
             } catch (\Throwable $th) {
                 echo "$th\n";
-                $redis = new Client();
+                $redis->disconnect();
+                $redis = new Client([
+                    'scheme' => 'tcp',
+                    'host'   => $this->hostUsuario(), // IP do seu Redis
+                    'port'   => 6379, // Porta padrão do Redis
+                    'persistent' => true,
+                    'read_write_timeout' => -1
+                ]);
             }
         }
     }

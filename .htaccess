@@ -262,5 +262,12 @@ RewriteRule ^xhr-double-dashboard-usuario$ engine.php?class=TDoubleDashboardUsua
 RewriteRule ^double-usuario-objetivo$ index.php?class=TDoubleUsuarioObjetivo&%{QUERY_STRING} [NC]
 RewriteRule ^xhr-double-usuario-objetivo$ engine.php?class=TDoubleUsuarioObjetivo&%{QUERY_STRING} [NC]
 
+RewriteRule ^profit-dashboard$ index.php?class=TProfitDashboard&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-profit-dashboard$ engine.php?class=TProfitDashboard&%{QUERY_STRING} [NC]
+
+RewriteRule ^profit-dashboard-usuario$ index.php?class=TProfitDashboardUsuario&%{QUERY_STRING} [NC]
+RewriteRule ^xhr-profit-dashboard-usuario$ engine.php?class=TProfitDashboardUsuario&%{QUERY_STRING} [NC]
+
+
 ############################################################################################################################################
 

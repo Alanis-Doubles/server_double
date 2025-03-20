@@ -8,7 +8,7 @@ use Adianti\Widget\Form\TLabel;
 /**
  * SystemPasswordRenewalForm
  *
- * @version    7.6
+ * @version    8.0
  * @package    control
  * @subpackage admin
  * @author     Lucas Tomasi

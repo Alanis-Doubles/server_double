@@ -1,0 +1,2515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="../../assets/images/logo/logo-sm.png" type="image/gif" sizes="16x16">
+        <title>Advanced Table</title>
+        <meta name="og:description" content="IC Crypto is an impressive and free crypto admin dashboard template that caters to the needs of cryptocurrency enthusiasts and professionals alike. Its well-designed interface, comprehensive features, and accessibility make it a strong contender as one of the best crypto dashboard templates available for download.">
+        <meta name="robots" content="index, follow">
+        <meta name="og:title" property="og:title" content="IC Crypto - Free Bootstrap Crypto Dashboard Admin Template">
+        <meta property="og:image" content="https://www.designtocodes.com/wp-content/uploads/2023/09/IC-Crypto-Thumbnail-V-1-scaled.jpg">
+        <!-- bootstrap css link -->
+        <link rel="stylesheet" href="../../lib/bootstrap_5/bootstrap.min.css">
+        <!-- Font Awesome CDN -->
+        <link rel="stylesheet" href="../../lib/fontawesome/css/all.min.css">
+        <!-- DataTable Css -->
+        <link rel="stylesheet" href="../../lib/DataTables/datatables.min.css">
+        <link rel="stylesheet" href="../../lib/DataTables/select.dataTables.min.css">
+        <link rel="stylesheet" href="../../lib/DataTables/buttons.dataTables.min.css">
+        <!-- main css -->
+        <link rel="stylesheet" href="../../assets/css/global.css">
+        <link rel="stylesheet" href="../../assets/css/style.css">
+        <!-- responsive css -->
+        <link rel="stylesheet" href="../../assets/css/responsive.css">
+        
+    </head>
+
+    <body class="d2c_theme_light">
+        <!-- Preloader Start -->
+        <div class="preloader">
+            <img src="../../assets/images/logo/logo.png" alt="DesignToCodes">
+        </div>
+        <!-- Preloader End -->
+
+        <div class="d2c_wrapper">
+            <!-- Main sidebar -->
+            <div class="d2c_sidebar offcanvas-lg offcanvas-start p-4" tabindex="-1" id="d2c_sidebar">
+                <div class="d-flex flex-column">
+                    <!-- Logo -->
+                    <a href="../../index.html" class="brand-icon">
+                        <img class="navbar-brand" src="../../assets/images/logo/logo.png" alt="logo">
+                    </a>
+                    <!-- End:Logo -->
+
+                    <!-- Menu -->
+                    <ul class="navbar-nav flex-grow-1">
+                        <!-- Menu Item -->
+                        <li class="nav-item">
+                            <h6 class="d2c_nav_title">Menu</h6>
+                            <!-- Sub Menu -->
+                            <ul class="sub-menu">
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../index.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-home"></i>
+                                        </span>
+                                        <span> Dashboard </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/exchange.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </span>
+                                        <span> Exchange </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/market.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </span>
+                                        <span> Market </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/wallet.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-wallet"></i>
+                                        </span>
+                                        <span> Wallet </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/profile.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-network-wired"></i>
+                                        </span>
+                                        <span> Profile </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/notifications.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-bell"></i>
+                                        </span>
+                                        <span> Notifications </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/transaction.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-hand-holding-usd"></i>
+                                        </span>
+                                        <span> Transaction </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/investment.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-funnel-dollar"></i>
+                                        </span>
+                                        <span> Investment </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/transfer.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-random"></i>
+                                        </span>
+                                        <span> Transfer </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/activity.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-recycle"></i>
+                                        </span>
+                                        <span> Activity </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+                            </ul>
+                            <!-- End:Sub Menu -->
+                        </li>
+                        <!-- End:Menu Item -->
+
+                        <!-- Menu Item -->
+                        <li class="nav-item">
+                            <h6 class="d2c_nav_title">Pages</h6>
+
+                            <!-- Sub Menu -->
+                            <ul class="sub-menu collapse show" id="legal">
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/email.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-envelope-open-text"></i>
+                                        </span>
+                                        <span> Mail </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/blank.html">
+                                        <span class="d2c_icon">
+                                            <i class="far fa-file"></i>
+                                        </span>
+                                        <span> Blank </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                 <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/faq.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-question-circle"></i>
+                                        </span>
+                                        <span> FAQ </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" data-bs-toggle="collapse" data-bs-target="#form"
+                                        aria-expanded="false" href="#">
+                                        <span class="d2c_icon">
+                                            <i class="far fa-file-alt"></i>
+                                        </span>
+                                        <span> Form </span>
+                                        <span class="fas fa-chevron-right ms-auto text-end"></span>
+                                    </a>
+                                    <!-- Child Sub Menu -->
+                                    <ul class="sub-menu collapse" id="form">
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/basicForms.html">
+                                                <span> Basic Form </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/advancedForm.html">
+                                                <span> Advanced Form </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+                                    </ul>
+                                    <!-- End:Child Sub Menu -->
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item active">
+                                    <a class="sub-menu-link" data-bs-toggle="collapse" data-bs-target="#table"
+                                        aria-expanded="true" href="#">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-table"></i>
+                                        </span>
+                                        <span> Table </span>
+                                        <span class="fas fa-chevron-right ms-auto text-end"></span>
+                                    </a>
+                                    <!-- Child Sub Menu -->
+                                    <ul class="sub-menu collapse show" id="table">
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/basicTable.html">
+                                                <span> Basic Table </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link active" href="../../pages/components/advancedTable.html">
+                                                <span> Advanced Table </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+                                    </ul>
+                                    <!-- End:Child Sub Menu -->
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" data-bs-toggle="collapse" data-bs-target="#charts"
+                                        aria-expanded="false" href="#">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-chart-pie"></i>
+                                        </span>
+                                        <span> Charts </span>
+                                        <span class="fas fa-chevron-right ms-auto text-end"></span>
+                                    </a>
+                                    <!-- Child Sub Menu -->
+                                    <ul class="sub-menu collapse" id="charts">
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/chartJS.html">
+                                                <span> ChartJS </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/apexCharts.html">
+                                                <span> ApexCharts </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/e_charts.html">
+                                                <span> E-Charts </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/amCharts.html">
+                                                <span> Am Charts </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+                                    </ul>
+                                    <!-- End:Child Sub Menu -->
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" data-bs-toggle="collapse" data-bs-target="#authentication"
+                                        aria-expanded="false" href="#">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-user-lock"></i>
+                                        </span>
+                                        <span> Authentication </span>
+                                        <span class="fas fa-chevron-right ms-auto text-end"></span>
+                                    </a>
+                                    <!-- Child Sub Menu -->
+                                    <ul class="sub-menu collapse" id="authentication">
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/authentication/signUp.html">
+                                                <span> Sing up </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/authentication/signIn.html">
+                                                <span> Sign In </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/authentication/forgetPassword.html">
+                                                <span> Forget Password </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/authentication/lockscreen.html">
+                                                <span> Lock Screen </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/authentication/404.html">
+                                                <span> 404 </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+                                    </ul>
+                                    <!-- End:Child Sub Menu -->
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" data-bs-toggle="collapse" data-bs-target="#components" aria-expanded="false" href="#">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-dice-d6"></i>
+                                        </span>
+                                        <span> Component </span>
+                                        <span class="fas fa-chevron-right ms-auto text-end"></span>
+                                    </a>
+                                    <!-- Child Sub Menu -->
+                                    <ul class="sub-menu collapse" id="components">
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/invoice.html">
+                                                <span> Invoice </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/createInvoice.html">
+                                                <span> Create Invoice </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/calender.html">
+                                                <span> Calendar </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/cards.html">
+                                                <span> Cards </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/timeline.html">
+                                                <span> Timeline </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/map.html">
+                                                <span> Map </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/button.html">
+                                                <span> Buttons </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/listGroup.html">
+                                                <span> List Group </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/alerts.html">
+                                                <span> Alerts </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/modal.html">
+                                                <span> Modals </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/badges.html">
+                                                <span> Badges </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/spinners.html">
+                                                <span> Spinners </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+
+                                        <!-- Child Sub Menu Item -->
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="../../pages/components/progress.html">
+                                                <span> Progress </span>
+                                            </a>
+                                        </li>
+                                        <!-- End:Child Sub Menu Item -->
+                                    </ul>
+                                    <!-- End:Child Sub Menu -->
+                                </li>
+                                <!-- End:Sub Menu Item -->
+
+                                <!-- Sub Menu Item -->
+                                <li class="nav-item">
+                                    <a class="sub-menu-link" href="../../pages/support.html">
+                                        <span class="d2c_icon">
+                                            <i class="fas fa-hands-helping"></i>
+                                        </span>
+                                        <span> Support </span>
+                                    </a>
+                                </li>
+                                <!-- End:Sub Menu Item -->
+                            </ul>
+                            <!-- End:Sub Menu -->
+                        </li>
+                        <!-- End:Menu Item -->
+                    </ul>
+                    <!-- End:Menu -->
+
+                    <!-- Theme Mode -->
+                    <div class="card d2c_switch_card">
+                        <div class="card-body">
+                            <ul class="navbar-nav">
+                                <!-- Item -->
+                                <li class="nav-item clearfix mb-4">
+                                    <div class="float-start me-2">
+                                        <a href="../../pages/profile.html"><img class="w-100 rounded" src="../../assets/images/profile/profile-1.jpg" alt="Profile Image" style="height: 3rem; width: 3rem; object-fit: cover"></a>
+                                    </div>
+                                    <div class="float-start">
+                                        <h6 class="mb-1"><a href="../../pages/profile.html">Wade Warren</a></h6>
+                                        <p class="mb-0">Trader</p>
+                                    </div>
+                                </li>
+                                <!-- Item -->
+                                <li class="nav-item d-flex align-items-center">
+                                    <span>Mood</span>
+                                    <span class="form-switch d-flex ms-auto">
+                                        <input class="form-check-input" id="d2c_theme_changer" type="checkbox" role="switch">
+                                    </span>
+                                </li>
+                                <!-- End:Item -->
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- End:Theme Mode -->
+                </div>
+            </div>
+            <!-- End:Sidebar -->
+
+            <!-- Main Body-->
+            <div class="d2c_main px-0 px-md-2 py-4">
+                <div class="container-fluid">
+                    <!-- Title -->
+                    <h4 class="mb-4 text-capitalize">Advanced Tables</h4>
+                    <!-- End:Title -->
+
+                    <div class="row">
+
+                        <div class="col-xl-12 mb-4">
+                            <!-- Data Table -->
+                            <div class="card h-auto">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Data table</h5>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle" id="d2c_datatable">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width: 150px">Transaction Id</th>
+                                                    <th style="min-width: 70px">Type</th>
+                                                    <th style="min-width: 100px">Coins</th>
+                                                    <th style="min-width: 120px">From</th>
+                                                    <th style="min-width: 120px">To</th>
+                                                    <th style="min-width: 180px">Date</th>
+                                                    <th style="min-width: 120px">Amount</th>
+                                                    <th style="min-width: 120px">Balance</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>124153465342</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-warning text-warning bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Charles Beaird</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>10-4-2023 08:24am</td>
+                                                    <td><span class="text-danger">-0.342345 BTC</span></td>
+                                                    <td>-05.345 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465126</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            BTC
+                                                        </div>
+                                                    </td>
+                                                    <td>Eric Loveland</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>12-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465127</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Bitcoin
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Robert Childs</td>
+                                                    <td>23-4-2023 06:12am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465128</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Yen
+                                                        </div>
+                                                    </td>
+                                                    <td>Doug Michelson</td>
+                                                    <td>Edwi Bedoya</td>
+                                                    <td>29-6-2024 06:24am</td>
+                                                    <td><span class="text-success">1.000242 BTC</span></td>
+                                                    <td>-25.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465129</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Ruble
+                                                        </div>
+                                                    </td>
+                                                    <td>Mike Cox</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-15.876 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465130</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-secondary text-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            BTC
+                                                        </div>
+                                                    </td>
+                                                    <td>Victor Leatherman</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465131</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Dollar
+                                                        </div>
+                                                    </td>
+                                                    <td>Jeffrey Lockhart</td>
+                                                    <td>Ned Fonseca</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465132</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465133</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465134</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465135</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465136</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-warning text-warning bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465137</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465138</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End:Advanced Table -->
+                        </div>
+
+                        <div class="col-xl-12 mb-4">
+                            <!-- button selection control -->
+                            <div class="card h-auto">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Button selection control</h5>
+                                    <div class="table-responsive">
+                                        <table id="d2c_selection_control" class="table w-100 display">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Position</th>
+                                                    <th>Office</th>
+                                                    <th>Age</th>
+                                                    <th>Start date</th>
+                                                    <th>Salary</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Tiger Nixon</td>
+                                                    <td>System Architect</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>61</td>
+                                                    <td>2011-04-25</td>
+                                                    <td>$320,800</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Garrett Winters</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>63</td>
+                                                    <td>2011-07-25</td>
+                                                    <td>$170,750</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ashton Cox</td>
+                                                    <td>Junior Technical Author</td>
+                                                    <td>San Francisco</td>
+                                                    <td>66</td>
+                                                    <td>2009-01-12</td>
+                                                    <td>$86,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cedric Kelly</td>
+                                                    <td>Senior Javascript Developer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2012-03-29</td>
+                                                    <td>$433,060</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Airi Satou</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>33</td>
+                                                    <td>2008-11-28</td>
+                                                    <td>$162,700</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Brielle Williamson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>New York</td>
+                                                    <td>61</td>
+                                                    <td>2012-12-02</td>
+                                                    <td>$372,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Herrod Chandler</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>San Francisco</td>
+                                                    <td>59</td>
+                                                    <td>2012-08-06</td>
+                                                    <td>$137,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Rhona Davidson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>Tokyo</td>
+                                                    <td>55</td>
+                                                    <td>2010-10-14</td>
+                                                    <td>$327,900</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Colleen Hurst</td>
+                                                    <td>Javascript Developer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>39</td>
+                                                    <td>2009-09-15</td>
+                                                    <td>$205,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sonya Frost</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>23</td>
+                                                    <td>2008-12-13</td>
+                                                    <td>$103,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jena Gaines</td>
+                                                    <td>Office Manager</td>
+                                                    <td>London</td>
+                                                    <td>30</td>
+                                                    <td>2008-12-19</td>
+                                                    <td>$90,560</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Quinn Flynn</td>
+                                                    <td>Support Lead</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2013-03-03</td>
+                                                    <td>$342,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Charde Marshall</td>
+                                                    <td>Regional Director</td>
+                                                    <td>San Francisco</td>
+                                                    <td>36</td>
+                                                    <td>2008-10-16</td>
+                                                    <td>$470,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Haley Kennedy</td>
+                                                    <td>Senior Marketing Designer</td>
+                                                    <td>London</td>
+                                                    <td>43</td>
+                                                    <td>2012-12-18</td>
+                                                    <td>$313,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tatyana Fitzpatrick</td>
+                                                    <td>Regional Director</td>
+                                                    <td>London</td>
+                                                    <td>19</td>
+                                                    <td>2010-03-17</td>
+                                                    <td>$385,750</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Position</th>
+                                                    <th>Office</th>
+                                                    <th>Age</th>
+                                                    <th>Start date</th>
+                                                    <th>Salary</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End:Advanced Table -->
+                        </div> 
+
+                        <div class="col-xl-12 mb-4">
+                            <!-- vertical scroll Table -->
+                            <div class="card h-auto">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Vertical scroll table</h5>
+                                    <div class="table-responsive">
+                                        <table id="d2c_vertical_scroll" class="table display w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width: 120px">Name</th>
+                                                    <th style="min-width: 120px">Position</th>
+                                                    <th style="min-width: 120px">Office</th>
+                                                    <th style="min-width: 80px">Age</th>
+                                                    <th style="min-width: 120px">Start date</th>
+                                                    <th style="min-width: 120px">Salary</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Tiger Nixon</td>
+                                                    <td>System Architect</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>61</td>
+                                                    <td>2011-04-25</td>
+                                                    <td>$320,800</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Garrett Winters</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>63</td>
+                                                    <td>2011-07-25</td>
+                                                    <td>$170,750</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ashton Cox</td>
+                                                    <td>Junior Technical Author</td>
+                                                    <td>San Francisco</td>
+                                                    <td>66</td>
+                                                    <td>2009-01-12</td>
+                                                    <td>$86,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cedric Kelly</td>
+                                                    <td>Senior Javascript Developer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2012-03-29</td>
+                                                    <td>$433,060</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Airi Satou</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>33</td>
+                                                    <td>2008-11-28</td>
+                                                    <td>$162,700</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Brielle Williamson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>New York</td>
+                                                    <td>61</td>
+                                                    <td>2012-12-02</td>
+                                                    <td>$372,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Herrod Chandler</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>San Francisco</td>
+                                                    <td>59</td>
+                                                    <td>2012-08-06</td>
+                                                    <td>$137,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Rhona Davidson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>Tokyo</td>
+                                                    <td>55</td>
+                                                    <td>2010-10-14</td>
+                                                    <td>$327,900</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Colleen Hurst</td>
+                                                    <td>Javascript Developer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>39</td>
+                                                    <td>2009-09-15</td>
+                                                    <td>$205,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sonya Frost</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>23</td>
+                                                    <td>2008-12-13</td>
+                                                    <td>$103,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jena Gaines</td>
+                                                    <td>Office Manager</td>
+                                                    <td>London</td>
+                                                    <td>30</td>
+                                                    <td>2008-12-19</td>
+                                                    <td>$90,560</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Quinn Flynn</td>
+                                                    <td>Support Lead</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2013-03-03</td>
+                                                    <td>$342,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Charde Marshall</td>
+                                                    <td>Regional Director</td>
+                                                    <td>San Francisco</td>
+                                                    <td>36</td>
+                                                    <td>2008-10-16</td>
+                                                    <td>$470,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Haley Kennedy</td>
+                                                    <td>Senior Marketing Designer</td>
+                                                    <td>London</td>
+                                                    <td>43</td>
+                                                    <td>2012-12-18</td>
+                                                    <td>$313,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tatyana Fitzpatrick</td>
+                                                    <td>Regional Director</td>
+                                                    <td>London</td>
+                                                    <td>19</td>
+                                                    <td>2010-03-17</td>
+                                                    <td>$385,750</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Michael Silva</td>
+                                                    <td>Marketing Designer</td>
+                                                    <td>London</td>
+                                                    <td>66</td>
+                                                    <td>2012-11-27</td>
+                                                    <td>$198,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Paul Byrd</td>
+                                                    <td>Chief Financial Officer (CFO)</td>
+                                                    <td>New York</td>
+                                                    <td>64</td>
+                                                    <td>2010-06-09</td>
+                                                    <td>$725,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gloria Little</td>
+                                                    <td>Systems Administrator</td>
+                                                    <td>New York</td>
+                                                    <td>59</td>
+                                                    <td>2009-04-10</td>
+                                                    <td>$237,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Bradley Greer</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>London</td>
+                                                    <td>41</td>
+                                                    <td>2012-10-13</td>
+                                                    <td>$132,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Dai Rios</td>
+                                                    <td>Personnel Lead</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>35</td>
+                                                    <td>2012-09-26</td>
+                                                    <td>$217,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jenette Caldwell</td>
+                                                    <td>Development Lead</td>
+                                                    <td>New York</td>
+                                                    <td>30</td>
+                                                    <td>2011-09-03</td>
+                                                    <td>$345,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Yuri Berry</td>
+                                                    <td>Chief Marketing Officer (CMO)</td>
+                                                    <td>New York</td>
+                                                    <td>40</td>
+                                                    <td>2009-06-25</td>
+                                                    <td>$675,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Caesar Vance</td>
+                                                    <td>Pre-Sales Support</td>
+                                                    <td>New York</td>
+                                                    <td>21</td>
+                                                    <td>2011-12-12</td>
+                                                    <td>$106,450</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Doris Wilder</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>Sydney</td>
+                                                    <td>23</td>
+                                                    <td>2010-09-20</td>
+                                                    <td>$85,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Angelica Ramos</td>
+                                                    <td>Chief Executive Officer (CEO)</td>
+                                                    <td>London</td>
+                                                    <td>47</td>
+                                                    <td>2009-10-09</td>
+                                                    <td>$1,200,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gavin Joyce</td>
+                                                    <td>Developer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>42</td>
+                                                    <td>2010-12-22</td>
+                                                    <td>$92,575</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jennifer Chang</td>
+                                                    <td>Regional Director</td>
+                                                    <td>Singapore</td>
+                                                    <td>28</td>
+                                                    <td>2010-11-14</td>
+                                                    <td>$357,650</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Brenden Wagner</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>28</td>
+                                                    <td>2011-06-07</td>
+                                                    <td>$206,850</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Fiona Green</td>
+                                                    <td>Chief Operating Officer (COO)</td>
+                                                    <td>San Francisco</td>
+                                                    <td>48</td>
+                                                    <td>2010-03-11</td>
+                                                    <td>$850,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Shou Itou</td>
+                                                    <td>Regional Marketing</td>
+                                                    <td>Tokyo</td>
+                                                    <td>20</td>
+                                                    <td>2011-08-14</td>
+                                                    <td>$163,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Michelle House</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>Sydney</td>
+                                                    <td>37</td>
+                                                    <td>2011-06-02</td>
+                                                    <td>$95,400</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Suki Burks</td>
+                                                    <td>Developer</td>
+                                                    <td>London</td>
+                                                    <td>53</td>
+                                                    <td>2009-10-22</td>
+                                                    <td>$114,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Prescott Bartlett</td>
+                                                    <td>Technical Author</td>
+                                                    <td>London</td>
+                                                    <td>27</td>
+                                                    <td>2011-05-07</td>
+                                                    <td>$145,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gavin Cortez</td>
+                                                    <td>Team Leader</td>
+                                                    <td>San Francisco</td>
+                                                    <td>22</td>
+                                                    <td>2008-10-26</td>
+                                                    <td>$235,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Martena Mccray</td>
+                                                    <td>Post-Sales support</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>46</td>
+                                                    <td>2011-03-09</td>
+                                                    <td>$324,050</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Unity Butler</td>
+                                                    <td>Marketing Designer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>47</td>
+                                                    <td>2009-12-09</td>
+                                                    <td>$85,675</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Howard Hatfield</td>
+                                                    <td>Office Manager</td>
+                                                    <td>San Francisco</td>
+                                                    <td>51</td>
+                                                    <td>2008-12-16</td>
+                                                    <td>$164,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Hope Fuentes</td>
+                                                    <td>Secretary</td>
+                                                    <td>San Francisco</td>
+                                                    <td>41</td>
+                                                    <td>2010-02-12</td>
+                                                    <td>$109,850</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Vivian Harrell</td>
+                                                    <td>Financial Controller</td>
+                                                    <td>San Francisco</td>
+                                                    <td>62</td>
+                                                    <td>2009-02-14</td>
+                                                    <td>$452,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Timothy Mooney</td>
+                                                    <td>Office Manager</td>
+                                                    <td>London</td>
+                                                    <td>37</td>
+                                                    <td>2008-12-11</td>
+                                                    <td>$136,200</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jackson Bradshaw</td>
+                                                    <td>Director</td>
+                                                    <td>New York</td>
+                                                    <td>65</td>
+                                                    <td>2008-09-26</td>
+                                                    <td>$645,750</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Olivia Liang</td>
+                                                    <td>Support Engineer</td>
+                                                    <td>Singapore</td>
+                                                    <td>64</td>
+                                                    <td>2011-02-03</td>
+                                                    <td>$234,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Bruno Nash</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>London</td>
+                                                    <td>38</td>
+                                                    <td>2011-05-03</td>
+                                                    <td>$163,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sakura Yamamoto</td>
+                                                    <td>Support Engineer</td>
+                                                    <td>Tokyo</td>
+                                                    <td>37</td>
+                                                    <td>2009-08-19</td>
+                                                    <td>$139,575</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Thor Walton</td>
+                                                    <td>Developer</td>
+                                                    <td>New York</td>
+                                                    <td>61</td>
+                                                    <td>2013-08-11</td>
+                                                    <td>$98,540</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Finn Camacho</td>
+                                                    <td>Support Engineer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>47</td>
+                                                    <td>2009-07-07</td>
+                                                    <td>$87,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Serge Baldwin</td>
+                                                    <td>Data Coordinator</td>
+                                                    <td>Singapore</td>
+                                                    <td>64</td>
+                                                    <td>2012-04-09</td>
+                                                    <td>$138,575</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Zenaida Frank</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>New York</td>
+                                                    <td>63</td>
+                                                    <td>2010-01-04</td>
+                                                    <td>$125,250</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Zorita Serrano</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>56</td>
+                                                    <td>2012-06-01</td>
+                                                    <td>$115,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jennifer Acosta</td>
+                                                    <td>Junior Javascript Developer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>43</td>
+                                                    <td>2013-02-01</td>
+                                                    <td>$75,650</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cara Stevens</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>New York</td>
+                                                    <td>46</td>
+                                                    <td>2011-12-06</td>
+                                                    <td>$145,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Hermione Butler</td>
+                                                    <td>Regional Director</td>
+                                                    <td>London</td>
+                                                    <td>47</td>
+                                                    <td>2011-03-21</td>
+                                                    <td>$356,250</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Lael Greer</td>
+                                                    <td>Systems Administrator</td>
+                                                    <td>London</td>
+                                                    <td>21</td>
+                                                    <td>2009-02-27</td>
+                                                    <td>$103,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jonas Alexander</td>
+                                                    <td>Developer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>30</td>
+                                                    <td>2010-07-14</td>
+                                                    <td>$86,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Shad Decker</td>
+                                                    <td>Regional Director</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>51</td>
+                                                    <td>2008-11-13</td>
+                                                    <td>$183,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Michael Bruce</td>
+                                                    <td>Javascript Developer</td>
+                                                    <td>Singapore</td>
+                                                    <td>29</td>
+                                                    <td>2011-06-27</td>
+                                                    <td>$183,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Donna Snider</td>
+                                                    <td>Customer Support</td>
+                                                    <td>New York</td>
+                                                    <td>27</td>
+                                                    <td>2011-01-25</td>
+                                                    <td>$112,000</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Position</th>
+                                                    <th>Office</th>
+                                                    <th>Age</th>
+                                                    <th>Start date</th>
+                                                    <th>Salary</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End:Basic Table -->
+                        </div>
+
+                        <div class="col-xl-12 mb-4">
+                            <!-- Complex headers with column visibility -->
+                            <div class="card h-auto">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Complex headers with column visibility</h5>
+                                    <div class="table-responsive">
+                                        <table id="d2c_complex_header" class="table display" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th rowspan="2" style="min-width: 150px;" class="text-primary">Name</th>
+                                                    <th colspan="2" style="min-width: 150px;" class="text-primary">HR Information</th>
+                                                    <th colspan="3" style="min-width: 150px;" class="text-primary">Contact</th>
+                                                </tr>
+                                                <tr>
+                                                    <th style="min-width: 220px;" class="text-primary">Position</th>
+                                                    <th style="min-width: 150px;" class="text-primary">Salary</th>
+                                                    <th style="min-width: 150px;" class="text-primary">Office</th>
+                                                    <th style="min-width: 150px;" class="text-primary">Extn.</th>
+                                                    <th style="min-width: 150px;" class="text-primary">E-mail</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Tiger Nixon</td>
+                                                    <td>System Architect</td>
+                                                    <td>$320,800</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>5421</td>
+                                                    <td>t.nixon@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Garrett Winters</td>
+                                                    <td>Accountant</td>
+                                                    <td>$170,750</td>
+                                                    <td>Tokyo</td>
+                                                    <td>8422</td>
+                                                    <td>g.winters@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ashton Cox</td>
+                                                    <td>Junior Technical Author</td>
+                                                    <td>$86,000</td>
+                                                    <td>San Francisco</td>
+                                                    <td>1562</td>
+                                                    <td>a.cox@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cedric Kelly</td>
+                                                    <td>Senior Javascript Developer</td>
+                                                    <td>$433,060</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>6224</td>
+                                                    <td>c.kelly@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Airi Satou</td>
+                                                    <td>Accountant</td>
+                                                    <td>$162,700</td>
+                                                    <td>Tokyo</td>
+                                                    <td>5407</td>
+                                                    <td>a.satou@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Brielle Williamson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>$372,000</td>
+                                                    <td>New York</td>
+                                                    <td>4804</td>
+                                                    <td>b.williamson@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Herrod Chandler</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>$137,500</td>
+                                                    <td>San Francisco</td>
+                                                    <td>9608</td>
+                                                    <td>h.chandler@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Rhona Davidson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>$327,900</td>
+                                                    <td>Tokyo</td>
+                                                    <td>6200</td>
+                                                    <td>r.davidson@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Colleen Hurst</td>
+                                                    <td>Javascript Developer</td>
+                                                    <td>$205,500</td>
+                                                    <td>San Francisco</td>
+                                                    <td>2360</td>
+                                                    <td>c.hurst@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sonya Frost</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>$103,600</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>1667</td>
+                                                    <td>s.frost@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jena Gaines</td>
+                                                    <td>Office Manager</td>
+                                                    <td>$90,560</td>
+                                                    <td>London</td>
+                                                    <td>3814</td>
+                                                    <td>j.gaines@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Quinn Flynn</td>
+                                                    <td>Support Lead</td>
+                                                    <td>$342,000</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>9497</td>
+                                                    <td>q.flynn@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Charde Marshall</td>
+                                                    <td>Regional Director</td>
+                                                    <td>$470,600</td>
+                                                    <td>San Francisco</td>
+                                                    <td>6741</td>
+                                                    <td>c.marshall@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Haley Kennedy</td>
+                                                    <td>Senior Marketing Designer</td>
+                                                    <td>$313,500</td>
+                                                    <td>London</td>
+                                                    <td>3597</td>
+                                                    <td>h.kennedy@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tatyana Fitzpatrick</td>
+                                                    <td>Regional Director</td>
+                                                    <td>$385,750</td>
+                                                    <td>London</td>
+                                                    <td>1965</td>
+                                                    <td>t.fitzpatrick@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Michael Silva</td>
+                                                    <td>Marketing Designer</td>
+                                                    <td>$198,500</td>
+                                                    <td>London</td>
+                                                    <td>1581</td>
+                                                    <td>m.silva@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Paul Byrd</td>
+                                                    <td>Chief Financial Officer (CFO)</td>
+                                                    <td>$725,000</td>
+                                                    <td>New York</td>
+                                                    <td>3059</td>
+                                                    <td>p.byrd@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gloria Little</td>
+                                                    <td>Systems Administrator</td>
+                                                    <td>$237,500</td>
+                                                    <td>New York</td>
+                                                    <td>1721</td>
+                                                    <td>g.little@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Bradley Greer</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>$132,000</td>
+                                                    <td>London</td>
+                                                    <td>2558</td>
+                                                    <td>b.greer@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Dai Rios</td>
+                                                    <td>Personnel Lead</td>
+                                                    <td>$217,500</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>2290</td>
+                                                    <td>d.rios@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jenette Caldwell</td>
+                                                    <td>Development Lead</td>
+                                                    <td>$345,000</td>
+                                                    <td>New York</td>
+                                                    <td>1937</td>
+                                                    <td>j.caldwell@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Yuri Berry</td>
+                                                    <td>Chief Marketing Officer (CMO)</td>
+                                                    <td>$675,000</td>
+                                                    <td>New York</td>
+                                                    <td>6154</td>
+                                                    <td>y.berry@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Caesar Vance</td>
+                                                    <td>Pre-Sales Support</td>
+                                                    <td>$106,450</td>
+                                                    <td>New York</td>
+                                                    <td>8330</td>
+                                                    <td>c.vance@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Doris Wilder</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>$85,600</td>
+                                                    <td>Sydney</td>
+                                                    <td>3023</td>
+                                                    <td>d.wilder@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Angelica Ramos</td>
+                                                    <td>Chief Executive Officer (CEO)</td>
+                                                    <td>$1,200,000</td>
+                                                    <td>London</td>
+                                                    <td>5797</td>
+                                                    <td>a.ramos@datatables.net</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Gavin Joyce</td>
+                                                    <td>Developer</td>
+                                                    <td>$92,575</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>8822</td>
+                                                    <td>g.joyce@datatables.net</td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Position</th>
+                                                    <th>Salary</th>
+                                                    <th>Office</th>
+                                                    <th>Extn.</th>
+                                                    <th>E-mail</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End:Advanced Table -->
+                        </div>
+
+                        <div class="col-xl-12 mb-4">
+                            <!-- Pagination with numbering Table -->
+                            <div class="card h-auto">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Pagination with numbering</h5>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle" id="d2c_table_with_pagination">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width: 150px">Transaction Id</th>
+                                                    <th style="min-width: 70px">Type</th>
+                                                    <th style="min-width: 100px">Coins</th>
+                                                    <th style="min-width: 120px">From</th>
+                                                    <th style="min-width: 120px">To</th>
+                                                    <th style="min-width: 180px">Date</th>
+                                                    <th style="min-width: 120px">Amount</th>
+                                                    <th style="min-width: 120px">Balance</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>124153465342</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-warning text-warning bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Charles Beaird</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>10-4-2023 08:24am</td>
+                                                    <td><span class="text-danger">-0.342345 BTC</span></td>
+                                                    <td>-05.345 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465126</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            BTC
+                                                        </div>
+                                                    </td>
+                                                    <td>Eric Loveland</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>12-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465127</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Bitcoin
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Robert Childs</td>
+                                                    <td>23-4-2023 06:12am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465128</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Yen
+                                                        </div>
+                                                    </td>
+                                                    <td>Doug Michelson</td>
+                                                    <td>Edwi Bedoya</td>
+                                                    <td>29-6-2024 06:24am</td>
+                                                    <td><span class="text-success">1.000242 BTC</span></td>
+                                                    <td>-25.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465129</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Ruble
+                                                        </div>
+                                                    </td>
+                                                    <td>Mike Cox</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-15.876 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465130</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-secondary text-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            BTC
+                                                        </div>
+                                                    </td>
+                                                    <td>Victor Leatherman</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465131</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            Dollar
+                                                        </div>
+                                                    </td>
+                                                    <td>Jeffrey Lockhart</td>
+                                                    <td>Ned Fonseca</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465132</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465133</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465134</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465135</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465136</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-warning text-warning bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465137</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465138</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465126</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465127</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465128</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465129</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465130</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-secondary text-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465131</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465132</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465126</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465127</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465128</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465129</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465130</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-secondary text-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465131</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465132</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465126</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465127</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-success text-success bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465128</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465129</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-info text-info bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465130</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-secondary text-secondary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465131</td>
+                                                    <td><span class="text-success">Buy</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-danger text-danger bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-success">0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>124153465132</td>
+                                                    <td><span class="text-danger">Sold</span></td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d2c_coin_icon_wrapper px-2 py-1 bg-primary text-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center rounded">
+                                                                <i class="fas fa-dollar-sign"></i>
+                                                            </div>
+                                                            USD
+                                                        </div>
+                                                    </td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>Jane Cooper</td>
+                                                    <td>2-4-2023 06:24am</td>
+                                                    <td><span class="text-danger">-0.000242 BTC</span></td>
+                                                    <td>-05.125 USD</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- End:Advanced Table -->
+                        </div>
+
+                        <!-- delete selected row -->
+                        <div class="col-xl-12 mb-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="text-capitalize mb-3">Delete selected row</h5>
+                                    <div class="table-responsive">
+                                        <p><button class="btn btn-primary" id="button">Remove</button></p>
+                                        <table id="d2c_delete_row" class="table display w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Position</th>
+                                                    <th>Office</th>
+                                                    <th>Age</th>
+                                                    <th>Start date</th>
+                                                    <th>Salary</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Tiger Nixon</td>
+                                                    <td>System Architect</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>61</td>
+                                                    <td>2011-04-25</td>
+                                                    <td>$320,800</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Garrett Winters</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>63</td>
+                                                    <td>2011-07-25</td>
+                                                    <td>$170,750</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ashton Cox</td>
+                                                    <td>Junior Technical Author</td>
+                                                    <td>San Francisco</td>
+                                                    <td>66</td>
+                                                    <td>2009-01-12</td>
+                                                    <td>$86,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Cedric Kelly</td>
+                                                    <td>Senior Javascript Developer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2012-03-29</td>
+                                                    <td>$433,060</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Airi Satou</td>
+                                                    <td>Accountant</td>
+                                                    <td>Tokyo</td>
+                                                    <td>33</td>
+                                                    <td>2008-11-28</td>
+                                                    <td>$162,700</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Brielle Williamson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>New York</td>
+                                                    <td>61</td>
+                                                    <td>2012-12-02</td>
+                                                    <td>$372,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Herrod Chandler</td>
+                                                    <td>Sales Assistant</td>
+                                                    <td>San Francisco</td>
+                                                    <td>59</td>
+                                                    <td>2012-08-06</td>
+                                                    <td>$137,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Rhona Davidson</td>
+                                                    <td>Integration Specialist</td>
+                                                    <td>Tokyo</td>
+                                                    <td>55</td>
+                                                    <td>2010-10-14</td>
+                                                    <td>$327,900</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Colleen Hurst</td>
+                                                    <td>Javascript Developer</td>
+                                                    <td>San Francisco</td>
+                                                    <td>39</td>
+                                                    <td>2009-09-15</td>
+                                                    <td>$205,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Sonya Frost</td>
+                                                    <td>Software Engineer</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>23</td>
+                                                    <td>2008-12-13</td>
+                                                    <td>$103,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jena Gaines</td>
+                                                    <td>Office Manager</td>
+                                                    <td>London</td>
+                                                    <td>30</td>
+                                                    <td>2008-12-19</td>
+                                                    <td>$90,560</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Quinn Flynn</td>
+                                                    <td>Support Lead</td>
+                                                    <td>Edinburgh</td>
+                                                    <td>22</td>
+                                                    <td>2013-03-03</td>
+                                                    <td>$342,000</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Charde Marshall</td>
+                                                    <td>Regional Director</td>
+                                                    <td>San Francisco</td>
+                                                    <td>36</td>
+                                                    <td>2008-10-16</td>
+                                                    <td>$470,600</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Haley Kennedy</td>
+                                                    <td>Senior Marketing Designer</td>
+                                                    <td>London</td>
+                                                    <td>43</td>
+                                                    <td>2012-12-18</td>
+                                                    <td>$313,500</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tatyana Fitzpatrick</td>
+                                                    <td>Regional Director</td>
+                                                    <td>London</td>
+                                                    <td>19</td>
+                                                    <td>2010-03-17</td>
+                                                    <td>$385,750</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>     
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- End:Main Body -->
+        </div>
+
+        <!-- Offcanvas Toggler -->
+        <button class="d2c_offcanvas_toggle position-fixed top-50 start-0 translate-middle-y d-block d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#d2c_sidebar" aria-controls="d2c_sidebar">
+            <i class="far fa-hand-point-right"></i>
+        </button>
+        <!-- End:Offcanvas Toggler -->
+
+        <!-- Initial  Javascript -->
+        <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+        <script src="../../lib/bootstrap_5/bootstrap.bundle.min.js"></script>
+
+        <!-- custom js -->
+        <script src="../../assets/js/main.js"></script>
+
+        <!-- DataTable JS -->
+        <script src="../../lib/DataTables/datatables.min.js"></script>
+        <script src="../../assets/js/datatable/script.js"></script>
+        <script src="../../lib/DataTables/dataTables.select.min.js"></script>
+        <script src="../../lib/DataTables/dataTables.buttons.min.js"></script>
+
+    <!-- 
+            Template Name: IC Crypto - Free Bootstrap Crypto Dashboard Admin Template
+            Template URI:  https://www.designtocodes.com/product/ic-crypto-free-bootstrap-crypto-dashboard-admin-template
+            Description:   IC Crypto is an impressive and free crypto admin dashboard template that caters to the needs of cryptocurrency enthusiasts and professionals alike. Its well-designed interface, comprehensive features, and accessibility make it a strong contender as one of the best crypto dashboard templates available for download.
+            Author:        DesignToCodes
+            Author URI:    https://www.designtocodes.com
+            Text Domain:   IC Crypto
+  	    -->
+    </body>
+</html>

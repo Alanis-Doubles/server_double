@@ -28,11 +28,16 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                     "direction" => $object['cor'] == 'black' ? "call" : "put",
                 ];
 
-                $service->jogarAPI($usuario, $params);
+                $executou = $service->jogarAPI($usuario, $params);
+                if (!$executou) {
+                    echo "Erro ao realizar entrada\n";
+                    return;
+                }
 
-                $canal = 'profit_usuario_' . $usuario->id;
+               $canal  = 'profit_usuario_' . $usuario->id;
                 $this->pubsub->subscribe($canal);
                 $this->pubsub->unsubscribe(self::redis_canal);
+                echo "Conectando no canal {$canal}\n";
                 
                 foreach ($this->pubsub as $message) {
                     $message = (object) $message;
@@ -40,7 +45,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                             $usuario = DoubleUsuario::identificarPorId($usuario->id);
                             echo "received message: {$message->channel} - {$message->payload}\n";
                             $payload = json_decode($message->payload); 
-                            if ($payload->resultado === 'win') {
+                            if ($payload->tipo === 'WIN') {
                                 $this->notificar_usuario_historico_consumidores([
                                     'sequencia' => $usuario->robo_sequencia,
                                     'usuario_id' => $usuario->id,
@@ -48,7 +53,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'entrada_id' => $object['id'],
                                     'valor_entrada' => $payload->valor_entrada,
                                     'valor_branco' => 0,
-                                    'gale' => $payload->protecao,
+                                    'gale' => $payload->gale,
                                     'tipo' => 'WIN',
                                     'cor'  => $payload->cor,
                                     'robo_inicio' => $usuario->robo_inicio,
@@ -76,7 +81,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     $botao_inicio
                                 ); 
                                 break;
-                            } elseif ($payload->resultado === 'loss') {
+                            } elseif ($payload->tipo === 'LOSS') {
                                 // $usuario->quantidade_loss += 1;
                                 // $usuario->saveInTransaction();
 
@@ -87,7 +92,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'entrada_id' => $object['id'],
                                     'valor_entrada' => $payload->valor_entrada,
                                     'valor_branco' => 0,
-                                    'gale' => $payload->protecao,
+                                    'gale' => $payload->gale,
                                     'tipo' => 'LOSS',
                                     'cor'  => $payload->cor,
                                     'robo_inicio' => $usuario->robo_inicio,
@@ -111,7 +116,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     $botao_inicio
                                 ); 
                                 break;
-                            } elseif ($payload->resultado === 'gale') {
+                            } elseif ($payload->tipo === 'GALE') {
                                 // $usuario->quantidade_loss += 1;
                                 // $usuario->saveInTransaction();
 
@@ -122,7 +127,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'entrada_id' => $object['id'],
                                     'valor_entrada' => $payload->valor_entrada,
                                     'valor_branco' => 0,
-                                    'gale' => $payload->protecao,
+                                    'gale' => $payload->gale - 1,
                                     'tipo' => 'GALE',
                                     'cor'  => $payload->cor,
                                     'robo_inicio' => $usuario->robo_inicio,
@@ -132,7 +137,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'fator' => $payload->fator,
                                     'ticker' => $payload->ticker
                                 ]);
-                            } elseif ($payload->resultado === 'saldo_insuficiente') {
+                            } elseif ($payload->tipo === 'saldo_insuficiente') {
                                 $usuario->robo_iniciar = 'N';
                                 $usuario->robo_status = 'PARANDO';
                                 $usuario->saveInTransaction();
@@ -144,7 +149,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     $botao_inicio
                                 );
                                 break;
-                            } elseif ($payload->resultado === 'stop') {
+                            } elseif ($payload->tipo === 'STOP') {
                                 if ($usuario->robo_status == "EXECUTANDO") {
                                     $usuario->robo_iniciar = 'N';
                                     $usuario->robo_status = 'PARADO';
@@ -159,10 +164,15 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                 }
                                 
                                 break;
-                            } else { // outros
+                            } elseif ($payload->tipo === 'ENTRADA') {
+                                echo "Entrou aqui\n";
+                            } elseif ($payload->tipo === 'ORDEM_REALIZADA') {}
+                            else { // outros
+                                echo "Saiu aqui\n";
                                 break;
                             }
                     }
+                    echo "aguardando próximo sinal do usuário\n";
                 }
             
             }
@@ -183,7 +193,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
 
         $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
             'read_write_timeout' => -1
         ]);
@@ -228,6 +238,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                             exit;
                         }
                     }
+                    echo "aguardando próximo sinal da sala de sinal\n";
                 } 
             } catch (\Throwable $th) {
                 $trace = ''; // json_encode($th->getTrace());
@@ -235,7 +246,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
 
                 $redis = new Client([
                     'scheme' => 'tcp',
-                    'host'   => '180.149.34.86', // IP do seu Redis
+                    'host'   => $this->hostUsuario(), // IP do seu Redis
                     'port'   => 6379, // Porta padrão do Redis
                     'read_write_timeout' => -1
                 ]);
@@ -250,10 +261,10 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
     public function validar_stop_win_loss($param) 
     {
         $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
-        $canal = DoubleCanal::identificarPorChannel($param['channel_id']);
+        // $canal = DoubleCanal::identificar($param['channel_id']);
         
-        if (!$canal)
-            throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
+        // if (!$canal)
+        //     throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);
 
         if (!$plataforma) 
             throw new Exception($plataforma->translate->MSG_OPERACAO_NAO_SUPORTADA);

@@ -17,16 +17,20 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
         $channel_name = strtolower("{$this->serverName()}_usuario_historico");
         $channel_notify = strtolower("{$this->serverName()}_usuario_historico_notify");
 
+        echo "notificar_usuario_historico_consumidores - 1\n";
         $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
         ]);
+        echo "notificar_usuario_historico_consumidores - 2\n";
         $redis->lpush($channel_name, json_encode($historico));
+        echo "notificar_usuario_historico_consumidores - 3\n";
         $redis->publish($channel_notify, json_encode($historico));
+        echo "notificar_usuario_historico_consumidores - 4\n";
 
         $payload = json_encode($historico);
-        // echo "$channel_notify - $payload\n";
+        echo "$channel_notify - $payload\n";
     }
 
     private function aguardar_entrada()

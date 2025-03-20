@@ -1,6 +1,7 @@
+--- Create system_change_log table
 CREATE TABLE system_change_log (
-    id INTEGER PRIMARY KEY NOT NULL,
-    logdate timestamp,
+    id int PRIMARY KEY NOT NULL,
+    logdate varchar(20),
     login varchar(256),
     tablename varchar(256),
     primarykey varchar(256),
@@ -19,9 +20,11 @@ CREATE TABLE system_change_log (
     log_month varchar(2),
     log_day varchar(2)
 );
+
+--- Create system_sql_log table
 CREATE TABLE system_sql_log (
-    id INTEGER PRIMARY KEY NOT NULL,
-    logdate timestamp,
+    id int PRIMARY KEY NOT NULL,
+    logdate varchar(20),
     login varchar(256),
     database_name varchar(256),
     sql_command text,
@@ -37,23 +40,26 @@ CREATE TABLE system_sql_log (
     log_month varchar(2),
     log_day varchar(2)
 );
+
+--- Create system_access_log table
 CREATE TABLE system_access_log (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     sessionid varchar(256),
     login varchar(256),
-    login_time timestamp,
+    login_time varchar(20),
     login_year varchar(4),
     login_month varchar(2),
     login_day varchar(2),
-    logout_time timestamp,
+    logout_time varchar(20),
     impersonated char(1),
     access_ip varchar(45),
     impersonated_by varchar(200)
 );
 
+--- Create system_request_log table
 CREATE TABLE system_request_log (
-    id INTEGER PRIMARY KEY NOT NULL,
-    endpoint varchar(4096),
+    id int PRIMARY KEY NOT NULL,
+    endpoint text,
     logdate varchar(256),
     log_year varchar(4),
     log_month varchar(2),
@@ -70,17 +76,30 @@ CREATE TABLE system_request_log (
     query_string text,
     request_headers text,
     request_body text,
-    request_duration INT
+    request_duration int
 );
 
+--- Create system_access_notification_log table
 CREATE TABLE system_access_notification_log (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     login varchar(256),
     email varchar(256),
     ip_address varchar(256),
     login_time varchar(256)
 );
 
+--- Create system_schedule_log table
+CREATE TABLE system_schedule_log (
+    id int PRIMARY KEY NOT NULL,
+    logdate varchar(19),
+    title varchar(256),
+    class_name varchar(256),
+    method varchar(256),
+    status varchar(1),
+    message text
+);
+
+--- Create indexes
 CREATE INDEX sys_change_log_login_idx ON system_change_log(login);
 CREATE INDEX sys_change_log_date_idx ON system_change_log(logdate);
 CREATE INDEX sys_change_log_year_idx ON system_change_log(log_year);
@@ -112,3 +131,5 @@ CREATE INDEX sys_request_log_method_idx ON system_request_log(class_method);
 
 CREATE INDEX sys_access_notification_log_login_idx ON system_access_notification_log(login);
 
+CREATE INDEX sys_schedule_log_class_idx ON system_schedule_log(class_name);
+CREATE INDEX sys_schedule_log_method_idx ON system_schedule_log(method);

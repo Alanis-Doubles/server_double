@@ -5,7 +5,7 @@ use Adianti\Database\TTransaction;
 /**
  * SystemChangeLogTrait
  *
- * @version    7.6
+ * @version    8.0
  * @package    model
  * @subpackage log
  * @author     Pablo Dall'Oglio

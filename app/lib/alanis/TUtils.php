@@ -99,7 +99,7 @@ class TUtils
     public static function createXMLBreadCrumb($xml_file, $controller)
     {
         $frontpageController = TSession::getValue('frontpage');
-        TXMLBreadCrumb::setHomeController($frontpageController);
+        // TXMLBreadCrumb::setHomeController($frontpageController);
         return new TXMLBreadCrumb($xml_file, $controller);
     }
 
@@ -283,6 +283,8 @@ class TUtils
         $param = http_build_query($parms);
         
         $command = 'php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
+        // $command = 'cmd /k php ' . $server_root . '/cmd.php "class=' . $class . '&method=' . $method . '&' . $param . '"';
+
         ////  DoubleErros::registrar(1, 'TDoubleUtils', 'cmd_run', $command);
         if (substr(php_uname(), 0, 7) == "Windows") {
             // pclose(popen("start /B " . $command, "r"));

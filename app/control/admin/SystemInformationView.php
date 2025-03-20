@@ -4,7 +4,7 @@ use Linfo\Linfo;
 /**
  * SystemInformationView
  *
- * @version    7.6
+ * @version    8.0
  * @package    control
  * @subpackage admin
  * @author     Pablo Dall'Oglio
@@ -18,56 +18,57 @@ class SystemInformationView extends TPage
     private $settings;
     private $cpu_usage;
     private $cpu_usage_value;
-
+    
+    /**
+     * Constructor method
+     */
     public function __construct()
     {
         parent::__construct();
-
+        parent::setTargetContainer('adianti_right_panel');
+        
         $this->cpu_usage = FALSE;
         $this->getInfo();
 
-        $system_information        = new TElement("div");
-        $system_information->class = "row";
-        $system_information->style = "padding-top: 20px;";
-
-        $system_information->add($this->getMemoryInfo());
+        $system_information = new TPanelGroup(_t('System information'));
+        $system_information->addHeaderActionLink(_t('Close'), new TAction([$this, 'onClose']), 'fa:times red');
+        $system_information->getBody()->style = 'padding-right:30px';
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
+        $row->add($this->getMemoryInfo());
         if ($this->cpu_usage)
         {
-            $system_information->add($this->getCpuUsage());
+            $row->add($this->getCpuUsage());
         }
-        $system_information->add($this->getCpuInfo());
-        $system_information->add($this->createPanelSystemInfo());
-        $system_information->add($this->createPanelSystemProcess());
-        $system_information->add($this->getDiskInfo());
-        $system_information->add($this->getNetWorkInfo());
+        
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
+        $row->add($this->getCpuInfo());
+        
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
+        $row->add($this->createPanelSystemInfo());
+        $row->add($this->createPanelSystemProcess());
+        
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
+        $row->add($this->getDiskInfo());
+        
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
+        $row->add($this->getNetWorkInfo());
 
+        $row = TElement::tag('div', null, ['class' => 'row']);
+        $system_information->add($row);
         $temps = $this->getTemperatureInfo();
-
         foreach ($temps as $value)
         {
-            $system_information->add($value);
+            $row->add($value);
         }
 
         parent::add($system_information);
-        parent::add($this->createRefreshButton());
     }
-
-    public function createRefreshButton()
-    {
-        $a            = new TElement("a");
-        $a->href      = "index.php?class=SystemInformationView";
-        $a->generator = "adianti";
-        $a->class     = "btn btn-primary btn-circle-lg waves-effect waves-circle waves-float";
-        $a->style     = "border-radius:50%;width:50px;height:50px;position:fixed;right:30px;bottom:10px";
-        $icon = new TImage("fa:sync");
-        $icon->style = "line-height:40px;font-size:24px !important";
-
-        $a->add($icon);
-        $a->title = _t("Reload");
-
-        return $a;
-    }
-
+    
     /**
      * Linfo get system information
      *
@@ -174,7 +175,6 @@ class SystemInformationView extends TPage
         $system_info->add($this->datagrid);
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($system_info);
         $a->class .= " col-md-6";
         return $a;
@@ -222,7 +222,6 @@ class SystemInformationView extends TPage
         $system_info->add($this->datagrid);
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($system_info);
         $a->class .= " col-md-6";
         return $a;
@@ -233,7 +232,7 @@ class SystemInformationView extends TPage
         $this->cpu_usage_value = str_replace("%", "", $this->cpu_usage_value);
         $this->cpu_usage_value = round($this->cpu_usage_value);
 
-        $circle = new THtmlRenderer("app/resources/system_information.html");
+        $circle = new THtmlRenderer("app/resources/system/circle.html");
         $circle->enableSection("main", ["value" => $this->cpu_usage_value]);
 
         $span = new TElement("div");
@@ -246,7 +245,6 @@ class SystemInformationView extends TPage
 
         $a = new TElement("div");
         $a->add($system_info);
-        $a->style  = "padding: 0 10px;";
         $a->class .= " col-md-4";
         $a->id     = "si_cpu_usage";
         return $a;
@@ -316,7 +314,6 @@ class SystemInformationView extends TPage
         // return $memory;
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($memory);
         $a->class .= " col-md-12";
         return $a;
@@ -337,7 +334,7 @@ class SystemInformationView extends TPage
             $card->add($temp["temp"] . " " . $temp["unit"]);
 
             $a = new TElement("div");
-            $a->style = "padding: 0 10px;text-align:center;";
+            $a->style = "text-align:center;";
             $a->class .= " col-md-3";
             $a->add($card);
 
@@ -417,7 +414,6 @@ class SystemInformationView extends TPage
         // return $memory;
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($memory);
         $a->class .= " col-md-12";
         return $a;
@@ -516,7 +512,6 @@ class SystemInformationView extends TPage
         // return $memory;
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($memory);
         $a->class .= " col-md-12";
         return $a;
@@ -597,7 +592,6 @@ class SystemInformationView extends TPage
         // return $memory;
 
         $a = new TElement("div");
-        $a->style = "padding: 0 10px;";
         $a->add($memory);
 
         if ($this->cpu_usage)
@@ -843,16 +837,26 @@ class SystemInformationView extends TPage
         }
 
         TScript::create("
-        var cpu_usage  = $('#si_cpu_usage .panel');
+        $(function() {
+            var cpu_usage  = $('#si_cpu_usage .panel');
             var ram_memory = $('#si_ram_memory .panel');
             var max_height = Math.max(ram_memory.height(), cpu_usage.height());
 
             cpu_usage.height(max_height);
             ram_memory.height(max_height);
+        });
         ");
     }
     
     public function onLoad()
     {
+    }
+    
+    /**
+     * on close
+     */
+    public static function onClose($param)
+    {
+        TScript::create("Template.closeRightPanel()");
     }
 }

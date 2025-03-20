@@ -69,8 +69,8 @@ class TDashboardUsuarioService
         });
 
         $saldo = $usuario->plataforma->service->saldo($usuario);
-        if ($usuario->modo_treinamento == 'Y') 
-            $saldo += $result[0]['lucro_prejuizo'];
+        // if ($usuario->modo_treinamento == 'Y') 
+        //     $saldo += $result[0]['lucro_prejuizo'];
 
 
         $convert = [
@@ -84,11 +84,85 @@ class TDashboardUsuarioService
             'lucro_prejuizo'          => number_format($result[0]['lucro_prejuizo'], 2, ',', '.'),
             'saldo'                   => number_format($saldo, 2, ',', '.'),
             'maior_entrada'           => number_format($result[0]['maior_entrada'], 2, ',', '.'),
+            'assertividade'           => $result[0]['total_win'] + $result[0]['total_loss'] > 0 ? number_format(($result[0]['total_win'] / ($result[0]['total_win'] + $result[0]['total_loss'])) * 100, 2, ',', '.') : 0
         ];
 
         $nao_mostra_treinamento = DoubleConfiguracao::getConfiguracao('nao_mostra_treinamento');
         if (in_array($usuario->chat_id, explode(',', $nao_mostra_treinamento)))
             $convert['modo_treinamento'] = 'N';
+
+        return json_encode($convert);
+    }
+
+    public static function getHistoricoAtivos($usuario)
+    {
+        $sql = "SELECT dh.usuario_id, 
+                       dh.ticker,
+                       IFNULL(SUM(CASE WHEN dh.tipo = 'win' THEN 1 ELSE 0 END), 0) AS total_win,
+                       IFNULL(SUM(CASE WHEN dh.tipo = 'loss' THEN 1 ELSE 0 END), 0) AS total_loss
+                  FROM double_usuario du
+                  LEFT JOIN double_usuario_historico dh ON du.id = dh.usuario_id AND dh.robo_inicio = du.robo_inicio
+                 WHERE du.id = {$usuario->id} AND dh.ticker IS NOT NULL AND dh.tipo IN ('win', 'loss')
+                 GROUP BY dh.ticker
+                 ORDER BY 3 DESC, 4 asc";
+
+        $result = TUtils::openFakeConnection('double', function () use($sql){
+            $conn = TTransaction::get();
+            $list = TDatabase::getData(
+                $conn, 
+                $sql
+            );
+
+            return $list;
+        });
+
+        // $moedas = [
+        //     "SOLUSD-AV" => "Solana",
+        //     "ETHUSD-AV" => "Ethereum",
+        //     "EURJPY-AV" => "EUR/JPY",
+        //     "TRON-AV" => "Tron",
+        //     "ADAUSD-AV" => "Cardano",
+        //     "USDCHF-AV" => "USD/CHF",
+        //     "GBPJPY-AV" => "GBP/JPY",
+        //     "AMZN" => "Amazon",
+        //     "USDBRL-AV" => "USD/BRL",
+        //     "UKOUSD-AV" => "Crude Oil Brent",
+        //     "AUDCAD-AV" => "AUD/CAD",
+        //     "GOOGLE-AV" => "Google",
+        //     "META-AV" => "Meta",
+        //     "USNDAQ 100 (NDX) Spot Index" => "US 100",
+        //     "PENUSD-AV" => "PEN/USD",
+        //     "USDCOP-AV" => "USD/COP",
+        //     "USDJPY-AV" => "USD/JPY",
+        //     "USDXOF-AV" => "USD/XOF",
+        //     "EURGBP-AV" => "EUR/GBP",
+        //     "SHIBUSDT-AV" => "Shiba Inu",
+        //     "GBPUSD-AV" => "GBP/USD",
+        //     "EURRUB-AV" => "EUR/USD",
+        //     "USDSGD-AV" => "USD/SGD",
+        //     "USDMXN-AV" => "USD/MXN",
+        //     "EURUSD-AV" => "EUR/RUB",
+        //     "AAPL" => "Apple",
+        //     "DOGEUSD-AV" => "Doge",
+        //     "NZDUSD-AV" => "NZD/USD",
+        //     "S&P 500" => "US 500",
+        //     "USDINR-AV" => "USD/INR",
+        //     "BTCUSD-AV" => "Bitcoin",
+        //     "US30-AV" => "US 30",
+        //     "TESLA" => "TESLA",
+        // ];
+
+        $convert = [];
+        foreach ($result as $key => $value) {
+            $convert[] = [
+                'usuario_id'     => $value['usuario_id'],
+                'ticker'         => $value['ticker'],
+                "moeda"          => $value['ticker'],
+                'total_win'      => $value['total_win'],
+                'total_loss'     => $value['total_loss'],
+                'assertividade'  => $value['total_win'] + $value['total_loss'] > 0 ? number_format(($value['total_win'] / ($value['total_win'] + $value['total_loss'])) * 100, 2, ',', '.') : 0
+            ];
+        }
 
         return json_encode($convert);
     }

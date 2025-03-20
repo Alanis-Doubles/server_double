@@ -7,7 +7,7 @@ class TRedisUtils
     public static function sendMessage($chat_id, $token, $message, $reply_markup = [], $excluir = false) {
          $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => DoubleConfiguracao::getConfiguracao('host_usuario'), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
         ]);
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');
@@ -31,7 +31,7 @@ class TRedisUtils
     public static function deleteMessage($chat_id, $token, $message_id){
          $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => DoubleConfiguracao::getConfiguracao('host_usuario'), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
         ]);
         $server_name = DoubleConfiguracao::getConfiguracao('server_name');

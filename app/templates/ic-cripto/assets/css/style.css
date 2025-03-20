@@ -1,0 +1,1691 @@
+.d2c_theme_dark .d2c_chat_footer .d2c_input_wrapper input[type='text'] {
+    background: #292d38;
+    color: #6c757a;
+}
+
+.d2c_theme_dark .form-control {
+    background: var(--dark_bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    color: var(--bs-white);
+}
+.d2c_theme_dark .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+.d2c_theme_dark form .input-group .btn {
+    background: var(--dark_bg);
+    color: var(--bs-white);
+}
+.d2c_theme_dark .input-group {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/* ---------------------------------------------------
+    Table Pagination
+----------------------------------------------------- */
+.dataTables_paginate .pagination {
+    --bs-pagination-color: var(--bs-dark);
+    --bs-pagination-active-bg: var(--dark-theme-color);
+    --bs-pagination-active-border-color: var(--dark-theme-color);
+}
+/* ---------------------------------------------------
+    advanced table page
+----------------------------------------------------- */
+#d2c_table_with_pagination_wrapper .dataTables_length,#d2c_table_with_pagination_wrapper .dataTables_filter,
+#d2c_table_with_pagination_wrapper .dataTables_info,#d2c_table_with_pagination_search_wrapper .dataTables_info,
+#d2c_table_with_pagination_search_wrapper .dataTables_length{
+    display: none;
+}
+#d2c_table_with_pagination_wrapper div.dataTables_paginate ul.pagination{
+    justify-content: flex-start;
+}
+
+@media only screen and (min-width: 0px) and (max-width: 767px){
+    .dataTables_filter{
+        margin-top: 15px;
+    }
+    
+}
+
+.dt-button{
+    background: transparent !important;
+    border-color: var(--bs-primary) !important;
+    color: var(--bs-primary) !important;
+}
+.dt-button:focus{
+    box-shadow: none !important;
+    outline: none !important;
+}
+.dt-button-active{
+    box-shadow: none !important;
+    outline: none !important;
+    background: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: var(--bs-white) !important;
+}
+
+/* ---------------------------------------------------
+    Dashboard/home page
+----------------------------------------------------- */
+.d2c_currency_card_wrapper .d2c_coin_icon_wrapper {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    font-size: 28px;
+}
+.d2c_currency_card_wrapper p {
+    color: rgba(13, 16, 36, 0.7);
+    font-weight: 500;
+}
+.d2c_exchange_form {
+    border-bottom: 1px dotted var(--primary_border);
+}
+.d2c_exchange_form li {
+    width: 50%;
+}
+.d2c_exchange_form .nav-link {
+    color: var(--heading_color);
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    font-size: 20px;
+    margin-bottom: -2px;
+}
+.d2c_exchange_form .nav-link.active {
+    background: transparent;
+    color: var(--heading_color);
+    border-bottom: 3px solid var(--bs-primary);
+}
+.d2c_available_balance {
+    font-size: 22px;
+    color: var(--bs-primary);
+}
+
+/* dark */
+.d2c_theme_dark .d2c_currency_card_wrapper p {
+    color: rgba(255, 255, 255, 0.8);
+}
+.d2c_theme_dark .d2c_available_balance {
+    color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_exchange_form .nav-link,
+.d2c_theme_dark .d2c_exchange_form .nav-link.active {
+    color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_exchange_form {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------------------------------------------------
+    FAQ page
+----------------------------------------------------- */
+
+.d2c_faq_main {
+    box-shadow: 0rem 0rem 0.5rem rgba(0, 0, 0, 0.07);
+    border-radius: 0.313rem;
+    margin-bottom: 1.25rem;
+}
+.accordion-button {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--bs-secondary);
+    border-radius: 0.625rem 0.625rem 0rem 0rem;
+    box-shadow: none !important;
+    padding-right: 2.813rem;
+    background-color: var(--bs-white);
+}
+.accordion-button:focus {
+    box-shadow: none;
+}
+.accordion-button:not(.collapsed) {
+    background-color: var(--bs-white);
+    color: var(--bs-primary);
+}
+.accordion-item {
+    border: 0.063rem solid rgba(229, 227, 242, 0.5) !important;
+    border-radius: 0.625rem;
+    overflow: hidden;
+    background: rgba(246, 245, 255, 0.5);
+}
+.accordion-body {
+    border-top: 0.063rem solid rgba(229, 227, 242, 0.5);
+    background-color: var(--bs-white);
+}
+.accordion .accordion-item:last-child {
+    margin-bottom: 0rem !important;
+}
+.accordion-item .accordion-button::after {
+    content: '\002B';
+    background-image: none;
+    font-weight: 600;
+    color: var(--primary_color);
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    border: 0.063rem solid var(--bs-secondary);
+    background: #fff;
+    text-align: right;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 0.938rem;
+    border-radius: 50%;
+}
+.accordion-item .accordion-button:not(.collapsed)::after {
+    content: '\002D';
+    color: var(--bs-primary);
+    background-image: none;
+    border-color: var(--bs-primary);
+}
+
+/*---------------------------------------------------
+    invoice page
+-----------------------------------------------------*/
+
+.d2c_invoice_list {
+    box-shadow: none;
+}
+.d2c_invoice_header hr {
+    border-color: rgb(56 56 56 / 25%);
+}
+.d2c_theme_dark .d2c_invoice_header hr {
+    border-color: rgb(229 227 242 / 20%);
+}
+.d2c_invoice_header img {
+    width: 136px;
+    object-fit: cover;
+}
+.d2c_invoice_content p {
+    margin-bottom: 0.5rem;
+}
+
+
+/* create invoice page */
+.d2c_product_form .form-check .form-control {
+    width: max-content;
+    background: var(--bs-white);
+}
+
+/*---------------------------------------------------
+    Advanced Form page
+-----------------------------------------------------*/
+
+#d2c_form_step {
+    max-width: 100%;
+}
+#d2c_form_step .d2c_step_form_header {
+    gap: 5px;
+    text-align: center;
+    font-size: 0.9em;
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator {
+    position: relative;
+    flex: 1;
+    padding-bottom: 20px;
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.active {
+    font-weight: 700;
+    color: var(--bs-primary);
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.finish {
+    font-weight: 600;
+    color: var(--bs-secondary);
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    z-index: 9;
+    width: 20px;
+    height: 20px;
+    background-color: #d7ddf6;
+    border-radius: 50%;
+    border: 3px solid #ecf5f4;
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.active::before {
+    background-color: var(--bs-primary);
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.finish::before {
+    background-color: var(--bs-success);
+    border: 3px solid #bef2da;
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    width: 100%;
+    height: 1px;
+    background-color: #f3f3f3;
+}
+.d2c_theme_dark .d2c_step_form_header .stepIndicator::after{
+    background-color: #21232d !important;
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.active::after {
+    background-color: var(--bs-primary);
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator.finish::after {
+    background-color: var(--bs-success);
+}
+#d2c_form_step .d2c_step_form_header .stepIndicator:last-child:after {
+    display: none;
+}
+#d2c_form_step input,
+#d2c_form_step textarea {
+    width: 100%;
+    background-color: rgba(246, 245, 255, 0.5);
+    border: 0.063rem solid rgba(229, 227, 242, 0.5);
+    border-radius: 0.313rem;
+    padding: 0.5rem 1.25rem;
+    color: rgba(56, 56, 56, 0.6);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+#d2c_form_step input:focus,
+#d2c_form_step textarea:focus {
+    border: 1px solid #009688;
+    outline: 0;
+}
+#d2c_form_step input.invalid,
+#d2c_form_step textarea.invalid {
+    border-color: #ffaba5 !important;
+}
+#d2c_form_step .step {
+    display: none;
+}
+#d2c_form_step .form-footer {
+    overflow: auto;
+    gap: 20px;
+}
+#d2c_form_step .form-footer #prevBtn {
+    background-color: #fff;
+    color: var(--bs-primary);
+}
+.ck-editor__editable{
+    height: 250px;
+}
+.d2c_theme_dark .ck.ck-toolbar.ck-toolbar_grouping>.ck-toolbar__items{
+    background: var(--dark_bg);
+    color: var(--bs-white);
+}
+.d2c_theme_dark .ck-reset_all :not(.ck-reset_all-excluded *), .ck.ck-reset_all{
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--dark_bg);
+}
+.d2c_theme_dark .ck-button,.d2c_theme_dark .ck-button:hover,
+.d2c_theme_dark .ck-button:focus,.d2c_theme_dark .ck-button:active,
+.d2c_theme_dark [dir=ltr] .ck.ck-labeled-field-view>.ck.ck-labeled-field-view__input-wrapper>.ck.ck-label,
+.d2c_theme_dark .ck.ck-toolbar>.ck-toolbar__items>:not(.ck-toolbar__line-break), 
+.ck.ck-toolbar>.ck.ck-toolbar__grouped-dropdown,.d2c_theme_dark .ck.ck-dropdown .ck-dropdown__panel .ck-list{
+    background: var(--dark_bg) !important;
+}
+.d2c_theme_dark .ck.ck-input:focus{
+    box-shadow: none;
+}
+.d2c_theme_dark .ck.ck-toolbar,
+.d2c_theme_dark .ck.ck-editor__main>.ck-editor__editable:is(.ck-focused),
+.d2c_theme_dark .ck.ck-editor__main>.ck-editor__editable:not(.ck-focused){
+    background: var(--dark_bg);
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.d2c_theme_dark #d2c_form_step input,.d2c_theme_dark #d2c_form_step textarea{
+    background: var(--dark_bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--bs-white);
+}
+.d2c_theme_dark #d2c_form_step .d2c_step_form_header .stepIndicator::before{
+    background: var(--bs-primary);
+    border-color: #21232d;
+}
+/* quill editor */
+.d2c_theme_dark .ql-container{
+    font-family: 'Poppins', sans-serif;
+}
+.d2c_theme_dark .ql-toolbar.ql-snow{
+    background: var(--dark_bg);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.d2c_theme_dark #editor{
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.d2c_theme_dark .ql-editor.ql-blank::before{
+    color: var(--bs-white);
+}
+.d2c_theme_dark .ql-stroke {
+    stroke: rgba(255, 255, 255, 0.8);
+}
+.d2c_theme_dark .ql-snow .ql-picker.ql-header,.d2c_theme_dark .ql-snow .ql-picker-options{
+    color: rgba(255, 255, 255, 0.8);
+    background: var(--dark_bg) !important;
+}
+.d2c_theme_dark .ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill{
+    fill: rgba(255, 255, 255, 0.8);
+}
+
+/* multi step form validation */
+.stepwizard-step p {
+    margin-top: 10px;
+}
+.stepwizard-row {
+    display: table-row;
+}
+.stepwizard {
+    display: table;
+    position: relative;
+}
+.stepwizard-step a.btn[disabled] {
+    filter: alpha(opacity=100) !important;
+    background: var(--bs-primary);
+}
+.stepwizard-row:before {
+    top: 20px;
+    bottom: 0;
+    position: absolute;
+    content: " ";
+    width: 100%;
+    height: 1px;
+    background-color: #ccc;
+    z-index: 0;
+}             
+.d2c_theme_dark .stepwizard-row:before{
+    background-color: #21232d;
+}             
+.stepwizard-step {                             
+    display: table-cell;
+    text-align: center;
+    position: relative;
+}
+.btn-circle {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+/* editor */
+#editor {
+    height: 400px;
+}
+
+/*---------------------------------------------------
+    Support and help page
+-----------------------------------------------------*/
+
+.d2c_chat_box {
+    background: var(--bs-white);
+    border: 0.063rem solid rgba(229, 227, 242, 0.5);
+    border-radius: 0.313rem;
+    -webkit-border-radius: 0.313rem;
+    -moz-border-radius: 0.313rem;
+    -ms-border-radius: 0.313rem;
+    -o-border-radius: 0.313rem;
+}
+.d2c_chat_header {
+    background: var(--bs-primary);
+    border-bottom: 0.063rem solid rgba(229, 227, 242, 0.5);
+    border-radius: 0.313rem 0.313rem 0px 0px;
+    padding: 0.938rem 1.25rem;
+    -webkit-border-radius: 0.313rem 0.313rem 0px 0px;
+    -moz-border-radius: 0.313rem 0.313rem 0px 0px;
+    -ms-border-radius: 0.313rem 0.313rem 0px 0px;
+    -o-border-radius: 0.313rem 0.313rem 0px 0px;
+    color: #ffffff;
+}
+.d2c_chat_header .badge {
+    top: 0.625rem;
+}
+.d2c_theme_dark .d2c_chat_header{
+    background: #080e27;
+    border-color: #0000002e;
+}
+.chat-messages {
+    padding: 1.25rem 1.25rem 0rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 30.5rem;
+    overflow-y: scroll;
+}
+.chat-messages .flex-shrink-1 {
+    background: rgba(53, 87, 212, 0.06);
+    border: 0.125rem solid #fbfbfb;
+    box-shadow: 0.313rem 0.563rem 1.875rem rgba(56, 56, 56, 0.1), inset 0rem 0rem 9.375rem #f4f3ff;
+    border-radius: 0rem 0.625rem 0.625rem 0.625rem;
+}
+.chat-message-right .flex-shrink-1 {
+    border-radius: 0.625rem 0rem 0.625rem 0.625rem !important;
+}
+.d2c_chat_footer {
+    border-top: 0.063rem solid rgba(229, 227, 242, 0.5);
+}
+.d2c_chat_footer .btn,
+.d2c_chat_footer .d2c_input_wrapper {
+    background: rgba(246, 245, 255, 0.5);
+    border: 0.063rem solid rgba(229, 227, 242, 0.5);
+    border-radius: 0.188rem;
+}
+.d2c_chat_footer .btn:active {
+    border: 0.063rem solid rgba(229, 227, 242, 0.5);
+}
+.chat-message-left,
+.chat-message-right {
+    display: flex;
+    flex-shrink: 0;
+}
+.chat-message-left {
+    margin-right: auto;
+}
+.chat-message-right {
+    flex-direction: row-reverse;
+    margin-left: auto;
+}
+.d2c_communication{
+    color: var(--bs-white) !important;
+}
+.d2c_communication:focus,.d2c_communication.active,.d2c_communication.show{
+    border-color: transparent !important;
+}
+
+/* Chrome, Edge, and Safari */
+.chat-messages::-webkit-scrollbar,
+.message_people_list::-webkit-scrollbar {
+    width: 0.625rem;
+}
+
+.chat-messages::-webkit-scrollbar-track,
+.message_people_list::-webkit-scrollbar-track {
+    background: #ffffff;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.message_people_list::-webkit-scrollbar-thumb {
+    background-color: #eeeeee;
+    border-radius: 0.625rem;
+    border: 0.125rem solid #ffffff;
+}
+
+/* Dark */
+.d2c_theme_dark .chat-messages::-webkit-scrollbar,
+.d2c_theme_dark .message_people_list::-webkit-scrollbar {
+    width: 0.313rem;
+}
+
+.d2c_theme_dark .chat-messages::-webkit-scrollbar-track,
+.d2c_theme_dark .message_people_list::-webkit-scrollbar-track {
+    background: #292d38;
+}
+
+.d2c_theme_dark .chat-messages::-webkit-scrollbar-thumb,
+.d2c_theme_dark .message_people_list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 170, 93, 0.1);
+    border-radius: 0.625rem;
+    border: 0.125rem solid rgba(0, 170, 93, 0.1);
+}
+
+.d2c_theme_dark .d2c_chat_box {
+    background: #292d38;
+    border-color: #0000002e;
+}
+.d2c_theme_dark .d2c_chat_box,
+.d2c_theme_dark .d2c_chat_footer {
+    border-color: #0000002e;
+}
+.d2c_theme_dark .d2c_chat_footer .form-control{
+    padding-left: 16px !important;
+    margin-left: 5px;
+    border-radius: 0px;
+}
+.d2c_theme_dark .d2c_chat_footer .d2c_input_wrapper{
+    padding-right: 0px !important;
+}
+.d2c_theme_dark .chat-messages .flex-shrink-1 {
+    background: #292d38;
+    border-color: #0000002e;
+    box-shadow: none;
+}
+.d2c_theme_dark .d2c_chat_header .d2c_communication {
+    color: var(--dark-text-color);
+}
+.d2c_theme_dark .d2c_chat_footer .d2c_input_wrapper {
+    background: #292d38;
+    border-color: #0000002e;
+}
+.d2c_theme_dark .d2c_chat_footer .btn {
+    background: #2a3148;
+    border-color: rgb(255 255 255 / 10%);
+    color: var(--bs-primary) !important;
+}
+
+/*---------------------------------------------------
+    Timeline page start
+-----------------------------------------------------*/
+.d2c_timeline_upper {
+    margin-bottom: 140px;
+}
+.d2c_timeline_upper:before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background: var(--bs-primary);
+    bottom: -70px;
+}
+.d2c_timeline_content {
+    width: 20%;
+    position: relative;
+}
+.d2c_timeline_content::before {
+    content: '';
+    width: 1px;
+    height: 50px;
+    position: absolute;
+    left: 0px;
+    background: rgba(166, 170, 180, 0.3);
+}
+.d2c_timeline_upper .d2c_timeline_content::before {
+    bottom: -53px;
+}
+.d2c_timeline_wrapper {
+    padding: 30px;
+}
+.d2c_timeline_wrapper .d2c_timeline_content::after {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    bottom: -82px;
+    left: -12px;
+    background: var(--bs-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bs-white);
+}
+.d2c_timeline_upper .d2c_timeline_content:first-child::after {
+    content: '2';
+}
+.d2c_timeline_upper .d2c_timeline_content:last-child::after {
+    content: '4';
+}
+.d2c_timeline_down .d2c_timeline_content::before {
+    top: -53px;
+}
+.d2c_timeline_down .d2c_timeline_content::after {
+    top: -84px;
+    left: -12px;
+}
+.d2c_timeline_down .d2c_timeline_content:first-child::after {
+    content: '1';
+}
+.d2c_timeline_down .d2c_timeline_content:nth-child(2)::after {
+    content: '3';
+}
+.d2c_timeline_down .d2c_timeline_content:last-child::after {
+    content: '5';
+}
+
+/* web journey timeline */
+.d2c_web_journey_timeline {
+    padding: 30px;
+}
+.d2c_web_timeline_content {
+    position: relative;
+}
+.d2c_web_timeline_content .d2c_years {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 150%;
+    position: absolute;
+    top: 20px;
+    right: -28px;
+}
+.d2c_web_timeline_content p i {
+    font-size: 8px;
+    border: 1px solid var(--bs-primary);
+    color: var(--bs-primary);
+    border-radius: 50px;
+    padding: 3px;
+}
+.d2c_web_timeline_content p sup {
+    top: -3px;
+    z-index: 11;
+}
+.d2c_web_timeline_content .d2c_card_wrapper {
+    padding: 20px;
+    padding-left: 100px;
+    padding-right: 100px;
+    position: relative;
+}
+.d2c_web_journey_timeline .d2c_web_timeline_content:first-child::after,
+.d2c_web_journey_timeline .d2c_web_timeline_content:nth-child(3)::after {
+    content: '';
+    width: 1px;
+    height: 100%;
+    background: var(--bs-primary);
+    position: absolute;
+    right: -8px;
+    top: 30px;
+    z-index: 0;
+}
+.d2c_web_journey_timeline .d2c_web_timeline_content:nth-child(4) .d2c_years {
+    left: -12px;
+}
+/*---------------------------------------------------
+    Timeline page end
+-----------------------------------------------------*/
+
+
+/*---------------------------------------------------
+    Button page
+-----------------------------------------------------*/
+.d2c_hover_btn {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    padding: 8px 20px;
+    border-radius: 0.938rem;
+    text-align: center;
+    border: 1px solid var(--bs-primary);
+    color: var(--bs-primary);
+    z-index: 0;
+    background: var(--bs-white);
+} 
+.d2c_hover_btn:hover{
+    color: var(--bs-white);
+    border-color: var(--bs-primary);
+}
+.d2c_hover_btn::before,.d2c_hover_btn::after{
+    position: absolute;
+    content: "";
+    background: var(--bs-primary);
+    transition-duration: 0.3s;
+    z-index: -1;
+    opacity: 1;
+}
+.d2c_theme_dark .d2c_hover_btn,
+.d2c_theme_dark .d2c_detail_btn{
+    background: var(--dark_bg);
+    color: var(--bs-white);
+    border-color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_hover_btn:hover{
+    border-color: var(--bs-primary);
+}
+.d2c_theme_dark .d2c_detail_btn::after{
+    border-color: var(--bs-white);
+}
+/* top */
+.btn_fill_top::before {
+    inset: auto auto 0px 0px;
+    width: 100%;
+    height: 0px;
+} 
+.btn_fill_top:hover::before {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+} 
+/* right */
+.btn_fill_right::before {
+    inset: 0px auto auto 0px;
+    width: 0px;
+    height: 100%;
+} 
+.btn_fill_right:hover::before {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+} 
+/* down */
+.btn_fill_down::before {
+    inset: 0px auto auto 0px;
+    width: 100%;
+    height: 0px;
+} 
+.btn_fill_down:hover::before {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+} 
+/* left */
+.btn_fill_left::before {
+    inset: 0px 0px auto auto;
+    width: 0px;
+    height: 100%;
+} 
+.btn_fill_left:hover::before {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+} 
+/* middle */
+.btn_fill_middle::before {
+    inset: auto auto 0px 0px;
+    width: 100%;
+    height: 0px;
+} 
+.btn_fill_middle:hover::before {
+    width: 100%;
+    height: 50%;
+    opacity: 1;
+} 
+.btn_fill_middle::after {
+    inset: 0px auto auto 0px;
+    width: 100%;
+    height: 0px;
+} 
+.btn_fill_middle:hover::after {
+    height: 50%;
+} 
+/* horizontal middle */
+.btn_fill_middle_horizontal::before {
+    inset: 0px 0px auto auto;
+    width: 0px;
+    height: 100%;
+} 
+.btn_fill_middle_horizontal:hover::before {
+    width: 50%;
+    height: 100%;
+    opacity: 1;
+} 
+.btn_fill_middle_horizontal::after {
+    inset: 0px auto auto 0px;
+    width: 0px;
+    height: 100%;
+} 
+.btn_fill_middle_horizontal:hover::after {
+    width: 50%;
+} 
+
+/* details button css */
+/* detail top */
+.d2c_detail_btn {
+    position: relative;
+    box-sizing: border-box;
+    display: inline-block;
+    overflow: hidden;
+    padding: 8px 20px;
+    margin: 0px 3px 6px;
+    text-align: center;
+    border: none;
+    text-decoration: none;
+    background: var(--bs-white);
+    color: var(--bs-primary);
+    white-space: nowrap;
+    border-radius: 4px;
+    z-index: 0;
+} 
+.d2c_detail_btn::after{
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    content: "";
+    border: 2px solid var(--bs-primary);
+    z-index: 2;
+    margin: 0px;
+    transition: border-bottom-width 0.1s ease 0.2s, height 0.2s ease 0.1s, width 0.2s ease 0s, margin 0.2s ease 0s;
+}
+.d2c_detail_top {
+    position: relative;
+    transition-duration: 0.3s;
+    overflow: visible;
+    box-sizing: border-box;
+    border: none;
+    padding: 10px 22px;
+} 
+.d2c_detail_top::after {
+    top: 0px;
+    right: 0px;
+    border-bottom-width: 2px;
+} 
+.d2c_detail_top:hover::after {
+    width: 60%;
+    height: 0px;
+    border-width: 2px 2px 0px;
+    margin: 0px 20%;
+    transition: border-bottom-width 0.1s ease 0s, height 0.2s ease 0.1s, width 0.2s ease 0.2s, margin 0.2s ease 0.2s;
+} 
+/* detail right */ 
+.d2c_detail_right::after{
+    bottom: 0px;
+    right: 0px;
+    border-left-width: 2px;
+    transition: border-left-width 0.1s ease 0.2s, width 0.2s ease 0.1s, height 0.2s ease 0s, margin 0.2s ease 0s;
+}
+.d2c_detail_right:hover::after {
+    width: 0px;
+    height: 60%;
+    border-width: 2px 2px 2px 0px;
+    margin: 5% 0px;
+    transition: border-left-width 0.1s ease 0s, width 0.2s ease 0.1s, height 0.2s ease 0.2s, margin 0.2s ease 0.2s;
+} 
+/* detail bottom */
+.d2c_detail_bottom::after{
+    left: 0px;
+    bottom: 0px;
+    border-top-width: 2px;
+    transition: border-top-width 0.1s ease 0.2s, height 0.2s ease 0.1s, width 0.2s ease 0s, margin 0.2s ease 0s;
+}
+.d2c_detail_bottom:hover::after {
+    width: 60%;
+    height: 0px;
+    border-width: 0px 2px 2px;
+    margin: 0px 20%;
+    transition: border-top-width 0.1s ease 0s, height 0.2s ease 0.1s, width 0.2s ease 0.2s, margin 0.2s ease 0.2s;
+} 
+/* detail bottom */
+.d2c_detail_left::after{
+    bottom: 0px;
+    left: 0px;
+    border-right-width: 2px;
+    transition: border-right-width 0.1s ease 0.2s, width 0.2s ease 0.1s, height 0.2s ease 0s, margin 0.2s ease 0s;
+}
+.d2c_detail_left:hover::after {
+    width: 0px;
+    height: 60%;
+    border-width: 2px 0px 2px 2px;
+    margin: 5% 0px;
+    transition: border-right-width 0.1s ease 0s, width 0.2s ease 0.1s, height 0.2s ease 0.2s, margin 0.2s ease 0.2s;
+} 
+/*---------------------------------------------------
+    Map page
+-----------------------------------------------------*/
+.d2c_map {
+    width: 80% !important;
+    height: 350px;
+    margin: 0 auto;
+}
+.d2c_map svg path {
+    fill: var(--bs-primary);
+}
+
+/* ---------------------------------------------------
+    FAQ page
+----------------------------------------------------- */
+
+.d2c_faq_main {
+    box-shadow: 0rem 0rem 0.5rem rgba(0, 0, 0, 0.07);
+    border-radius: 0.313rem;
+    margin-bottom: 1.25rem;
+}
+.accordion-button {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: var(--bs-secondary);
+    border-radius: 0.625rem 0.625rem 0rem 0rem;
+    box-shadow: none !important;
+    padding-right: 2.813rem;
+}
+.accordion-button:focus {
+    box-shadow: none;
+}
+.accordion-button:not(.collapsed) {
+    background: var(--bs-white);
+    color: var(--bs-primary);
+}
+.accordion-item {
+    border: 0.063rem solid rgba(229, 227, 242, 0.5);
+    border-radius: 0.625rem;
+    overflow: hidden;
+    background: rgba(246, 245, 255, 0.5);
+}
+.accordion-body {
+    border-top: 0.063rem solid rgba(229, 227, 242, 0.5);
+}
+.accordion .accordion-item:last-child {
+    margin-bottom: 0rem !important;
+}
+.accordion-item .accordion-button::after {
+    content: '\002B';
+    background-image: none;
+    font-weight: 600;
+    color: var(--primary_color);
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    border: 0.063rem solid var(--bs-secondary);
+    background: #fff;
+    text-align: right;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 0.938rem;
+    border-radius: 50%;
+}
+.accordion-item .accordion-button:not(.collapsed)::after {
+    content: '\002D';
+    color: var(--text_color);
+    background-image: none;
+    border-color: var(--text_color);
+}
+
+/* for dark */
+.d2c_theme_dark .accordion-item {
+    background: rgba(30, 30, 30, 0.3);
+    border: 0.063rem solid rgba(30, 30, 30, 0.7);
+}
+.d2c_theme_dark .accordion-body {
+    border-top: 0.063rem solid rgb(229 227 242 / 12%);
+    background: var(--dark_bg);
+}
+.d2c_theme_dark .accordion-item {
+    color: #cfcfcf;
+}
+.d2c_theme_dark .accordion-button {
+    color: #cfcfcf;
+    background: var(--dark_bg);
+}
+.d2c_theme_dark .accordion-button:not(.collapsed) {
+    color: var(--bs-primary);
+}
+.d2c_theme_dark .accordion-item .accordion-button::after {
+    background: transparent;
+    color: rgb(229 227 242 / 12%);
+    border-color: rgb(229 227 242 / 12%);
+}
+.d2c_theme_dark .accordion-button:not(.collapsed) {
+    background: var(--dark_bg);
+}
+.d2c_theme_dark .accordion-item {
+    border-color: rgb(229 227 242 / 12%) !important;
+}
+
+/*---------------------------------------------------
+    login system(login,registration,forget),lockscreen page
+-----------------------------------------------------*/
+
+.d2c_login_system {
+    background-image: url(../images/login_bg.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+}
+.d2c_sign_up {
+    height: auto;
+    padding: 115px 0px;
+}
+.d2c_login_wrapper {
+    padding: 60px 75px;
+    box-shadow: 0rem 0rem 1.5rem rgba(0, 0, 0, 0.06);
+    border-radius: var(--border-radius) 0px 0px var(--border-radius);
+    background: var(--bs-white);
+}
+.d2c_login_wrapper h4 {
+    font-weight: 600;
+    color: var(--bs-primary);
+}
+.d2c_login_wrapper .d2c_link {
+    font-weight: 600;
+}
+.d2c_login_wrapper .input-group .btn {
+    border: 0.063rem solid rgba(111, 106, 248, 0.1);
+    font-size: 0.875rem;
+    padding: 0.688rem 0.938rem;
+    color: var(--text_color);
+}
+.d2c_login_wrapper .input-group .btn:active {
+    border-color: rgba(111, 106, 248, 0.1) !important;
+    background: rgba(246, 245, 255, 0.5);
+}
+.d2c_login_wrapper .input-group {
+    border: 1px solid var(--primary_border);
+    border-radius: 15px;
+}
+.d2c_login_wrapper .input-group:focus {
+    border-color: rgb(13 16 36 / 20%);
+}
+.d2c_login_wrapper .input-group .btn {
+    z-index: 10;
+}
+.d2c_login_wrapper .btn {
+    border-radius: var(--border-radius);
+    padding: 10px 10px 9px 10px;
+}
+.d2c_login_wrapper .d2c_link_btn {
+    background: rgba(53, 87, 212, 0.05);
+    border-radius: 0.313rem;
+    padding: 0.5rem 1.25rem;
+    color: var(--bs-primary);
+    font-size: 0.938rem;
+    font-weight: 500;
+    border-radius: var(--border-radius);
+}
+.d2c_login_wrapper .d2c_link_btn:hover {
+    color: var(--bs-secondary) !important;
+}
+.d2c_login_wrapper .d2c_link_btn:active {
+    border-color: rgba(166, 170, 180, 0.3) !important;
+}
+.d2c_lockscreen {
+    background-image: url(../images/lockscreen_bg.jpg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+}
+.d2c_lockscreen .d2c_user_avatar {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    margin: 0rem auto 1.25rem auto;
+}
+.d2c_lockscreen_content .form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(2.5px);
+    color: var(--bs-white);
+}
+.d2c_lockscreen_content .btn {
+    background: var(--bs-success);
+    color: var(--bs-white);
+    border-radius: var(--border-radius);
+    border-color: transparent !important;
+    padding: 10px 10px 9px 10px;
+}
+.d2c_lockscreen_content .btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.d2c_lockscreen_content .btn:active{
+    background: var(--bs-success);
+    color: var(--bs-white);
+}
+.d2c_lockscreen_content .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.8);
+}
+.d2c_theme_dark .d2c_lockscreen_content .form-control {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+.d2c_login_right_image {
+    background: linear-gradient(0deg, rgba(53, 87, 212, 0.25), rgba(53, 87, 212, 0.25)), url(../images/login_image.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0px var(--border-radius) var(--border-radius) 0px;
+}
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+    border-color: var(--primary_border);
+}
+
+.d2c_theme_dark .d2c_login_wrapper {
+    background: var(--dark_bg) !important;
+    border: 1px solid rgb(229 227 242 / 12%);
+    border-right: 0px;
+}
+.d2c_theme_dark .d2c_login_wrapper form .input-group .btn {
+    color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_login_wrapper .d2c_link_btn {
+    color: var(--bs-white);
+}
+
+/* ---------------------------------------------------
+    error page
+----------------------------------------------------- */
+
+.d2c_error {
+    background-image: url(../images/login_bg.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100vh;
+}
+.d2c_error_content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.d2c_error_content h1 {
+    font-size: 9.375rem;
+}
+.d2c_error_content h3 {
+    font-size: 40px;
+    font-weight: 600;
+}
+.d2c_error_content p {
+    font-size: 1.125rem;
+}
+.d2c_theme_dark .d2c_error_content_wrapper img {
+    display: none;
+}
+
+/*---------------------------------------------------
+    transaction page
+-----------------------------------------------------*/
+.d2c_coin_icon_wrapper {
+    width: 30px;
+    height: 30px;
+}
+#d2c_transaction_dataTable_length,
+#d2c_transaction_dataTable_filter,
+#d2c_transaction_dataTable_info {
+    display: none;
+}
+.d2c_theme_dark .table th,
+.d2c_theme_dark .table td,
+.d2c_theme_dark .d2c_wallet_footer {
+    border-color: rgb(229 227 242 / 12%);
+}
+.d2c_theme_dark .page-link {
+    background: #292d38;
+    color: var(--bs-white);
+    border-color: rgb(229 227 242 / 12%);
+}
+.d2c_theme_dark .page-item.active .page-link{
+    background: var(--bs-primary);
+} 
+.d2c_theme_dark .d2c_asset_balance_table .pagination .page-link {
+    color: var(--bs-white);
+    border-color: rgb(229 227 242 / 12%);
+}
+.d2c_theme_dark .dataTables_filter .form-control,
+.d2c_theme_dark .dataTables_length .form-select {
+    background-color: #292d38;
+    border-color: rgb(229 227 242 / 12%);
+    color: var(--bs-white);
+}
+
+/*---------------------------------------------------
+    Notification page
+-----------------------------------------------------*/
+
+.d2c_notification_content .d2c_notification_first_letter {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius);
+}
+.d2c_notification_content h5 {
+    font-size: 18px;
+}
+.d2c_notification_content h5 a {
+    color: var(--heading_color);
+}
+.d2c_notification_content h6 {
+    font-size: 12px;
+}
+.d2c_notification_content span i {
+    font-size: 8px;
+    color: var(--bs-secondary);
+}
+.d2c_notification_content span.active i {
+    font-size: 8px;
+    color: var(--bs-success);
+}
+.d2c_notification_wrapper {
+    border-color: rgba(13, 16, 36, 0.08) !important;
+}
+.d2c_notification .d2c_notification_wrapper:last-child {
+    border: none !important;
+}
+.d2c_theme_dark .d2c_notification_wrapper {
+    border-color: rgb(229 227 242 / 12%) !important;
+}
+.d2c_theme_dark .d2c_notification_content h5 a {
+    color: var(--bs-white);
+}
+
+/*---------------------------------------------------
+    Profile page
+-----------------------------------------------------*/
+#d2c_wallet_activity_table {
+    margin-bottom: 0px;
+}
+#d2c_wallet_activity_table_filter,
+#d2c_wallet_activity_table_length,
+#d2c_wallet_activity_table_info,
+#d2c_wallet_activity_table_paginate {
+    display: none;
+}
+.d2c_connection_list figure img {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    object-fit: cover;
+}
+.d2c_list_wrapper .d2c_mail {
+    word-break: break-all;
+}
+.d2c_list_wrapper {
+    border-bottom: 1px solid rgba(13, 16, 36, 0.08);
+}
+.d2c_list_wrapper .btn {
+    padding: 12px 24px 11px 24px;
+    border-radius: var(--border-radius);
+}
+.d2c_connection_list .d2c_list_wrapper:last-child {
+    border-bottom: 0px;
+}
+.d2c_user_profile_img {
+    width: 90px;
+    height: 90px;
+    border-radius: var(--border-radius);
+    object-fit: cover;
+}
+.d2c_user_info {
+    margin-top: -45px;
+}
+.d2c_profile_card {
+    border-radius: 30px 30px var(--border-radius) var(--border-radius);
+}
+.d2c_profile_coin_card {
+    border-radius: var(--border-radius);
+    padding: 44px;
+}
+.d2c_user_bg {
+    border-radius: 30px 30px 0px 0px;
+    height: 160px;
+    object-fit: cover;
+}
+.d2c_profile_coin_card .d2c_coin_icon_wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: 8px;
+    border: 1px solid var(--bs-warning);
+    font-size: 2rem;
+}
+
+.d2c_theme_dark .d2c_list_wrapper {
+    border-color: rgb(229 227 242 / 12%);
+}
+
+/*---------------------------------------------------
+    transfer page
+-----------------------------------------------------*/
+.d2c_balance {
+    border-radius: var(--border-radius);
+}
+.d2c_balance p {
+    color: rgba(255, 255, 255, 0.6);
+}
+.d2c_theme_dark .form-label {
+    color: var(--bs-white);
+}
+
+/*---------------------------------------------------
+    wallet page
+-----------------------------------------------------*/
+.d2c_wallet_balance p span {
+    font-size: 27px;
+    font-weight: 700;
+}
+.d2c_wallet_balance p {
+    color: var(--heading_color);
+}
+.d2c_wallet_balance h5 {
+    font-size: 18px;
+    font-weight: 500;
+}
+.d2c_wallet_footer {
+    border-top: 1px solid rgba(13, 16, 36, 0.08);
+    border-radius: 0px 0px var(--border-radius) var(--border-radius);
+}
+.d2c_wallet_balance .btn {
+    background: rgba(53, 87, 212, 0.03);
+    border: 1px solid rgba(13, 16, 36, 0.05);
+    border-radius: 10px;
+    color: rgba(13, 16, 36, 0.6);
+}
+.d2c_wallet_balance .btn:hover {
+    color: var(--bs-primary);
+}
+.d2c_asset_balance_table .d2c_earn {
+    vertical-align: top;
+}
+.d2c_asset_balance_table tbody tr:last-child td,
+.d2c_asset_balance_table tbody tr:last-child th {
+    border-bottom: 1px solid rgb(229 227 242 / 12%);
+    padding-bottom: 0.813rem !important;
+}
+.d2c_asset_balance_table .pagination .page-link {
+    color: rgba(13, 16, 36, 0.5);
+}
+.d2c_asset_balance_table .pagination .page-link.active {
+    background: var(--bs-primary);
+    color: var(--bs-white);
+}
+.d2c_asset_balance_table .pagination .page-link:focus {
+    box-shadow: none;
+}
+.d2c_theme_dark .d2c_wallet_balance .btn {
+    background: #2a3148;
+    color: var(--bs-primary);
+}
+.d2c_theme_dark .d2c_wallet_balance p {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/*---------------------------------------------------
+    Market page
+-----------------------------------------------------*/
+.d2c_market .d2c_coin_icon_wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 24px;
+    border: none;
+}
+.d2c_market_card_footer {
+    border-top: 1px solid rgba(13, 16, 36, 0.08);
+    border-radius: 0px 0px var(--border-radius) var(--border-radius);
+}
+.d2c_market_card_footer h2 {
+    color: rgba(13, 16, 36, 0.7);
+}
+.d2c_market_card_footer p {
+    font-weight: 500;
+}
+.d2c_theme_dark .d2c_market_card_footer h2 {
+    color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_market_card_footer {
+    border-color: rgb(229 227 242 / 7%);
+}
+#d2c_market_trade_table>tbody>tr.odd{
+    box-shadow: inset 0 0 0 9999px rgb(239 239 239 / 44%);
+}
+#d2c_market_trade_table>tbody>tr:hover{
+    box-shadow: inset 0 0 0 9999px rgb(234 238 251);
+    color: var(--bs-primary);
+}
+.d2c_theme_dark #d2c_market_trade_table>tbody>tr.odd{
+    box-shadow: inset 0 0 0 9999px rgb(47 50 59);
+}
+.d2c_theme_dark #d2c_market_trade_table>tbody>tr:hover{
+    box-shadow: inset 0 0 0 9999px rgb(38 45 68 / 81%);
+    color: var(--bs-primary);
+}
+#d2c_market_trade_table td, #d2c_market_trade_table th{
+    border: none;
+}
+
+/*---------------------------------------------------
+    investment page
+-----------------------------------------------------*/
+.d2c_investment_card .d2c_coin_icon_wrapper {
+    width: 55px;
+    height: 55px;
+    border-radius: var(--border-radius);
+    font-size: 28px;
+}
+.d2c_investment_card p {
+    color: rgba(13, 16, 36, 0.8);
+}
+.d2c_theme_dark .d2c_investment_card p {
+    color: var(--bs-white);
+}
+.d2c_investment_details {
+    background: rgba(53, 87, 212, 0.04);
+    border: 1px solid rgba(53, 87, 212, 0.1);
+    border-radius: var(--border-radius);
+}
+.d2c_investment_details p {
+    font-size: 15px;
+}
+.d2c_investment_details .d2c_coin_icon_wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 22px;
+}
+.d2c_investment_details .d2c_investment_title {
+    font-weight: 500;
+    color: rgba(13, 16, 36, 0.8);
+    font-size: 16px;
+}
+.d2c_theme_dark .d2c_investment_details .d2c_investment_title {
+    color: var(--bs-white);
+}
+
+
+/*---------------------------------------------------
+    Exchange page
+-----------------------------------------------------*/
+.d2c_top_gainer_looser .d2c_coin_icon_wrapper{
+    width: 43px;
+    height: 43px;
+    border-radius: 4px;
+    font-size: 18px;
+}
+
+
+/* dark mood apex-chart tooltip color change css */
+.apexcharts-menu{
+    padding: 2px !important;
+}
+.d2c_theme_dark svg.apexcharts-svg{
+    background: rgb(41 45 56) !important;
+}
+.d2c_theme_dark .apexcharts-tooltip.apexcharts-theme-light {
+    background: #282B31;
+    color: var(--bs-white);
+    border: 1px solid rgb(229 227 242 / 20%);
+}
+.d2c_theme_dark .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title{
+    background: #282B31;
+    border-bottom: 1px solid rgb(229 227 242 / 20%);
+}
+.d2c_theme_dark .apexcharts-menu{
+    background: #242731;
+    border-color: #dddddd3b;
+}
+.d2c_theme_dark .apexcharts-menu-item:hover{
+    background: #292d38 !important;
+}
+/*---------------------------------------------------
+    AmmChart page
+-----------------------------------------------------*/
+.d2c_am_charts{
+    height: 350px;
+}
+
+/*---------------------------------------------------
+    activity page
+-----------------------------------------------------*/
+.d2c_activity_table_tabs .nav-link{
+    background-color: rgb(218 224 246);
+    font-weight: 500;
+    color: var(--bs-primary);
+    text-transform: capitalize;
+    border: none;
+}
+.d2c_activity_table_tabs .nav-item.show .nav-link, .d2c_activity_table_tabs .nav-link.active{
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+.d2c_theme_dark .d2c_activity_table_tabs .nav-link{
+    background-color: rgb(41 45 56);
+    color: rgba(255, 255, 255, 0.5);
+}
+.d2c_theme_dark .d2c_activity_table_tabs .nav-link.active{
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+/*---------------------------------------------------
+    card page
+-----------------------------------------------------*/
+
+.d2c_nft_card {
+    border-radius: 8px;
+    background: var(--bs-white);
+}
+.d2c_theme_dark .d2c_nft_card{
+    background: rgba(252, 251, 254, 0.04);
+    border-color: rgb(229 227 242 / 3%) !important;
+}
+.d2c_nft_card .card-body{
+    border-radius: 0px 0px 8px 8px;
+}
+.d2c_nft_card .d2c_small_btn{
+    padding: 3px 10px 3px;
+    border-radius: 8px;
+    font-weight: 400;
+    font-size: 14px;
+}
+.d2c_nft_card_image_top {
+    height: 275px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.d2c_nft_card_image_top img {
+    transform: scale(1.0);
+    object-fit: cover;
+    transition: all ease 0.4s;
+}
+.d2c_nft_card:hover .card-img-top {
+    transform: scale(1.1);
+    transition: all ease 0.4s;
+}
+.d2c_author_description img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+.d2c_author_description h6 {
+    font-weight: 500;
+    font-size: 14px;
+    display: inline;
+    margin-left: 10px;
+}
+
+/* upcoming card item */
+.d2c_upcoming_nft_card {
+    padding: 30px;
+}
+.d2c_nft_img_wrapper {
+    height: 300px;
+    border-radius: 8px;
+}
+.d2c_nft_img_wrapper img {
+    border-radius: 8px;
+    object-fit: cover;
+}
+.d2c_upcoming_btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    transition: all ease 0.4s;
+}
+.d2c_upcoming_nft_card .card-body {
+    margin-top: 56px;
+}
+.d2c_countdown_wrapper{
+    display: flex;
+    margin-top: -10px;
+    gap: 10px;
+    justify-content: center;
+}
+.d2c_counter_element {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+.d2c_number_wrapper {
+    background-color: var(--bs-primary);
+    border-radius: 4px;
+    width: 50px;
+    height: 40px;
+    margin-bottom: 4px;
+    overflow: hidden;
+}
+.counter-animate {
+    animation: slideInFromTop 0.5s ease-in-out;
+}
+.show {
+    opacity: 1;
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-80%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+/* nft collection card item 4 */
+
+.d2c_collection_img_wrapper {
+    overflow: hidden;
+    max-height: 230px;
+}
+.d2c_collection_img_wrapper img {
+    object-fit: cover;
+    transform: scale(1.0);
+    transition: all ease 0.4s;
+}
+.d2c_collection_card:hover .d2c_collection_img_wrapper img {
+    transform: scale(1.1);
+    transition: all ease 0.4s;
+}
+.d2c_collection_card .card-body img {
+    width: 100px;
+    height: 100px;
+    display: block;
+    margin: -77px auto 10px;
+    border-radius: 50%;
+    position: relative;
+}
+
+/* live action card item */
+.d2c_live_action_card {
+    padding: 30px;
+}
+.d2c_live_action_card .card-body{
+    margin-top: 56px;
+}
+.d2c_author_description a img{
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    margin-left: -15px;
+}
+.d2c_author_description a img:hover{
+    z-index: 9999;
+}
+.d2c_author_description a:first-child img{
+    margin-left: 0px;
+}
+
+/* creator card item */
+.d2c_creator_card{
+    background: #f6f5ff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 20px;
+}
+.d2c_theme_dark .d2c_creator_card{
+    background: var(--dark_bg);
+}
+.d2c_creator_card img{
+    object-fit: cover;
+    width: 60px;
+    height: 60px;
+}
+
+
+
+
+/* 
+Template Name: IC Crypto - Free Bootstrap Crypto Dashboard Admin Template
+Template URI:  https://www.designtocodes.com/product/ic-crypto-free-bootstrap-crypto-dashboard-admin-template
+Description:   IC Crypto is an impressive and free crypto admin dashboard template that caters to the needs of cryptocurrency enthusiasts and professionals alike. Its well-designed interface, comprehensive features, and accessibility make it a strong contender as one of the best crypto dashboard templates available for download.
+Author:        DesignToCodes
+Author URI:    https://www.designtocodes.com
+Text Domain:   IC Crypto
+*/

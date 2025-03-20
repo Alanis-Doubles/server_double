@@ -1,4 +1,4 @@
-loading = true;
+Adianti.loading = true;
 
 Application = {};
 Application.translation = {
@@ -37,18 +37,18 @@ Adianti.onClearDOM = function(){
 };
 
 
-function showLoading() 
-{ 
-    if(loading)
+Adianti.showLoading = function() {
+    if (Adianti.loading)
     {
         __adianti_block_ui(Application.translation[Adianti.language]['loading']);
     }
 }
 
-Adianti.onBeforeLoad = function(url) 
-{ 
-    loading = true; 
-    setTimeout(function(){showLoading()}, 400);
+Adianti.onBeforeLoad = function(url) {
+    setTimeout(function(){
+        Adianti.showLoading()
+    }, 400);
+    
     if (url.indexOf('&static=1') == -1 && url.indexOf('&noscroll=1') == -1) {
         $("html, body").animate({ scrollTop: 0 }, "fast");
     }
@@ -56,11 +56,7 @@ Adianti.onBeforeLoad = function(url)
 
 Adianti.onAfterLoad = function(url, data)
 { 
-    loading = false; 
     __adianti_unblock_ui( true );
-    
-    // Fill page tab title with breadcrumb
-    // window.document.title  = $('#div_breadcrumbs').text();
 };
 
 // set select2 language

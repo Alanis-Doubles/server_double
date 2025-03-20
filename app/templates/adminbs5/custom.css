@@ -1,0 +1,102 @@
+[data-bs-theme=light] .info-box-number
+{
+    display: block;
+    font-weight: bold;
+    font-size: 25px !important;
+    color: #5f5f5f;
+}
+
+[data-bs-theme=dark] .info-box-number
+{
+    display: block;
+    font-weight: bold;
+    font-size: 25px !important;
+    color: #dee2e6;
+}
+
+[data-bs-theme=light] .info-box-text
+{
+    display: block;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    color: gray;
+}
+
+[data-bs-theme=dark] .info-box-text
+{
+    display: block;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    color: #dee2e6;
+}
+
+[data-bs-theme=light] a.btn.superlight
+{
+    color: black;
+}
+
+[data-bs-theme=dark] a.btn.superlight
+{
+    color: #dee2e6;
+}
+
+[data-bs-theme=dark] button.dropdown-toggle.btn.superlight span
+{
+    color: #dee2e6;
+}
+
+[data-bs-theme=dark] button.dropdown-toggle.btn.superlight i.far.fa-circle-user
+{
+    color: #dee2e6 !important;
+} 
+
+[data-bs-theme=dark] ul.dropdown-menu h6.dropdown-header
+{
+    color: #dee2e6;
+}
+
+[data-bs-theme=light] .tbreadcrumb li span
+{
+    color: gray;
+}
+
+[data-bs-theme=dark] .tbreadcrumb li span
+{
+    color: #dee2e6;
+}
+
+[data-bs-theme=light] .cor_verde 
+{
+    color: green;
+}
+
+[data-bs-theme=dark] .cor_verde 
+{
+    color: #66FF66;
+}
+
+[data-bs-theme=light] .cor_vermelho 
+{
+    color: red;
+}
+
+[data-bs-theme=dark] .cor_vermelho 
+{
+    color: #FF6666;
+}
+
+.hide-desktop {
+    display: none;
+}
+
+@media (max-width: 768px) { /* Ajuste o breakpoint conforme necessário */
+    .hide-desktop {
+        display: inline-block; /* Ou flex, inline, etc., dependendo da necessidade */
+    }
+}

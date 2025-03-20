@@ -2,7 +2,7 @@
 /**
  * AdiantiFileHashGeneratorService
  *
- * @version    7.6
+ * @version    8.0
  * @package    core
  * @author     Pablo Dall'Oglio
  * @author     Lucas Tomasi
@@ -113,7 +113,7 @@ class AdiantiFileHashGeneratorService
      * 
      * @return $balance array with balance between files
      */
-    public static function compare()
+    public static function compare($strict = false)
     {
         $defaultFiles = require self::FILE_HASHES;
         $projectFiles = self::generate();
@@ -129,7 +129,7 @@ class AdiantiFileHashGeneratorService
             {
                 $balance[$file] = self::MODIFIED;
             }
-            else
+            else if (!$strict)
             {
                 $balance[$file] = self::EQUAL;
             }

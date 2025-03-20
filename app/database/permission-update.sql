@@ -35,7 +35,6 @@ INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_prog
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Message Form View','SystemMessageFormView');
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Notification List','SystemNotificationList');
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Notification Form View','SystemNotificationFormView');
-INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Document Category List','SystemDocumentCategoryFormList');
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Document Form','SystemDocumentForm');
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Document Upload Form','SystemDocumentUploadForm');
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Document List','SystemDocumentList');
@@ -57,8 +56,6 @@ INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from syste
                                         (select id from system_program where controller='SystemNotificationList'));
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 2,
                                         (select id from system_program where controller='SystemNotificationFormView'));
-INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 1,
-                                        (select id from system_program where controller='SystemDocumentCategoryFormList'));
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 2,
                                         (select id from system_program where controller='SystemDocumentForm'));
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 2,
@@ -79,10 +76,11 @@ INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from syste
                                         (select id from system_program where controller='SystemSupportForm'));
 
 CREATE TABLE system_unit (
-    id INTEGER PRIMARY KEY NOT NULL,
-    name varchar(100));
+    id int PRIMARY KEY NOT NULL,
+    name varchar(100)
+);
     
-ALTER TABLE system_user add column system_unit_id int references system_unit(id);
+ALTER TABLE system_user add column system_unit_id int REFERENCES system_unit(id);
 ALTER TABLE system_user add column active char(1);
 UPDATE system_user set active='Y';
 
@@ -92,13 +90,14 @@ CREATE TABLE system_preference (
 );
 
 
--- new programs of 5.0
+--- new programs of 5.0
 CREATE TABLE system_user_unit (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
     system_unit_id int,
     FOREIGN KEY(system_user_id) REFERENCES system_user(id),
-    FOREIGN KEY(system_unit_id) REFERENCES system_unit(id));
+    FOREIGN KEY(system_unit_id) REFERENCES system_unit(id)
+);
 
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System PHP Error','SystemPHPErrorLogView');
 
@@ -167,11 +166,12 @@ ALTER TABLE system_user add column about varchar(256);
 ALTER TABLE system_user add column function_name varchar(255);
 
 CREATE TABLE system_user_old_password (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
     password varchar(256),
-    created_at date,
-    FOREIGN KEY(system_user_id) REFERENCES system_user(id));
+    created_at varchar(20),
+    FOREIGN KEY(system_user_id) REFERENCES system_user(id)
+);
 
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System documents','SystemDriveList');
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 1,
@@ -288,13 +288,13 @@ ALTER TABLE system_user add column custom_code varchar(256);
 ALTER TABLE system_user add column otp_secret varchar(256);
 
 CREATE TABLE system_role (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     name varchar(256),
     custom_code varchar(256)
 );
 
 CREATE TABLE system_user_role (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
     system_role_id int,
     FOREIGN KEY(system_user_id) REFERENCES system_user(id),
@@ -302,12 +302,13 @@ CREATE TABLE system_user_role (
 );
 
 CREATE TABLE system_program_method_role (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_program_id int,
     system_role_id int,
     method_name varchar(256),
     FOREIGN KEY(system_program_id) REFERENCES system_program(id),
-    FOREIGN KEY(system_role_id) REFERENCES system_role(id));
+    FOREIGN KEY(system_role_id) REFERENCES system_role(id)
+);
     
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'System Role List','SystemRoleList');
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 1,
@@ -330,7 +331,7 @@ CREATE INDEX sys_program_controller_idx ON system_program(controller);
 CREATE INDEX sys_unit_name_idx ON system_unit(name);
 CREATE INDEX sys_role_name_idx ON system_role(name);
 CREATE INDEX sys_preference_id_idx ON system_preference(id);
--- CREATE INDEX sys_preference_value_idx ON system_preference(value);
+CREATE INDEX sys_preference_value_idx ON system_preference(value);
 CREATE INDEX sys_user_unit_user_idx ON system_user_unit(system_user_id);
 CREATE INDEX sys_user_unit_unit_idx ON system_user_unit(system_unit_id);
 CREATE INDEX sys_user_role_user_idx ON system_user_role(system_user_id);
@@ -343,3 +344,23 @@ CREATE INDEX sys_program_method_role_role_idx ON system_program_method_role(syst
 INSERT INTO system_program VALUES((select coalesce(max(id),0)+1 from system_program b),'Session vars','SystemSessionVarsView');
 INSERT INTO system_group_program VALUES((select coalesce(max(id),0)+1 from system_group_program b), 1,
                                         (select id from system_program where controller='SystemSessionVarsView'));
+
+--- changes from 8.0.0
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System document create form', 'SystemDriveDocumentCreateForm');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System Message Tag form', 'SystemMessageTagForm');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System schedule list', 'SystemScheduleList');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System schedule form', 'SystemScheduleForm');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System schedule log', 'SystemScheduleLogList');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'Text document editor', 'SystemTextDocumentEditor');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System Wiki page picker', 'SystemWikiPagePicker');
+INSERT INTO system_program (id, name, controller) values ((SELECT coalesce(max(id),0)+1 FROM system_program b), 'System Modules Check View', 'SystemModulesCheckView');
+
+
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 2, (select id from system_program where controller='SystemDriveDocumentCreateForm'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 2, (select id from system_program where controller='SystemMessageTagForm'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 1, (select id from system_program where controller='SystemScheduleList'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 1, (select id from system_program where controller='SystemScheduleForm'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 1, (select id from system_program where controller='SystemScheduleLogList'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 2, (select id from system_program where controller='SystemTextDocumentEditor'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 1, (select id from system_program where controller='SystemWikiPagePicker'));
+INSERT INTO system_group_program (id, system_group_id, system_program_id) values ( (SELECT coalesce(max(id),0)+1 FROM system_group_program b), 1, (select id from system_program where controller='SystemModulesCheckView'));

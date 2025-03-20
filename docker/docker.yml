@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   apache_php:
-    image: webdevops/php-apache:8.1
+    image: webdevops/php-apache:8.3
     container_name: profit_php
     restart: always
     networks:

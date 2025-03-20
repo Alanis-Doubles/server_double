@@ -1,99 +1,97 @@
 
 --- new table/columns of 7.5
 CREATE TABLE system_folder (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
-    created_at date,
+    created_at varchar(20),
     name varchar(256) not null,
     in_trash char(1),
     system_folder_parent_id int REFERENCES system_folder (id)
 );
 
-CREATE TABLE system_folder_user
-(
-    id INTEGER PRIMARY KEY NOT NULL,
-    system_folder_id INTEGER references system_folder(id),
-    system_user_id INTEGER
+CREATE TABLE system_folder_user (
+    id int PRIMARY KEY NOT NULL,
+    system_folder_id int REFERENCES system_folder(id),
+    system_user_id int
 );
 
-CREATE TABLE system_folder_group
-(
-    id INTEGER PRIMARY KEY NOT NULL,
-    system_folder_id INTEGER references system_folder(id),
-    system_group_id INTEGER
+CREATE TABLE system_folder_group (
+    id int PRIMARY KEY NOT NULL,
+    system_folder_id int REFERENCES system_folder(id),
+    system_group_id int
 );
 
-ALTER TABLE system_document add column system_folder_id INTEGER references system_folder(id);
+ALTER TABLE system_document add column system_folder_id int REFERENCES system_folder(id);
 ALTER TABLE system_document add column in_trash char(1);
 
 CREATE TABLE system_document_bookmark (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
-    system_document_id INTEGER references system_document(id)
+    system_document_id int REFERENCES system_document(id)
 );
 
 CREATE TABLE system_folder_bookmark (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
-    system_folder_id INTEGER references system_folder(id)
+    system_folder_id int REFERENCES system_folder(id)
 );
 
 CREATE TABLE system_post (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
     title varchar(256) not NULL,
     content text not NULL,
-    created_at timestamp not null,
+    created_at varchar(256) not null,
     active char(1) default 'Y' not null
 );
 
 CREATE TABLE system_post_share_group (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_group_id int,
     system_post_id int REFERENCES system_post (id) not null
 );
 
 CREATE TABLE system_post_tag (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_post_id int REFERENCES system_post (id) not null,
     tag varchar(256) not null
 );
 
 CREATE TABLE system_post_comment (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     comment text not NULL,
     system_user_id int not null,
     system_post_id int REFERENCES system_post (id) not null,
-    created_at timestamp not null
+    created_at varchar(256) not null
 );
 
 CREATE TABLE system_post_like (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
     system_post_id int REFERENCES system_post (id) not null,
-    created_at timestamp not null
+    created_at varchar(256) not null
 );
 
 CREATE TABLE system_wiki_page (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_user_id int,
-    created_at timestamp not null,
-    updated_at timestamp,
+    created_at varchar(256) not null,
+    updated_at varchar(256),
     title varchar(256) not null,
-    description varchar(4096) not null,
+    description text not null,
     content text not null,
     active char(1) default 'Y' not null,
     searchable char(1) default 'Y' not null
 );
 
 CREATE TABLE system_wiki_tag (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_wiki_page_id int REFERENCES system_wiki_page (id) not null,
     tag varchar(256) not null
 );
 
 CREATE TABLE system_wiki_share_group (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     system_group_id int,
     system_wiki_page_id int REFERENCES system_wiki_page (id) not null
 );
@@ -137,7 +135,6 @@ CREATE INDEX sys_message_user_id_idx ON system_message(system_user_id);
 CREATE INDEX sys_message_user_to_idx ON system_message(system_user_to_id);
 CREATE INDEX sys_notification_user_id_idx ON system_notification(system_user_id);
 CREATE INDEX sys_notification_user_to_idx ON system_notification(system_user_to_id);
-CREATE INDEX sys_document_category_name_idx ON system_document_category(name);
 CREATE INDEX sys_folder_user_id_idx ON system_folder(system_user_id);
 CREATE INDEX sys_folder_name_idx ON system_folder(name);
 CREATE INDEX sys_folder_parend_id_idx ON system_folder(system_folder_parent_id);
@@ -146,7 +143,6 @@ CREATE INDEX sys_folder_user_user_idx ON system_folder_user(system_user_id);
 CREATE INDEX sys_folder_group_folder_idx ON system_folder_group(system_folder_id);
 CREATE INDEX sys_folder_group_group_idx ON system_folder_group(system_group_id);
 CREATE INDEX sys_document_user_idx ON system_document(system_user_id);
-CREATE INDEX sys_document_category_idx ON system_document(category_id);
 CREATE INDEX sys_document_folder_idx ON system_document(system_folder_id);
 CREATE INDEX sys_document_user_document_idx ON system_document_user(document_id);
 CREATE INDEX sys_document_user_user_idx ON system_document_user(system_user_id);
@@ -168,3 +164,22 @@ CREATE INDEX sys_wiki_page_user_idx ON system_wiki_page(system_user_id);
 CREATE INDEX sys_wiki_tag_page_idx ON system_wiki_tag(system_wiki_page_id);
 CREATE INDEX sys_wiki_share_group_group_idx ON system_wiki_share_group(system_group_id);
 CREATE INDEX sys_wiki_share_group_page_idx ON system_wiki_share_group(system_wiki_page_id);
+
+--- changes from 8.0
+ALTER TABLE system_message ADD COLUMN removed char(1);
+ALTER TABLE system_message ADD COLUMN viewed char(1);
+ALTER TABLE system_message ADD COLUMN attachments text;
+
+ALTER TABLE system_document ADD COLUMN content text;
+ALTER TABLE system_document ADD COLUMN content_type varchar(100);
+
+ALTER TABLE system_post ADD COLUMN updated_at varchar(20);
+ALTER TABLE system_post ADD COLUMN updated_by int;
+
+CREATE TABLE system_message_tag (
+    id int PRIMARY KEY NOT NULL,
+    system_message_id int not null REFERENCES system_message (id),
+    tag varchar(256) not null
+);
+
+ALTER TABLE system_wiki_page ADD COLUMN updated_by int;

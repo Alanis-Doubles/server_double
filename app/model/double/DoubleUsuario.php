@@ -48,6 +48,29 @@ class DoubleUsuario extends DoubleRecord
         unset($this->usuario_canal);
         unset($this->plataforma);
 
+        if (isset($this->ciclo_valor)) {
+            $ciclo = $this->ciclo_valor;
+            $ciclo_stop_loss = $this->ciclo_stop_loss_valor;
+            if ($ciclo !== 'N' && $ciclo_stop_loss)
+                $ciclo = $ciclo_stop_loss;
+
+            $entrada_automatica = $this->entrada_automatica_valor;
+            $tipo_entrada_automatica =  $this->apos_valor;
+            if ($entrada_automatica !== 'N' && $tipo_entrada_automatica)
+                $entrada_automatica = $tipo_entrada_automatica;
+
+            if ($entrada_automatica == 'N')
+                $this->valor_max_ciclo = 0;
+
+            $this->ciclo              = $ciclo;
+            $this->entrada_automatica = $entrada_automatica;
+
+            unset($this->ciclo_valor);
+            unset($this->ciclo_stop_loss_valor);
+            unset($this->entrada_automatica_valor);
+            unset($this->apos_valor);
+        }
+
         $this->valor = $this->valor == null ? 0 : $this->valor;
         $this->protecao = $this->protecao == null ? 0 : $this->protecao;
         $this->stop_win = $this->stop_win == null ? 0 : $this->stop_win;
@@ -67,17 +90,17 @@ class DoubleUsuario extends DoubleRecord
                 $user->save();
             }
 
-            if (!$this->user->checkInUnit($user->unit)) {
+            if (!$this->checkInUnit($user->unit)) {
                 $user->addSystemUserUnit($user->unit);
                 $user->save();
             }
 
-            if (!$this->user->checkInRole($system_role)) {
+            if (!$this->checkInRole($system_role)) {
                 $user->addSystemUserRole($system_role);
                 $user->save();
             }
 
-            $dashboard = SystemProgram::where('controller', '=', 'TDoubleDashboardUsuario')->first();
+            $dashboard = SystemProgram::where('controller', '=', 'TProfitDashboardUsuario')->first();
             if ($dashboard)
                 $user->frontpage_id = $dashboard->id;
                 $user->save();
@@ -99,6 +122,34 @@ class DoubleUsuario extends DoubleRecord
         unset($this->email);
         
         parent::store();
+    }
+
+    /**
+     * Check if the user is within a unit
+     */
+    public function checkInUnit( SystemUnit $unit )
+    {
+        $user_units = array();
+        foreach( $this->user->getSystemUserUnits() as $user_unit )
+        {
+            $user_units[] = $user_unit->id;
+        }
+    
+        return in_array($unit->id, $user_units);
+    }
+
+    /**
+     * Check if the user is within a role
+     */
+    public function checkInRole( SystemRole $role )
+    {
+        $user_roles = array();
+        foreach( $this->user->getSystemUserRoles() as $user_role )
+        {
+            $user_roles[] = $user_role->id;
+        }
+    
+        return in_array($role->id, $user_roles);
     }
 
     public static function identificar($chat_id, $plataforma_id, $canal_id)

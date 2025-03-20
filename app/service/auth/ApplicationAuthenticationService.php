@@ -120,12 +120,16 @@ class ApplicationAuthenticationService
             TSession::setValue('userunitid',$user->unit->id);
             TSession::setValue('userunitname', $user->unit->name);
             TSession::setValue('userunitcustomcode', $user->unit->custom_code);
-            TSession::setValue('unit_database', $user->unit->connection_name);
         }
         
         if ($open_transaction)
         {
             TTransaction::close();
+        }
+        
+        if (TAPCache::enabled())
+        {
+            TAPCache::setValue('session_'.TSession::getValue('login'), session_id());
         }
     }
     
@@ -166,6 +170,49 @@ class ApplicationAuthenticationService
             TSession::setValue('userunitid', $token['userunitid']);
             TSession::setValue('userunitname', $token['userunitname']);
             TSession::setValue('unit_database', $token['unit_database']);
+        }
+    }
+    
+    /**
+     * Check multi session
+     */
+    public static function checkMultiSession()
+    {
+        $ini = AdiantiApplicationConfig::get();
+        
+        if (!TSession::getValue('logged'))
+        {
+            return;
+        }
+        
+        if (!isset($ini['general']['concurrent_sessions']))
+        {
+            return;
+        }
+        
+        if ($ini['general']['concurrent_sessions'] == '1')
+        {
+            return;
+        }
+        
+        if (!TAPCache::enabled())
+        {
+            new TMessage('error', AdiantiCoreTranslator::translate('PHP Module not found'). ': APCU');
+            return;
+        }
+        
+        $current_session = TAPCache::getValue('session_'.TSession::getValue('login'));
+        if ($current_session)
+        {
+            if ($current_session !== session_id())
+            {
+                SystemAccessLogService::registerLogout();
+                TSession::freeSession();
+                
+                $class = 'LoginForm';
+                AdiantiCoreApplication::gotoPage($class, 'onLoad');
+                return;
+            }
         }
     }
 }

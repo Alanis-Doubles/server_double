@@ -1,5 +1,6 @@
 <?php
 
+use GuzzleHttp\Client as GuzzClient;
 use Predis\Client;
 
 class TTelegramConsumer extends TDoubleRedis
@@ -22,7 +23,7 @@ class TTelegramConsumer extends TDoubleRedis
 
          $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
             'persistent' => true,
             'read_write_timeout' => -1
@@ -51,50 +52,73 @@ class TTelegramConsumer extends TDoubleRedis
 
         $location = str_replace('{token}', $telegram_token, $telegram_host);
 
-        $ch = curl_init();
-    
-        $defaults = array(
-            CURLOPT_URL => $location . 'sendMessage', 
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($telegram_payload),
-            CURLOPT_HTTPHEADER => array(
-                'Accept: application/json',
-                'Content-Type: application/json'
-              ),
+        $client = new GuzzClient();
+        $response = $client->request(
+            'POST',
+            $location . 'sendMessage',
+            [
+                'json' => $telegram_payload,
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ]
+            ]
         );
-        
-        curl_setopt_array($ch, $defaults);
-        $output = curl_exec ($ch);
-        
-        curl_close ($ch);
-        $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
+
         $contents = null;
-        if ($http_status == 200)
-            $contents = json_decode($output);
-        else {
-            $error_message = curl_error($ch);
-            $error_number = curl_errno($ch);
+        if ($response->getStatusCode() == 200) {
+            $contents = json_decode($response->getBody()->getContents());
+        } else {
+            $error_message = $response->getReasonPhrase();
+            $error_number = response->getStatusCode();
             $json_erro = json_encode($telegram_payload);
-            ////  DoubleErros::registrar(
-            //     1, 
-            //     'TTelegramConsumer', 
-            //     'sendMessageToTelegram', 
-            //     "cURL error ({$error_number}): {$error_message}",
-            //     json_encode($telegram_payload)
-            // );
             echo "cURL error ({$error_number}): {$error_message}\nJSON: $json_erro";
         }
 
+        // $ch = curl_init();
+    
+        // $defaults = array(
+        //     CURLOPT_URL => $location . 'sendMessage', 
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 0,
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'POST',
+        //     CURLOPT_POSTFIELDS => json_encode($telegram_payload),
+        //     CURLOPT_HTTPHEADER => array(
+        //         'Accept: application/json',
+        //         'Content-Type: application/json'
+        //       ),
+        // );
+        
+        // curl_setopt_array($ch, $defaults);
+        // $output = curl_exec ($ch);
+        
+        // curl_close ($ch);
+        // $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        // $contents = null;
+        // if ($http_status == 200)
+        //     $contents = json_decode($output);
+        // else {
+        //     $error_message = curl_error($ch);
+        //     $error_number = curl_errno($ch);
+        //     $json_erro = json_encode($telegram_payload);
+        //     ////  DoubleErros::registrar(
+        //     //     1, 
+        //     //     'TTelegramConsumer', 
+        //     //     'sendMessageToTelegram', 
+        //     //     "cURL error ({$error_number}): {$error_message}",
+        //     //     json_encode($telegram_payload)
+        //     // );
+        //     echo "cURL error ({$error_number}): {$error_message}\nJSON: $json_erro";
+        // }
+
          $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
             'persistent' => true,
             'read_write_timeout' => -1
@@ -177,7 +201,7 @@ class TTelegramConsumer extends TDoubleRedis
     public function run($param) {
          $redis = new Client([
             'scheme' => 'tcp',
-            'host'   => '180.149.34.86', // IP do seu Redis
+            'host'   => $this->hostUsuario(), // IP do seu Redis
             'port'   => 6379, // Porta padrão do Redis
             'persistent' => true,
             'read_write_timeout' => -1
@@ -200,7 +224,15 @@ class TTelegramConsumer extends TDoubleRedis
                     }
                 }
             } catch (\Throwable $th) {
-               
+                echo "$th\n";
+                $redis->disconnect();
+                $redis = new Client([
+                    'scheme' => 'tcp',
+                    'host'   => $this->hostUsuario(), // IP do seu Redis
+                    'port'   => 6379, // Porta padrão do Redis
+                    'persistent' => true,
+                    'read_write_timeout' => -1
+                ]);
             }
         }
     }

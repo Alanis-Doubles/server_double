@@ -23,8 +23,8 @@ ALTER TABLE system_change_log add column class_name varchar(256);
 ALTER TABLE system_sql_log    add column request_id varchar(256);
 
 CREATE TABLE system_request_log (
-    id INTEGER PRIMARY KEY NOT NULL,
-    endpoint varchar(4096),
+    id int PRIMARY KEY NOT NULL,
+    endpoint text,
     logdate varchar(256),
     log_year varchar(4),
     log_month varchar(2),
@@ -59,7 +59,7 @@ ALTER TABLE system_change_log ADD COLUMN log_day varchar(2);
 ALTER TABLE system_access_log ADD COLUMN impersonated_by varchar(256);
 
 CREATE TABLE system_access_notification_log (
-    id INTEGER PRIMARY KEY NOT NULL,
+    id int PRIMARY KEY NOT NULL,
     login varchar(256),
     email varchar(256),
     ip_address varchar(256),
@@ -99,3 +99,19 @@ CREATE INDEX sys_request_log_class_idx ON system_request_log(class_name);
 CREATE INDEX sys_request_log_method_idx ON system_request_log(class_method);
 
 CREATE INDEX sys_access_notification_log_login_idx ON system_access_notification_log(login);
+
+--- changes from 8.0.0
+
+CREATE TABLE system_schedule_log (
+    id int PRIMARY KEY NOT NULL,
+    logdate varchar(19),
+    title varchar(256),
+    class_name varchar(256),
+    method varchar(256),
+    status varchar(1),
+    message text
+);
+
+CREATE INDEX sys_schedule_log_class_idx ON system_schedule_log(class_name);
+CREATE INDEX sys_schedule_log_method_idx ON system_schedule_log(method);
+

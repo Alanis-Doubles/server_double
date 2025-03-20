@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menu>
+  <menuitem label="🎲 Double">
+    <menu>
+      <menuitem label="📈 Dashboard">
+        <action>TDoubleDashboard</action>
+      </menuitem>
+      <menuitem label="📈 Dashboard">
+        <action>TDoubleDashboardUsuario</action>
+      </menuitem>
+      <menuitem label="🖥️ Plataformas">
+        <action>TDoublePlataformaList</action>
+      </menuitem>
+      <menuitem label="👥 Usuários">
+        <action>TDoubleUsuarioList</action>
+      </menuitem>
+      <menuitem label="📡 Canais">
+        <action>TDoubleCanalList</action>
+      </menuitem>
+      <menuitem label="🔮 Estratégias">
+        <action>TDoubleEstrategiaList</action>
+      </menuitem>
+      <menuitem label="🔊 Mensagens de recuperação">
+        <action>TDoubleRecuperacaoMenagemList</action>
+      </menuitem>
+      <menuitem label="🎯 Objetivos">
+        <action>TDoubleUsuarioObjetivo</action>
+      </menuitem>
+      <menuitem label="📨 Mensagem Direta">
+        <action>TDoubleMensagemDiretaForm</action>
+      </menuitem>
+      <menuitem label="📆 Histórico">
+        <action>TDoubleHistoricoUsuario</action>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="_t{Administration}">
+    <icon>fas:home fa-fw</icon>
+    <menu>
+      <menuitem label="Dashboard">
+        <action>SystemAdministrationDashboard</action>
+        <icon>fas:tachometer-alt fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Programs}">
+        <action>SystemProgramList</action>
+        <icon>far:file-code fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Groups}">
+        <action>SystemGroupList</action>
+        <icon>fas:users fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Units}">
+        <action>SystemUnitList</action>
+        <icon>fas:university fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Roles}">
+        <action>SystemRoleList</action>
+        <icon>fas:user-tag fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Users}">
+        <action>SystemUserList</action>
+        <icon>fas:user fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Contacts}">
+        <action>SystemContactsList</action>
+        <icon>far:address-card fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Database explorer}">
+        <action>SystemDatabaseExplorer</action>
+        <icon>fas:database fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{SQL Panel}">
+        <action>SystemSQLPanel</action>
+        <icon>fas:table fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Menu editor}">
+        <action>SystemMenuEditor</action>
+        <icon>far:edit fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Files diff}">
+        <action>SystemFilesDiff</action>
+        <icon>fas:file-medical-alt fa-fw</icon>
+      </menuitem>
+      <menuitem label="PHP Info">
+        <action>SystemPHPInfoView</action>
+        <icon>fas:info-circle fa-fw</icon>
+      </menuitem>
+      <menuitem label="System Information">
+        <action>SystemInformationView</action>
+        <icon>fas:desktop fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Preferences}">
+        <action>SystemPreferenceForm#method=onEdit</action>
+        <icon>fas:cog fa-fw</icon>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="📄 _t{Documents}">
+    <menu>
+      <menuitem label="📦 _t{Documents}">
+        <action>SystemDriveList</action>
+      </menuitem>
+      <menuitem label="🗄️ _t{Categories}">
+        <action>SystemDocumentCategoryFormList</action>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="📢 _t{Posts}">
+    <menu>
+      <menuitem label="📝 _t{News management}">
+        <action>SystemPostList</action>
+      </menuitem>
+      <menuitem label="📢 _t{List news}">
+        <action>SystemPostFeedView</action>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="_t{📚 Courses}">
+    <menu>
+      <menuitem label="_t{📝 Page managements}">
+        <action>SystemWikiList</action>
+      </menuitem>
+      <menuitem label="_t{🔎 Search pages}">
+        <action>SystemWikiSearchList</action>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="Logs">
+    <icon>fas:desktop fa-fw</icon>
+    <menu>
+      <menuitem label="Dashboard">
+        <action>SystemLogDashboard</action>
+        <icon>fas:tachometer-alt fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Access Log}">
+        <action>SystemAccessLogList</action>
+        <icon>fas:key fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Change Log}">
+        <action>SystemChangeLogView</action>
+        <icon>fas:film fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{SQL Log}">
+        <action>SystemSqlLogList</action>
+        <icon>fas:database fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{Request Log}">
+        <action>SystemRequestLogList</action>
+        <icon>fas:globe fa-fw</icon>
+      </menuitem>
+      <menuitem label="_t{PHP Log}">
+        <action>SystemPHPErrorLogView</action>
+        <icon>fas:exclamation-triangle fa-fw</icon>
+      </menuitem>
+      <menuitem label="Session vars">
+        <action>SystemSessionVarsView</action>
+        <icon>fas:code fa-fw</icon>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="Common pages">
+    <menu>
+      <menuitem label="Common page 1">
+        <action>CommonPage</action>
+      </menuitem>
+      <menuitem label="Common page 2">
+        <action>CommonPage</action>
+      </menuitem>
+      <menuitem label="Common page 3">
+        <action>CommonPage</action>
+      </menuitem>
+    </menu>
+  </menuitem>
+  <menuitem label="_t{Two factor authentication}">
+    <action>SystemProfile2FAForm</action>
+    <icon>fa:shield-alt</icon>
+  </menuitem>
+  <menuitem label="🚪 Sair">
+    <action>LoginForm#method=onLogout#static=1</action>
+  </menuitem>
+</menu>

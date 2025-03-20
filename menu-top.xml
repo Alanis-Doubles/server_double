@@ -1,0 +1,55 @@
+<menu>
+    <menuitem label="Shortcut">
+        <icon>fas:bolt fa-fw</icon>
+        <mobile>N</mobile>
+        <menu>
+            <menuitem label="Dashboard">
+              <icon>fas:tachometer-alt fa-fw</icon>
+              <action>SystemAdministrationDashboard</action>
+              <title>Dashboard</title>
+              <mobile>N</mobile>
+            </menuitem>
+        </menu>
+    </menuitem>
+
+    
+    <menuitem>
+        <icon>fas:bars fa-fw</icon>
+        <desktop>N</desktop>
+        <menu>
+            <menuitem label="📈 Dashboard">
+              <action>TProfitDashboardUsuario</action>
+              <desktop>N</desktop>
+            </menuitem>
+            <menuitem label="🔮 Estratégias">
+              <action>TDoubleEstrategiaList</action>
+              <desktop>N</desktop>
+            </menuitem>
+            <menuitem label="🎯 Objetivos">
+              <action>TDoubleUsuarioObjetivo</action>
+              <desktop>N</desktop>
+            </menuitem>
+            <menuitem label="📆 Histórico">
+              <action>TProfitHistoricoUsuario</action>
+              <desktop>N</desktop>
+            </menuitem>
+        </menu>
+    </menuitem>
+
+    <menuitem label="📈 Dashboard">
+      <action>TProfitDashboardUsuario</action>
+      <mobile>N</mobile>
+    </menuitem>
+    <menuitem label="🔮 Estratégias">
+      <action>TDoubleEstrategiaList</action>
+      <mobile>N</mobile>
+    </menuitem>
+    <menuitem label="🎯 Objetivos">
+      <action>TDoubleUsuarioObjetivo</action>
+      <mobile>N</mobile>
+    </menuitem>
+    <menuitem label="📆 Histórico">
+      <action>TProfitHistoricoUsuario</action>
+      <mobile>N</mobile>
+    </menuitem>
+</menu>

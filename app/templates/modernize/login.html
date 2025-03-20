@@ -3,22 +3,49 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Modernize Free</title>
-  <link rel="shortcut icon" type="image/png" href="app/templates/{template}/assets/images/logos/favicon.png" />
+  <!-- meta name="viewport" content="width=device-width, initial-scale=1" -->
+  <title>{title}</title>
+  <!-- link rel="shortcut icon" type="image/png" href="app/templates/{template}/assets/images/logos/favicon.png" /-->
   <link rel="stylesheet" href="app/templates/{template}/assets/css/styles.min.css" />
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="manifest" href="manifest.json?appver=760">
+  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="apple-touch-icon" sizes="180x180" href="app/images/icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   
   {LIBRARIES}
   {HEAD}
+
+  <script src="app/templates/{template}/js/theme.js?appver=800"></script>
+  <link rel="stylesheet" href="app/templates/{template}/theme.css?appver=800">
 </head>
 
-<script>
-  $(function() {
-      __adianti_set_name('{application}');
-      __adianti_set_language('{lang}');
-      __adianti_set_debug({debug});
-  });
-</script>
+<style>
+  .form-floating>div>.form-control {
+      padding: 1rem 0.75rem;
+  }
+  .tabpanel_two_factor_form {
+      padding: 2rem !important;
+  }
+  :root {
+      --ad-font-size: 1rem;
+  }
+  </style>
+  <script>
+      $(function() {
+          // Start framework.
+          Adianti.configure({adianti_options});
+          Adianti.start();
+          
+          // Start template.
+          Template.configure({template_options}, 'login');
+          Template.start();
+      });
+  </script>
 
 <body>
   <!--  Body Wrapper -->
@@ -29,9 +56,18 @@
       <div class="d-flex align-items-center justify-content-center w-100">
         <div class="row justify-content-center w-100">
           <div class="col-md-8 col-lg-6 col-xxl-3">
-            <div id="adianti_div_content"></div>
-            <div id="adianti_online_content"></div>
-            <div id="adianti_online_content2"></div>
+            <div class="wrapper">
+              <div class="main" style="{login_background};background-size: cover;height: 100%;overflow: hidden;">
+                  <main class="content px-3 py-2">
+                      <div class="container-fluid">
+                          <!-- Where the framework content is injected -->
+                          <div id="adianti_div_content"></div>
+                      </div>
+                      
+                      <div id="adianti_online_content"></div>
+                  </main>
+              </div>
+            </div>
             <!-- <div class="card mb-0">
               <div class="card-body">
                 <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
@@ -69,8 +105,6 @@
       </div>
     </div>
   </div>
-  <script src="app/templates/{template}/assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="app/templates/{template}/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

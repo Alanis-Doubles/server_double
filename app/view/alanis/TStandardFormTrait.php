@@ -1,6 +1,7 @@
 <?php
 
 use Adianti\Control\TAction;
+use Adianti\Wrapper\BootstrapFormBuilder;
 
 trait TStandardFormTrait
 {

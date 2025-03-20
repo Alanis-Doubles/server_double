@@ -17,18 +17,18 @@ class TAvalon extends TDoublePlataforma
         return 'Avalon';
     }
 
-    public function sinalCorrente() {}
-
-    public function aguardarSinal($ultimo_sinal) {}
-
-    public function ultimoSinal()
+    private function getHost()
     {
-        return self::$ultimo_sinal->numero;
+        return 'http://' . DoubleConfiguracao::getConfiguracao('host_usuario') . ':3001';
     }
 
     public function getToken(DoubleUsuario $usuario)
     {
-        $expiracao = date_create_from_format('Y-m-d H:i:s', $usuario->token_expiracao);
+        if ($usuario->token_expiracao)
+            $expiracao = date_create_from_format('Y-m-d H:i:s', $usuario->token_expiracao);
+        else
+            $expiracao = new DateTime('2000-01-01 00:00:00');
+        
         $now = new DateTime();
         if ($now > $expiracao) {
             $payload = $usuario->token_acesso;
@@ -39,7 +39,7 @@ class TAvalon extends TDoublePlataforma
             $client = new Client();
             $response = $client->request(
                 'POST',
-                'http://180.149.34.86:3001/api/usuarios/auth',
+                $this->getHost() . '/api/usuarios/auth',
                 [
                     'json' => $payload,
                     'headers' => [
@@ -70,7 +70,7 @@ class TAvalon extends TDoublePlataforma
 
         $response = $client->request(
             'POST',
-            'http://180.149.34.86:3001/api/usuarios/balance/reset_demo',
+            $this->gethost() . '/api/usuarios/balance/reset_demo',
             [
                 'json' => $payload,
                 'headers' => [
@@ -98,7 +98,7 @@ class TAvalon extends TDoublePlataforma
         $client = new Client(['http_errors' => false]);
         $response = $client->request(
             'POST',
-            'http://180.149.34.86:3001/api/usuarios/balance',
+            $this->gethost() . '/api/usuarios/balance',
             [
                 'json' => $payload,
                 'headers' => [
@@ -125,7 +125,7 @@ class TAvalon extends TDoublePlataforma
         $client = new Client();
         $response = $client->request(
             'POST',
-            'http://180.149.34.86:3001/api/usuarios/auth',
+            $this->gethost() . '/api/usuarios/auth',
             [
                 'json' => $payload,
                 'headers' => [
@@ -151,7 +151,7 @@ class TAvalon extends TDoublePlataforma
         $client = new Client();
         $response = $client->request(
             'POST',
-            'http://180.149.34.86:3001/api/usuarios/buyorsell',
+            $this->gethost() . '/api/usuarios/buyorsell',
             [
                 'json' => $payload,
                 'headers' => [
@@ -162,9 +162,12 @@ class TAvalon extends TDoublePlataforma
         );
 
         if ($response->getStatusCode() == 200) {
-            json_decode($response->getBody()->getContents());
+            $response = json_decode($response->getBody()->getContents());
+            echo "Resposta: " . json_encode($response) . "\n";
+            return true;
         } else {
-            throw new Exception("Login inválido, por favor refaça a operação."); 
+            echo "Erro: " . $response->getBody()->getContents() . "\n";
+            return false;
         }
     }
 
@@ -191,7 +194,7 @@ class TAvalon extends TDoublePlataforma
         }
 
         //echo "Configurando arquivo supervisor\n";
-        DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Configurando arquivo supervisor', 'Configurando arquivo supervisor');
+        // DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Configurando arquivo supervisor', 'Configurando arquivo supervisor');
         $usuario_id = $usuario->id;
 
         $path_supervisor = "/opt/docker/etc/supervisor.d/";
@@ -220,7 +223,7 @@ class TAvalon extends TDoublePlataforma
 
         $criado = file_put_contents($filename, $usuarioConfig);
         //echo "Arquivo supervisor criado: {$criado}\n";
-        DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Arquivo supervisor criado', 'Arquivo supervisor criado -' . $criado);
+        // DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Arquivo supervisor criado', 'Arquivo supervisor criado -' . $criado);
         return '';
     }
 

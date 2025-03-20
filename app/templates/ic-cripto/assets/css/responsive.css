@@ -1,0 +1,250 @@
+@media only screen and (min-width: 0px) and (max-width: 575px) {
+
+    /* data-table info spacing */
+    .dataTables_info{
+        margin-bottom: 10px;
+    }
+
+    /* ==========error page========== */
+    .d2c_error_content h1{
+        font-size: 3rem;
+    }
+    .d2c_error_content h3{
+        font-size: 24px;
+    }
+    .d2c_error_content p{
+        font-size: 16px;
+    }
+    /* ==========login system page page========== */
+    .d2c_login_system{
+        padding: 80px 0px;
+    }
+    .d2c_login_wrapper{
+        padding: 40px 30px;
+        border-radius: var(--border-radius);
+    }
+    /* ==========wallet page========== */
+    .d2c_asset_balance_table .table th, .d2c_asset_balance_table .table td {
+        padding: 0.813rem 0.5rem !important;
+        font-size: 15px;
+    }
+    /* ==========notification page========== */
+    .d2c_notification_content .d2c_notification_first_letter{
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+    }
+    .d2c_notification_content h5{
+        font-size: 14px;
+    }
+    .d2c_theme_light p{
+        font-size: 14px;
+    }
+    /* ==========Profile page========== */
+    .d2c_list_wrapper .btn{
+        padding: 8px 20px 7px 20px;
+        font-size: 14px;
+    }
+
+    /* ==========Timeline page========== */
+    .d2c_timeline_content {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .d2c_timeline_upper .d2c_timeline_content::before,
+    .d2c_timeline_content::before,
+    .d2c_timeline_upper .d2c_timeline_content:last-child::after,
+    .d2c_timeline_upper:before,
+    .d2c_timeline_wrapper .d2c_timeline_content::after {
+        display: none !important;
+    }
+    .d2c_timeline_upper {
+        margin-bottom: 0px;
+    }
+    .d2c_web_timeline_content .d2c_card_wrapper {
+        padding: 20px 0px 20px 0px !important;
+    }
+    .d2c_web_timeline_content .d2c_years {
+        position: unset;
+        margin-bottom: 5px;
+    }
+    .d2c_web_journey_timeline .d2c_web_timeline_content:first-child::after,
+    .d2c_web_journey_timeline .d2c_web_timeline_content:nth-child(3)::after {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 576px) and (max-width: 767px) {
+    /* ==========error page========== */
+    .d2c_error_content h1{
+        font-size: 3rem;
+    }
+    .d2c_error_content h3{
+        font-size: 24px;
+    }
+    .d2c_error_content p{
+        font-size: 14px;
+    }
+    /* ==========login system page page========== */
+    .d2c_login_system{
+        padding: 80px 0px;
+    }
+    .d2c_login_wrapper{
+        padding: 40px;
+        border-radius: var(--border-radius);
+    }
+    /* ==========wallet page========== */
+    .d2c_asset_balance_table .table th, .d2c_asset_balance_table .table td {
+        padding: 0.813rem 0.5rem !important;
+        font-size: 15px;
+    }
+    /* ==========notification page========== */
+    .d2c_notification_content .d2c_notification_first_letter{
+        width: 30px;
+        height: 30px;
+        border-radius: 5px;
+    }
+    .d2c_notification_content h5{
+        font-size: 14px;
+    }
+    .d2c_theme_light p{
+        font-size: 14px;
+    }
+    /* ==========Profile page========== */
+    .d2c_list_wrapper .btn{
+        padding: 8px 20px 7px 20px;
+        font-size: 14px;
+    }
+    /* ==========Timeline page========== */
+    .d2c_timeline_content {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .d2c_timeline_upper .d2c_timeline_content::before,
+    .d2c_timeline_content::before,
+    .d2c_timeline_upper .d2c_timeline_content:last-child::after,
+    .d2c_timeline_upper:before,
+    .d2c_timeline_wrapper .d2c_timeline_content::after {
+        display: none !important;
+    }
+    .d2c_timeline_upper {
+        margin-bottom: 0px;
+    }
+    .d2c_web_timeline_content .d2c_card_wrapper {
+        padding: 20px 0px 20px 0px !important;
+    }
+    .d2c_web_timeline_content .d2c_years {
+        position: unset;
+        margin-bottom: 5px;
+    }
+    .d2c_web_journey_timeline .d2c_web_timeline_content:first-child::after,
+    .d2c_web_journey_timeline .d2c_web_timeline_content:nth-child(3)::after {
+        display: none;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+    /* ==========error page========== */
+    .d2c_error_content h1{
+        font-size: 7rem;
+    }
+    .d2c_error_content h3{
+        font-size: 28px;
+    }
+    /* ==========login system page page========== */
+    .d2c_login_system{
+        padding: 80px 0px;
+    }
+    .d2c_login_wrapper{
+        border-radius: var(--border-radius);
+    }
+    /* ==========wallet page========== */
+    .d2c_asset_balance_table .table th, .d2c_asset_balance_table .table td {
+        padding: 0.813rem 0.5rem !important;
+        font-size: 15px;
+    }
+
+    /* timeline Page */
+    .d2c_timeline_content {
+        width: 32%;
+    }
+    .d2c_web_timeline_content .d2c_card_wrapper {
+        padding: 20px !important;
+    }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    /* ==========login system page page========== */
+    .d2c_login_system{
+        padding: 80px 0px;
+    }
+    .d2c_login_wrapper{
+        padding: 60px 30px;
+    }
+
+    /* timeline */
+    .d2c_timeline_content {
+        width: 30%;
+    }
+    .d2c_web_timeline_content .d2c_card_wrapper {
+        padding: 10px;
+    }
+    .d2c_web_journey_timeline{
+        padding: 0px;
+    }
+    
+}
+
+@media only screen and (min-width: 1200px) and (max-width: 1600px){
+    /* home page */
+    .d2c_currency_card_wrapper p{
+        font-size: 14px;
+    }
+    .d2c_currency_card_wrapper .d2c_coin_icon_wrapper{
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    /* timeline */
+    .d2c_timeline_content {
+        width: 27%;
+    }
+    .d2c_web_timeline_content .d2c_card_wrapper {
+        padding: 20px !important;
+    }
+
+    /* profile page */
+    .d2c_profile_coin_card{
+        padding: 32px;
+    }
+    .d2c_user_bg{
+        height: 113px;
+    }
+    /* market page */
+    .d2c_market h5{
+        font-size: 15px;
+    }
+    .d2c_market .d2c_coin_icon_wrapper{
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+    .d2c_market_card_footer h2{
+        font-size: 20px;
+    }
+    .d2c_market_card_footer p{
+        font-size: 14px;
+    }
+    
+}
+
+
+/* 
+Template Name: IC Crypto - Free Bootstrap Crypto Dashboard Admin Template
+Template URI:  https://www.designtocodes.com/product/ic-crypto-free-bootstrap-crypto-dashboard-admin-template
+Description:   IC Crypto is an impressive and free crypto admin dashboard template that caters to the needs of cryptocurrency enthusiasts and professionals alike. Its well-designed interface, comprehensive features, and accessibility make it a strong contender as one of the best crypto dashboard templates available for download.
+Author:        DesignToCodes
+Author URI:    https://www.designtocodes.com
+Text Domain:   IC Crypto
+*/
