@@ -9,6 +9,7 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
 
     public function realizarEntrada(&$usuario, $object, $botao, $botao_inicio)
     {
+        $canal  = 'profit_usuario_' . $usuario->id;
         try {
             //$this->pubsub->unsubscribe(self::redis_canal);
             $service = $usuario->plataforma->service;
@@ -34,7 +35,6 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                     return;
                 }
 
-               $canal  = 'profit_usuario_' . $usuario->id;
                 $this->pubsub->subscribe($canal);
                 $this->pubsub->unsubscribe(self::redis_canal);
                 echo "Conectando no canal {$canal}\n";
@@ -61,7 +61,9 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'lucro' => $usuario->lucro + $payload->lucro,
                                     'banca' => $payload->banca,
                                     'fator' => $payload->fator,
-                                    'ticker' => $payload->ticker
+                                    'ticker' => $payload->ticker,
+                                    'ticker_description' => $payload->ticker_description,
+                                    'ticker_classifier' => $payload->ticker_classifier
                                 ]);
                 
                                 $usuario->quantidade_loss = 0;
@@ -100,7 +102,9 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'lucro' => $usuario->lucro + $payload->lucro,
                                     'banca' => $payload->banca,
                                     'fator' => $payload->fator,
-                                    'ticker' => $payload->ticker
+                                    'ticker' => $payload->ticker,
+                                    'ticker_description' => $payload->ticker_description,
+                                    'ticker_classifier' => $payload->ticker_classifier
                                 ]);
 
                                 $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
@@ -135,7 +139,9 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'lucro' => $usuario->lucrso + $payload->lucro,
                                     'banca' => $payload->banca,
                                     'fator' => $payload->fator,
-                                    'ticker' => $payload->ticker
+                                    'ticker' => $payload->ticker,
+                                    'ticker_description' => $payload->ticker_description,
+                                    'ticker_classifier' => $payload->ticker_classifier
                                 ]);
                             } elseif ($payload->tipo === 'saldo_insuficiente') {
                                 $usuario->robo_iniciar = 'N';
@@ -166,6 +172,8 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                                 break;
                             } elseif ($payload->tipo === 'ENTRADA') {
                                 echo "Entrou aqui\n";
+                                $usuario->quantidade_loss = 0;
+                                $usuario->saveInTransaction();
                             } elseif ($payload->tipo === 'ORDEM_REALIZADA') {}
                             else { // outros
                                 echo "Saiu aqui\n";
@@ -222,6 +230,14 @@ class TAvalonUsuarioConsumer extends TDoubleUsuarioConsumer
                             //     continue;
         
                             echo "received message: {$message->channel} - {$message->payload}\n";
+
+                            $object = json_decode($message->payload, true);
+                            if ($usuario->classificacao != 'Todos' and $usuario->classificacao != $object['ticker_classifier'])
+                            {
+                                echo "Esperado '{$usuario->classificacao}' mas recebido '{$object['ticker_classifier']}'\n";
+                                continue;
+                            }
+                            
                             $this->processar_sinais($usuario, $message);
                             if ($usuario->roboStatus !== 'EXECUTANDO') 
                             {

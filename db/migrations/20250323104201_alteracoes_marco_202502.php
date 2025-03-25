@@ -11,8 +11,9 @@ final class AlteracoesMarco202502 extends AbstractMigration
     {
         FeatureFlags::setFlagsFromConfig(['unsigned_primary_keys' => false]);
 
-        $this->output->writeln('<info>Tabela</info> --nome tabela--');
-        $this->table('--nome tabela--')
-            ->create();
+        $this->output->writeln('<info>Tabela</info> double_usuario');
+        $this->table('double_usuario')
+            ->addColumn('classificacao', 'enum', ['values' => [ 'Todos', 'Ações', 'Commodities', 'Criptomoeda', 'Forex', 'Índice' ], 'null' => false, 'default' => 'Todos'])
+            ->save();
     }
 }

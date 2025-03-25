@@ -48,6 +48,10 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                         $bet->ticker = $object->dice;
                     if (isset($object->ticker))
                         $bet->ticker = $object->ticker;
+                    if (isset($object->ticker_description))
+                        $bet->ticker_description = $object->ticker_description;
+                    if (isset($object->ticker_classifier))
+                        $bet->ticker_classifier = $object->ticker_classifier;
                     if (isset($object->banca))
                         $bet->banca = $object->banca;
                     $bet->save();

@@ -558,9 +558,26 @@ class DoubleUsuario extends DoubleRecord
     public function get_configuracao_texto() {
         $translate = $this->plataforma->translate;
 
+        $valores_expiracao = ['5' => '5 segundos', '10' => '10 segundos', '15' => '15 segundos',
+            '30' => '30 segundos', '45' => '45 segundos', '60' => '1 minuto',
+            '120' => '2 minutos', '180' => '3 minutos', '300' => '5 minutos'];
+
         $texto = $translate->MSG_INICIO_ROBO_6;
         $msg = str_replace(
-            ['{usuario}', '{banca}', '{value}', '{gales}', '{stop_win}', '{stop_loss}', '{ciclo}', '{protecao_branco}', '{entrada_automatica}'],
+            [ 
+                '{usuario}', 
+                '{banca}', 
+                '{value}', 
+                '{gales}', 
+                '{stop_win}', 
+                '{stop_loss}', 
+                '{ciclo}', 
+                '{protecao_branco}', 
+                '{entrada_automatica}',
+                '{expiracao}',
+                '{fator_multiplicador}',
+                '{classificacao}'
+            ],
             [
                 $this->nome,
                 number_format($this->plataforma->service->saldo($this), 2, ',', '.'),
@@ -570,7 +587,10 @@ class DoubleUsuario extends DoubleRecord
                 number_format($this->stop_loss, 2, ',', '.') . '[' . ucfirst($this->tipo_stop_loss) . ']',
                 $this->ciclo == 'N' ? 'Não Habilitado' : 'Habilitado',
                 $this->protecao_branco == 'Y' ? 'Habilitado' : 'Não habilitado',
-                $this->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado'
+                $this->entrada_automatica == 'N' ? 'Não habilitado' : 'Habilitado',
+                $valores_expiracao[$this->expiration],
+                number_format($this->fator_multiplicador, 2, ',', '.'),
+                $this->classificacao
             ],
             $texto
         );

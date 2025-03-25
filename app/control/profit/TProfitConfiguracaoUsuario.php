@@ -39,6 +39,15 @@ class TProfitConfiguracaoUsuario extends TStandardForm
             '300' => '5 minutos'
         ];
 
+        $classificacao = [
+            'Todos' => 'Todos',
+            'Ações' => 'Ações',
+            'Commodities' => 'Commodities',
+            'Criptomoeda' => 'Criptomoeda',
+            'Forex' => 'Forex',
+            'Índice' => 'Índice'
+        ];
+
         $modo = ['Y' => '📚 Treinamento', 'N' => '🏆 Real'];
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => '🎮 Modo'])],
@@ -107,6 +116,21 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     ]
                 )
             ],
+            [$label = $this->makeTLabel(['value' => '🔎 Classific.'])],
+            [
+                $this->makeTCombo(
+                    [
+                        'name' => 'classificacao',
+                        'label' => $label,
+                        'items' => $classificacao,
+                        'width' => '100%',
+                        'defaultOption' => false
+                    ]
+                )
+            ],
+        );
+
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => '♻ Fator multip.'])],
             [
                 $this->makeTNumeric(
@@ -120,9 +144,6 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     ]
                 )
             ],
-        );
-
-        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => '✅ Stop WIN'])],
             [
                 $this->makeTNumeric(
@@ -136,6 +157,13 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     ]
                 )
             ],
+        );
+
+        $ciclo = ['N' => 'Desabilitado', 'Y' => 'Habilitado'];
+        $ciclo_valor = $usuario->ciclo == 'N' ? 'N' : 'Y';
+        $entrada_automatica_valor = $usuario->entrada_automatica == 'N' ? 'N' : 'Y';
+
+        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => '❌ Stop LOSS'])],
             [
                 $this->makeTCombo(
@@ -164,13 +192,6 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     }
                 )
             ],
-        );
-
-        $ciclo = ['N' => 'Desabilitado', 'Y' => 'Habilitado'];
-        $ciclo_valor = $usuario->ciclo == 'N' ? 'N' : 'Y';
-        $entrada_automatica_valor = $usuario->entrada_automatica == 'N' ? 'N' : 'Y';
-
-        $this->form->addFields(
             [$label = $this->makeTLabel(['value' => '↪️ Ciclo'])],
             [
                 $this->makeTRadioGroup(
@@ -186,8 +207,6 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     ]
                 )
             ],
-            [],
-            []
         );
 
         $this->form->addContent([new TFormSeparator('')]);

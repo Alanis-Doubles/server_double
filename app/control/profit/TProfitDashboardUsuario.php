@@ -161,6 +161,7 @@ class TProfitDashboardUsuario extends TPage
         $table->addRowSet('<b>💸 Valor aposta:</b>', '<span id="valor_aposta">' . number_format($usuario->valor, 2, ',', '.') . '</span>');
         $table->addRowSet('<b>🐓 Gales:</b>', '<span id="gales">' . $usuario->protecao . '</span>');
         $table->addRowSet('<b>⏰ Tempo expiração:</b>', '<span id="tempo_expiracao">' . $tempo_expiracao . '</span>');
+        $table->addRowSet('<b>🔎 Classificação:</b>', '<span id="classificacao">' . $usuario->classificacao . '</span>');
         $table->addRowSet('<b>♻ Fator multiplicador:</b>', '<span id="fator_multiplicador">' . number_format($usuario->fator_multiplicador, 2, ',', '.') . '</span>');
         $table->addRowSet('<b>✅ Stop WIN:</b>', '<span id="stop_win">' . number_format($usuario->stop_win, 2, ',', '.') . '</span>');
         $table->addRowSet('<b>❌ Stop LOSS:</b>', '<span id="stop_loss">' . $stop_loss  . '</span>');
