@@ -3,18 +3,18 @@
 use GuzzleHttp\Client;
 use WebSocket\Client as WebSocketClient;
 
-class TAvalon extends TDoublePlataforma
+class TPlaybroker extends TDoublePlataforma
 {
     private static $ultimo_sinal;
 
     public static function validate(string $nome)
     {
-        return substr($nome, 0, 6) == 'Avalon';
+        return substr($nome, 0, 10) == 'Playbroker';
     }
 
     public static function nome()
     {
-        return 'Avalon';
+        return 'Playbroker';
     }
 
     private function getHost()
@@ -33,8 +33,6 @@ class TAvalon extends TDoublePlataforma
         if ($now > $expiracao) {
             $payload = $usuario->token_acesso;
             $payload = (array)json_decode($payload);
-
-            // $payload = ['userId' => $payload['email']];
 
             $client = new Client();
             $response = $client->request(
@@ -151,7 +149,7 @@ class TAvalon extends TDoublePlataforma
         $client = new Client();
         $response = $client->request(
             'POST',
-            $this->gethost() . '/api/usuarios/buyorsell',
+            $this->gethost() . '/api/usuarios/trade/open',
             [
                 'json' => $payload,
                 'headers' => [
@@ -187,14 +185,11 @@ class TAvalon extends TDoublePlataforma
             $redis_param = [
                 'usuario_id' => $usuario->id
             ];
-            // php cmd.php "class=TAvalonUsuarioConsumer&method=run&usuario_id=7"
-            TUtils::cmd_run('TAvalonUsuarioConsumer', 'run', $redis_param);
+            TUtils::cmd_run('TPlaybrokerUsuarioConsumer', 'run', $redis_param);
 
             return;
         }
 
-        //echo "Configurando arquivo supervisor\n";
-        // DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Configurando arquivo supervisor', 'Configurando arquivo supervisor');
         $usuario_id = $usuario->id;
 
         $path_supervisor = "/opt/docker/etc/supervisor.d/";
@@ -207,23 +202,14 @@ class TAvalon extends TDoublePlataforma
             return "{$path_supervisor}{$server_name}_usuario_{$usuario_id}.conf";
 
         $usuarioConfig = "[program:{$server_name}_usuario_{$usuario_id}_consumer]\n";
-        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TAvalonUsuarioConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
+        $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TPlaybrokerUsuarioConsumer&method=run&usuario_id={$usuario_id}&server_name={$server_name}'\n";
         $usuarioConfig .= "autostart=true\n";
         $usuarioConfig .= "autorestart=true\n";
         $usuarioConfig .= "stdout_logfile={$log_supervisor}/{$server_name}_usuario_{$usuario_id}_consumer.out.log\n";
         $usuarioConfig .= "numprocs=1\n";
         $usuarioConfig .= "\n";
-        // $usuarioConfig .= "[program:{$server_name}_usuario_{$usuario_id}_sinais_consumer]\n";
-        // $usuarioConfig .= "command=php {$server_root}/cmd.php 'class=TAvalonUsuarioConsumer&method=run&usuario_id={$usuario_id}'\n";
-        // $usuarioConfig .= "autostart=true\n";
-        // $usuarioConfig .= "autorestart=true\n";
-        // $usuarioConfig .= "stdout_logfile={$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log\n";
-        // $usuarioConfig .= "numprocs=1\n";
-        // $usuarioConfig .= "\n";
 
         $criado = file_put_contents($filename, $usuarioConfig);
-        //echo "Arquivo supervisor criado: {$criado}\n";
-        // DoubleErros::registrar(2, 'TAvalon', 'iniciar', 'Arquivo supervisor criado', 'Arquivo supervisor criado -' . $criado);
         return '';
     }
 
@@ -246,15 +232,6 @@ class TAvalon extends TDoublePlataforma
         if (file_exists($filename))
             unlink($filename);
 
-        // $filename = "{$log_supervisor}/{$server_name}_usuario_{$usuario_id}_consumer.out.log";
-        // if (file_exists($filename))
-        //     unlink($filename);
-
         sleep(2); // Espera 2 segundos para finalizar o arquivo
-
-        // $filename = "{$server_root}/logs/{$server_name}_usuario_{$usuario_id}_sinais_consumer.out.log";
-        // if (file_exists($filename))
-        //     unlink($filename);    
-        //echo "Arquivo superfisor finalizado\n";
     }
 }

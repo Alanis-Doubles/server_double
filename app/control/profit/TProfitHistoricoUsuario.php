@@ -25,7 +25,7 @@ class TProfitHistoricoUsuario extends TStandardList
         parent::setAfterSearchCallback( [$this, 'onAfterSearch' ] );
 
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 

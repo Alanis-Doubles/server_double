@@ -76,7 +76,7 @@ class TProfitDashboardUsuario extends TPage
         parent::__construct();
 
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
@@ -324,7 +324,7 @@ class TProfitDashboardUsuario extends TPage
     {
         try {
             $canal = TUtils::openFakeConnection("double", function () {
-                return DoubleCanal::where('nome', '=', 'Avalon')
+                return DoubleCanal::where('nome', '=', 'Playbroker')
                     ->first();
             });
     
@@ -434,7 +434,7 @@ class TProfitDashboardUsuario extends TPage
     {
         try {
             $canal = TUtils::openFakeConnection("double", function () {
-                return DoubleCanal::where('nome', '=', 'Avalon')
+                return DoubleCanal::where('nome', '=', 'Playbroker')
                     ->first();
             });
     
@@ -543,7 +543,7 @@ class TProfitDashboardUsuario extends TPage
     private function getProfitJavaScript()
     {
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
@@ -993,7 +993,7 @@ class TProfitDashboardUsuario extends TPage
     public static function statusJs($param)
     {
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
@@ -1010,7 +1010,7 @@ class TProfitDashboardUsuario extends TPage
     public static function historicoativosJs($param)
     {
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
@@ -1027,7 +1027,7 @@ class TProfitDashboardUsuario extends TPage
     public static function usuarioJS($param)
     {
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 

@@ -28,24 +28,29 @@ class TProfitConfiguracaoUsuario extends TStandardForm
         );
 
         $expiracao = [
-            '5' => '5 segundos',
-            '10' => '10 segundos',
-            '15' => '15 segundos',
-            '30' => '30 segundos',
-            '45' => '45 segundos',
-            '60' => '1 minuto',
-            '120' => '2 minutos',
-            '180' => '3 minutos',
-            '300' => '5 minutos'
+            // '5' => '5 segundos',
+            // '10' => '10 segundos',
+            // '15' => '15 segundos',
+            // '30' => '30 segundos',
+            // '45' => '45 segundos',
+            // '60' => '1 minuto',
+            // '120' => '2 minutos',
+            // '180' => '3 minutos',
+            // '300' => '5 minutos'
+            '60'   => '1 minuto',
+            '300'  => '5 minutos',
+            '900'  => '15 minutos',
+            '1800' => '30 minutos',
         ];
 
         $classificacao = [
             'Todos' => 'Todos',
-            'Ações' => 'Ações',
-            'Commodities' => 'Commodities',
+            // 'Ações' => 'Ações',
+            // 'Commodities' => 'Commodities',
             'Criptomoeda' => 'Criptomoeda',
             'Forex' => 'Forex',
-            'Índice' => 'Índice'
+            'OTC' => 'OTC',
+            // 'Índice' => 'Índice'
         ];
 
         $modo = ['Y' => '📚 Treinamento', 'N' => '🏆 Real'];

@@ -222,7 +222,7 @@ RewriteRule ^xhr-arbety-param-delete$ engine.php?class=TArbetyParamList&method=D
 
 #DOUBLE
 #API
-RewriteRule ^api/avalon/ptBR/([A-Za-z-_0-9]*)/usuario/validar_stop_win_loss$ rest.php?call_method=POST&class=TAvalonUsuarioConsumer&method=validar_stop_win_loss&plataforma=avalon&idioma=ptBR&channel_id=$1&%{QUERY_STRING} [NC]
+RewriteRule ^api/playbroker/ptBR/([A-Za-z-_0-9]*)/usuario/validar_stop_win_loss$ rest.php?call_method=POST&class=TPlaybrokerUsuarioConsumer&method=validar_stop_win_loss&plataforma=avalon&idioma=ptBR&channel_id=$1&%{QUERY_STRING} [NC]
 
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/sinais/registrar$ rest.php?call_method=POST&auth=Bearer&class=TDoubleSinais&method=registrar&plataforma=$1&idioma=$2&%{QUERY_STRING} [NC]
 RewriteRule ^api/([A-Za-z-_0-9]*)/([A-Za-z-_0-9]*)/sinais/registrar_enviar_sinal_canal$ rest.php?call_method=POST&auth=Bearer&class=TDoubleSinais&method=registrar_enviar_sinal_canal&plataforma=$1&idioma=$2&%{QUERY_STRING} [NC]

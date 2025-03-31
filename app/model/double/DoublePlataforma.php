@@ -84,6 +84,8 @@ class DoublePlataforma extends DoubleRecord
             return new TBacboMCGames;
         else if (TAvalon::validate($this->nome))
             return new TAvalon;
+        else if (TPlaybroker::validate($this->nome))
+            return new TPlaybroker;
         else
             throw new Exception("Plataforma '{$this->nome}' não suportada.");
     }

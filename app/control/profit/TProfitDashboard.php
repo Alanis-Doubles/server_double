@@ -367,7 +367,7 @@ JAVASCRIPT;
     private function getProfitJavaScript()
     {
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
@@ -911,7 +911,7 @@ JAVASCRIPT;
     {
         
         $canal = TUtils::openFakeConnection("double", function () {
-            return DoubleCanal::where('nome', '=', 'Avalon')
+            return DoubleCanal::where('nome', '=', 'Playbroker')
                 ->first();
         });
 
