@@ -89,7 +89,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 $dados_resumo = json_decode($dados_resumo);
                 $assertividade = number_format($dados_resumo->total_win / ($dados_resumo->total_win + $dados_resumo->total_loss) * 100, 2, ',', '.');
                 $ultima_entrada = number_format($object->valor_entrada, 2, ',', '.');
-                $msg_resumo = "\n\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n\n📈 Assertividade: {$assertividade}%\n\n⬆ Última Entrada R$ {$ultima_entrada}";
+                $msg_resumo = "\n\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n\n📈 Assertividade: {$assertividade}%\n\n⬆ Última Entrada $ {$ultima_entrada}";
                 
                 if ($usuario->status_objetivo == 'EXECUTANDO') {
                     $msg_resumo .= "\n\n" . $usuario->usuario_objetivo->progresso;
@@ -146,7 +146,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                 // });
                 
                 // $dados_resumo = json_decode($dados_resumo);
-                // $msg_resumo = "Resumo\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n⬆ Maior Entrada R$ {$dados_resumo->maior_entrada}";
+                // $msg_resumo = "Resumo\n🏆 Win {$dados_resumo->total_win}   ❌ Loss {$dados_resumo->total_loss}\n⬆ Maior Entrada $ {$dados_resumo->maior_entrada}";
                 // echo "$msg_resumo\n";
 
                 // TRedisUtils::sendMessage(

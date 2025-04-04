@@ -28,13 +28,27 @@ class TDoubleWebhook
                     if ($pagamento)
                         return $pagamento;
 
+                    $plano = 'MENSAL';
+                    $produto_nome = '';
+                    foreach ($param['products'] as $key => $value) {
+                        if (isset($value['name']) && $value['name'] == 'Profit Bot') {
+                            $plano = 'MENSAL';
+                            $produto_nome = $value['name'];
+                            continue;
+                        } else if (isset($value['name']) && $value['name'] == 'Profit Bot - Acesso Vitalício') {
+                            $plano = 'VITALICIO';
+                            $produto_nome = $value['name'];
+                            break;
+                        }
+                    }
+
                     $pagamento = new DoublePagamentoHistorico;
                     $pagamento->plataforma_pagamento = strtoupper($param['origem']);
-                    $pagamento->tipo = 'VITALICIO'; // str_replace('PLANO ', '', strtoupper($param['plan']['name']));
+                    $pagamento->tipo = $plano; //'VITALICIO'; // str_replace('PLANO ', '', strtoupper($param['plan']['name']));
                     $pagamento->tipo_entrada = 'AUTOMATICA';
                     $pagamento->tipo_evento = $evento[$param['event']];
                     $pagamento->valor = floatval(str_replace(['R$ ', '.',',',' '], ['','','.',''], isset($param['total_price']) ? $param['total_price'] : '0'));
-                    $pagamento->produto = $param['products'][0]['name'];
+                    $pagamento->produto = $produto_nome; // $param['products'][0]['name'];
                     $pagamento->email = $param['customer']['email'];
                     $pagamento->plataforma_id = $plataforma->id;
                     $pagamento->canal_id = !$canal ? null : $canal->id;
@@ -68,8 +82,9 @@ class TDoubleWebhook
                 throw new Exception("Pagamento não suportado.");
             } 
         }
-        else {}
+        else {
             throw new Exception("Pagamento não suportado.");
+        }
         
         unset($param["call_method"]);
         unset($param["class"]);

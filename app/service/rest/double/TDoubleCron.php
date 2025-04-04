@@ -95,7 +95,10 @@ class TDoubleCron
             echo "\n" . json_encode($teste);
 
             $total = 0;
+            echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens a serem enviadas: " . count($list);
+            $count = count($list);
             foreach ($list as $key => $value) {
+                echo "\n [" . $total+1 . " de " . $count . "] Enviando mensagem para o usuario_id: " . $value['usuario_id'] . " - " . $value['recuperacao_mensagem_id'];
                 TUtils::openConnection('double', function() use ($value){
                     $usuario = new DoubleUsuario($value['usuario_id'], false);
                     $recuperacao = new DoubleRecuperacaoUsuario();
@@ -192,7 +195,10 @@ class TDoubleCron
 
         $ids = [];
         $total = 0;
+        echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens a serem enviadas: " . count($list);
+        $count = count($list);
         foreach ($list as $key => $value) {
+            echo "\n [" . $total+1 . " de " . $count . "] Enviando mensagem para o usuario_id: " . $value['usuario_id'] . " - " . $value['recuperacao_mensagem_id'];
             $id = TUtils::openFakeConnection('double', function() use ($value){
                 $usuario = new DoubleUsuario($value['usuario_id'], false);
 

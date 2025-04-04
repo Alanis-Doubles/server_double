@@ -18,7 +18,8 @@ class DoubleAuthenticationService
             return DoubleUsuario::where('chat_id', '=', $usuario->custom_code)->first();
         });
 
-        if ($double_usuario and $double_usuario->status !== 'ATIVO')
+        if ($double_usuario and !in_array($double_usuario->status, ['ATIVO', 'DEMO'])) 
+        // if ($double_usuario and $double_usuario->status !== 'ATIVO')
             throw new Exception('O acesso é permitido apenas para usuários ativos.');
 
         ////  DoubleErros::registrar(1, 'DoubleAuthenticationService', 'authenticate', $usuario->password, "{$user} - {$usuario->login} - {$password}");

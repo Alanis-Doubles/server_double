@@ -210,7 +210,7 @@ class TProfitHistoricoUsuario extends TStandardList
         if ($value) {
             $valor_entrada = number_format($object->valor_entrada, 2, ',', '.');
             $valor_branco = number_format($object->valor_branco, 2, ',', '.');
-            $lucro_prejuizo = 'R$ ' . number_format($object->lucro_prejuizo, 2, ',', '.');
+            $lucro_prejuizo = '$ ' . number_format($object->lucro_prejuizo, 2, ',', '.');
 
             if ($object->tipo === 'WIN') 
             {
@@ -229,14 +229,14 @@ class TProfitHistoricoUsuario extends TStandardList
     {
         if ($value) {
             $saldo_atual = $object->banca;
-            $formatado = 'R$ ' . number_format($saldo_atual, 2, ',', '.');
+            $formatado = '$ ' . number_format($saldo_atual, 2, ',', '.');
             if ($saldo_atual > 0) {
                 return "{$formatado}";
             } else {
                 return "<span style='color:red'>{$formatado}</span>";
             }
         } else {
-            return 'R$ 0.00';
+            return '$ 0.00';
         }
     }
 

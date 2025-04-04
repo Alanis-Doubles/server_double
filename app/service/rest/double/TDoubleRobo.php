@@ -95,7 +95,7 @@ class TDoubleRobo
 
             if (isset($param['data']['status']) and $param['data']['status'] == 'DEMO') {
                 $param['data']['data_expiracao'] = date('Y-m-d', strtotime('+5 days'));
-                $param['data']['demo_jogadas'] = 10;
+                $param['data']['demo_jogadas'] = 50;
                 $param['data']['demo_inicio'] = date('Y-m-d h:i:s');
             }
 

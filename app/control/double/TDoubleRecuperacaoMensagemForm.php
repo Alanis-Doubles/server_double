@@ -89,7 +89,7 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
             return DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $object->id)->getIndexedArray('id', 'imagem');
         });
         $object->videos = TUtils::openFakeConnection('double', function() use ($object){
-            return DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $object->id)->getIndexedArray('id', 'imagem');
+            return DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $object->id)->getIndexedArray('id', 'video');
         });
         $this->form->setData($object);
         

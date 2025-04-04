@@ -343,8 +343,9 @@ class DoubleUsuario extends DoubleRecord
             $result = TUtils::openFakeConnection('double', function () {
                 return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
                     ->where('sequencia', '=', $this->robo_sequencia)
-                    ->where('tipo', 'IN', ['WIN', 'LOSS'])
+                    //->where('tipo', 'IN', ['WIN', 'LOSS'])
                     ->select(['valor', 'created_at', 'valor_entrada'])
+                    ->orderBy('id', 'asc')
                     ->last();
             });
 

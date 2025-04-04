@@ -315,9 +315,9 @@ class TProfitDashboard extends TPage
                     console.log("entrada:", event.data);
                     document.getElementById('step_99').innerHTML = "Operção";
                     document.getElementById('step_0').innerHTML = "Entrada";
-                    document.getElementById('step_1').innerHTML = "Gale 1";
-                    document.getElementById('step_2').innerHTML = "Gale 2";
-                    document.getElementById('step_3').innerHTML = "Gale 3";
+                    document.getElementById('step_1').innerHTML = "Proteção 1";
+                    document.getElementById('step_2').innerHTML = "Proteção 2";
+                    document.getElementById('step_3').innerHTML = "Proteção 3";
                 }
             };
 
@@ -467,7 +467,7 @@ JAVASCRIPT;
                     addStep("LOSS ", "#e74c3c");
                 } else if (data.type === "gale") {
                     console.log("gale:", event.data);
-                    addStep("Gale " + data.gale, getGradientColor(data.gale, {$canal->protecoes}))
+                    addStep("Proteção " + data.gale, getGradientColor(data.gale, {$canal->protecoes}))
                 } else if (data.type === "indisponivel") {
                     console.log("indisponivel:", event.data);
                     document.getElementById('step_' + data.gale).innerHTML = "🚫 " + document.getElementById('step_' + data.gale).innerHTML;
@@ -587,7 +587,7 @@ JAVASCRIPT;
                 let _updateOptions = [];
                 let _points = [];
                 let galeMax = message.gale; 
-                let labels = ["Entrada", "Gale 1", "Gale 2", "Gale 3"];
+                let labels = ["Entrada", "Proteção 1", "Proteção 2", "Proteção 3"];
                 let cores = ["#27ae60", "#f1c40f", "#e67e22", "#e74c3c"];
                 
                 if (message.entrada) {

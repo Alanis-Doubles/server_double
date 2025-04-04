@@ -158,8 +158,8 @@ class TProfitDashboardUsuario extends TPage
             $ciclo = '<span class="cor_verde" id="ciclo">Habilitado</span>';
         }
 
-        $table->addRowSet('<b>💸 Valor aposta:</b>', '<span id="valor_aposta">' . number_format($usuario->valor, 2, ',', '.') . '</span>');
-        $table->addRowSet('<b>🐓 Gales:</b>', '<span id="gales">' . $usuario->protecao . '</span>');
+        $table->addRowSet('<b>💸 Valor operação:</b>', '<span id="valor_aposta">' . number_format($usuario->valor, 2, ',', '.') . '</span>');
+        $table->addRowSet('<b>🔒 Proteções:</b>', '<span id="gales">' . $usuario->protecao . '</span>');
         $table->addRowSet('<b>⏰ Tempo expiração:</b>', '<span id="tempo_expiracao">' . $tempo_expiracao . '</span>');
         $table->addRowSet('<b>🔎 Classificação:</b>', '<span id="classificacao">' . $usuario->classificacao . '</span>');
         $table->addRowSet('<b>♻ Fator multiplicador:</b>', '<span id="fator_multiplicador">' . number_format($usuario->fator_multiplicador, 2, ',', '.') . '</span>');
@@ -216,9 +216,9 @@ class TProfitDashboardUsuario extends TPage
                 'configuracao' => $configuracao,
                 'indicator1'   => TUtils::renderInfoBox('total-win', 'WIN', 'trophy', 'green', 0),
                 'indicator2'   => TUtils::renderInfoBox('total-loss', 'LOSS', 'times', 'red', 0),
-                'indicator3'   => TUtils::renderInfoBox('total-lucro', 'Lucro/Perda', 'dollar-sign', 'green', 'R$ 0,00'),
-                'indicator4'   => TUtils::renderInfoBox('total-saldo', 'Saldo Atual', 'money-bill-alt', 'green', 'R$ 0,00'),
-                'indicator5'   => TUtils::renderInfoBox('maior-entrada', 'Maior Entrada', 'arrow-alt-circle-up', 'green', 'R$ 0,00'),
+                'indicator3'   => TUtils::renderInfoBox('total-lucro', 'Lucro/Perda', 'dollar-sign', 'green', '$ 0,00'),
+                'indicator4'   => TUtils::renderInfoBox('total-saldo', 'Saldo Atual', 'money-bill-alt', 'green', '$ 0,00'),
+                'indicator5'   => TUtils::renderInfoBox('maior-entrada', 'Maior Entrada', 'arrow-alt-circle-up', 'green', '$ 0,00'),
                 'indicator6'   => TUtils::renderInfoBox('assertividade', 'Assertividade', 'percent', 'green', '0 %'),
                 'ativos'       => $ativosPanel,
                 'grafico'      => $panelGrafio,
@@ -366,7 +366,7 @@ class TProfitDashboardUsuario extends TPage
     
             $telegram = $usuario->canal->telegram;
     
-            if ($usuario->status == 'ATIVO') {
+            if (in_array($usuario->status, ['ATIVO', 'DEMO'])) {
                 $telegram->sendMessage($usuario->chat_id, 'Robô iniciado no Dashboard');
     
                 $telegram->sendMessage(
@@ -621,7 +621,7 @@ class TProfitDashboardUsuario extends TPage
                     __adianti_show_toast('error', 'Loss', 'top right', 'far:times-circle');
                     addStep("LOSS ", "#e74c3c");
                 } else if (data.type === "gale") {
-                    addStep("Gale " + data.gale, getGradientColor(data.gale, {$usuario->protecao}))
+                    addStep("Proteção " + data.gale, getGradientColor(data.gale, {$usuario->protecao}))
                 } else if (data.type === "indisponivel") {
                     document.getElementById('step_' + data.gale).innerHTML = "🚫 " + document.getElementById('step_' + data.gale).innerHTML;
                 } else if (data.type === "entrada") {
@@ -740,7 +740,7 @@ class TProfitDashboardUsuario extends TPage
                 let _updateOptions = [];
                 let _points = [];
                 let galeMax = message.gale; 
-                let labels = ["Entrada", "Gale 1", "Gale 2", "Gale 3"];
+                let labels = ["Entrada", "Proteção 1", "Proteção 2", "Proteção 3"];
                 let cores = ["#27ae60", "#f1c40f", "#e67e22", "#e74c3c"];
                 
                 if (message.entrada) {
@@ -755,7 +755,7 @@ class TProfitDashboardUsuario extends TPage
                         }
                     });
 
-                    if (ordem_realizada > 0) {
+                    if (ordem_realizada < 0) {
                         _updateOptions.push({
                             y: ordem_realizada,
                             borderColor: '#3498db',
@@ -808,9 +808,9 @@ class TProfitDashboardUsuario extends TPage
 
                     document.querySelector("#total-win").textContent = data.total_win;
                     document.querySelector("#total-loss").textContent = data.total_loss;
-                    document.querySelector("#total-lucro").textContent = 'R$ ' + data.lucro_prejuizo;
-                    document.querySelector("#total-saldo").textContent = 'R$ ' + data.saldo;
-                    document.querySelector("#maior-entrada").textContent = 'R$ ' + data.maior_entrada;
+                    document.querySelector("#total-lucro").textContent = '$ ' + data.lucro_prejuizo;
+                    document.querySelector("#total-saldo").textContent = '$ ' + data.saldo;
+                    document.querySelector("#maior-entrada").textContent = '$ ' + data.maior_entrada;
                     document.querySelector("#assertividade").textContent = data.assertividade + ' %';
 
                     var executando = data.status_objetivo == 'EXECUTANDO' || data.robo_status == 'EXECUTANDO';

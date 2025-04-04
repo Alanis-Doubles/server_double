@@ -82,7 +82,7 @@ class TProfitConfiguracaoUsuario extends TStandardForm
         );
 
         $this->form->addFields(
-            [$label = $this->makeTLabel(['value' => '💸 Valor aposta'])],
+            [$label = $this->makeTLabel(['value' => '💸 Valor operação'])],
             [
                 $this->makeTNumeric(
                     [
@@ -95,7 +95,7 @@ class TProfitConfiguracaoUsuario extends TStandardForm
                     ]
                 )
             ],
-            [$label = $this->makeTLabel(['value' => '🐓 Gales'])],
+            [$label = $this->makeTLabel(['value' => '🔒 Proteções'])],
             [
                 $this->makeTEntry(
                     [
