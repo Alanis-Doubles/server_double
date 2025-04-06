@@ -562,7 +562,8 @@ class DoubleUsuario extends DoubleRecord
 
         $valores_expiracao = ['5' => '5 segundos', '10' => '10 segundos', '15' => '15 segundos',
             '30' => '30 segundos', '45' => '45 segundos', '60' => '1 minuto',
-            '120' => '2 minutos', '180' => '3 minutos', '300' => '5 minutos'];
+            '120' => '2 minutos', '180' => '3 minutos', '300' => '5 minutos',
+            '900'  => '15 minutos', '1800' => '30 minutos'];
 
         $texto = $translate->MSG_INICIO_ROBO_6;
         $msg = str_replace(

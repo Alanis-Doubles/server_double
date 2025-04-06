@@ -29,7 +29,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
 
             if (in_array($object->tipo, ['WIN', 'LOSS', 'GALE'])) 
             {
-                TUtils::openConnection('double', function() use ($object) {
+                TUtils::openConnection('double', function() use ($object, $usuario) {
                     $bet = new DoubleUsuarioHistorico;
                     $bet->sequencia = $object->sequencia;
                     $bet->usuario_id = $object->usuario_id;
@@ -41,6 +41,7 @@ class TDoubleUsuarioHistoricoConsumer extends TDoubleRedis
                     $bet->tipo = $object->tipo;
                     $bet->robo_inicio = $object->robo_inicio;
                     $bet->configuracao = $object->configuracao;
+                    $bet->modo_treinamento = $usuario->modo_treinamento;
                     
                     if (isset($object->fator))
                         $bet->fator = $object->fator;

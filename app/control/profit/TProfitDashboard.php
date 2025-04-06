@@ -121,13 +121,15 @@ class TProfitDashboard extends TPage
             ]
         );
 
+        $permite_total_assinaturas = in_array('plataform_admin', TSession::getValue('userroles')) ? 'Y' : 'N';
+
         $html2 = new THtmlRenderer('app/resources/double/dashboard.html');
         $html2->enableSection(
             'main',
             [
                 'indicator1' => TUtils::renderInfoBox('usuariosAtivos', 'Usuários Jogando', 'trophy', 'red', 0),
                 'indicator2' => TUtils::renderInfoBox('totalTestesIniciados', 'Total Testes Iniciados', 'gamepad', 'aqua', 0),
-                'indicator3' => TUtils::renderInfoBox('valorTotalAssinaturas', 'Valor Total Assinaturas', 'dollar-sign', 'orange', ' R$ 0,00'),
+                'indicator3' => $permite_total_assinaturas == 'N' ? '' : TUtils::renderInfoBox('valorTotalAssinaturas', 'Valor Total Assinaturas', 'dollar-sign', 'orange', ' R$ 0,00'),
             ]
         );
 

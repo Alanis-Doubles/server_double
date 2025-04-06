@@ -18,7 +18,7 @@ if ( TSession::getValue('logged') )
     {
         $content = file_get_contents("app/templates/{$theme}/iframe.html");
     }
-    elseif (TUtils::isDoubleJogadores()) {
+    elseif (TUtils::isProfitJogadores()) {
         $content = file_get_contents("app/templates/{$theme}/layout-jogador.html");
         $content = str_replace('{MENU}', AdiantiMenuBuilder::parse('menu.xml', $theme), $content);
         $content = str_replace('{MENUTOP}', AdiantiMenuBuilder::parseNavBar('menu-top.xml', $theme), $content);
