@@ -28,6 +28,9 @@
       <menuitem label="📨 Mensagem Direta">
         <action>TDoubleMensagemDiretaForm</action>
       </menuitem>
+      <menuitem label="🕛 Mensagens Agendadas">
+        <action>TDoubleMensagemAgendadaList</action>
+      </menuitem>
       <menuitem label="📆 Histórico">
         <action>TDoubleHistoricoUsuario</action>
       </menuitem>

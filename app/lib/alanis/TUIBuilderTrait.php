@@ -640,6 +640,8 @@ trait TUIBuilderTrait
         $layout = 'vertical';
 	    if (isset($properties->{'layout'}))
             $layout = $properties->{'layout'};
+        if (isset($properties->{'layout_type'}))
+            $layout = $properties->{'layout_type'};
         $widget->setLayout($layout);
         
         if (isset($properties->{'value'})) 
@@ -682,6 +684,8 @@ trait TUIBuilderTrait
         $layout = 'vertical';
 	    if (isset($properties->{'layout'}))
             $layout = $properties->{'layout'};
+        if (isset($properties->{'layout_type'}))
+            $layout = $properties->{'layout_type'};
         $widget->setLayout($layout);
         
         if (isset($properties->{'tip'})) 

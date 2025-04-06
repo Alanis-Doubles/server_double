@@ -22,30 +22,27 @@ class TDoubleMensagemDiretaForm  extends TStandardForm
         );
 
         $status = ['NOVO' => 'Novo', 'ATIVO' => 'Ativo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => ' Aguardando Pagamento']; 
-        // $tipo_tempo = ['HORA' => 'Hora', 'MINUTO' => 'minuto'];
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Status'])],
             [$this->makeTCombo(['name' => 'status', 'label' => $label, 'items' => $status, 'defaultOption' => false, 'required' => true])],           
         );
 
-        // $this->form->addFields(
-        //     [$label = $this->makeTLabel(['value' => 'Ordem'])],
-        //     [$this->makeTEntry(['name' => 'ordem', 'label' => $label, 'mask' => '9!', 'required' => true])],
-        //     [], []
-        // );
-        
-        // $this->form->addFields(
-        //     [$label = $this->makeTLabel(['value' => 'Após qto. tempo disparar'])],
-        //     [$this->makeTEntry(['name' => 'horas', 'label' => $label, 'mask' => '9!', 'required' => true])],
-        //     [$label = $this->makeTLabel(['value' => 'Tipo tempo'])],
-        //     [$this->makeTCombo(['name' => 'tipo_tempo', 'label' => $label, 'items' => $tipo_tempo, 'defaultOption' => false, 'required' => true])],                      
-        // );
-
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Mensagem'])],
             [$this->makeTText(['name' => 'mensagem', 'label' => $label, 'required' => true])],
         );
+
+        $mensagem_apoio = new TAlert(
+            'primary', 
+            '<b>Dicas para montar a mensagem</b>' . '<br>' . 
+            '<code>{usuario} - Quando quiser referenciar o nome do usuário na mensagem.</code>' . '<br>' .  
+            '<code>\\n - Quando quiser fazer uma quebra de linha no texto.</code>', 
+            false
+        );
+
+        $this->form->addFields([], [$mensagem_apoio]);
+
 
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Botão - Mensagem'])],

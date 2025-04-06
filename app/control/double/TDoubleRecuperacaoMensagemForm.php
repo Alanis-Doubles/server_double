@@ -46,6 +46,17 @@ class TDoubleRecuperacaoMensagemForm  extends TStandardForm
             [$this->makeTText(['name' => 'mensagem', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],
         );
 
+        $mensagem_apoio = new TAlert(
+            'primary', 
+            '<b>Dicas para montar a mensagem</b>' . '<br>' . 
+            '<code>{usuario} - Quando quiser referenciar o nome do usuário na mensagem.</code>' . '<br>' .  
+            '<code>\\n - Quando quiser fazer uma quebra de linha no texto.</code>', 
+            false
+        );
+
+        $this->form->addFields([], [$mensagem_apoio]);
+
+
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Botão - Mensagem'])],
             [$this->makeTEntry(['name' => 'botao_1_mensagem', 'label' => $label, 'editable' => $param['method'] != 'onView'])],

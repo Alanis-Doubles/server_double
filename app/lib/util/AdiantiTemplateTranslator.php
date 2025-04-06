@@ -1655,9 +1655,9 @@ class AdiantiTemplateTranslator
         $this->messages['pt'][] = 'Uma vez por dia';
         $this->messages['es'][] = 'Una vez al dia';
 
-        $this->messages['en'][] = 'Each minute';
-        $this->messages['pt'][] = 'A cada minuto';
-        $this->messages['es'][] = 'Cada minuto';
+        $this->messages['en'][] = 'Each five minutes';
+        $this->messages['pt'][] = 'A cada 5 minutos';
+        $this->messages['es'][] = 'Cada 5 minutos';
 
         $this->messages['en'][] = 'Schedules';
         $this->messages['pt'][] = 'Agendamentos';
