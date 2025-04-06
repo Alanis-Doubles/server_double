@@ -1,9 +1,9 @@
 {
-  "short_name": "Alanis - Double Robô",
-  "name": "Alanis - Double Robô",
+  "short_name": "Profit Bot",
+  "name": "Profit Bot",
   "icons": [
     {
-      "src": "app/images/icon.png",
+      "src": "app/images/logo.jpeg",
       "type": "image/png",
       "sizes": "180x180"
     }

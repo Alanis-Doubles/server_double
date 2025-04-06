@@ -39,6 +39,13 @@ class DoubleRecord extends TRecord
             // Atualiza os dados originais após o insert
             $this->originalData = $this->toArray();
         } else {
+            if (method_exists($this, 'onBeforeStore'))
+            {
+                $virtual_object = (object) $this->data;
+                $this->onBeforeStore( $virtual_object );
+                $this->data = (array) $virtual_object;
+            }
+
             $class = get_class($this);
             // $this->originalData = TUtils::openFakeConnection('double', function() use($class){
             //     $obj = new $class($this->id, false);
@@ -76,6 +83,11 @@ class DoubleRecord extends TRecord
                         $stmt->execute($params);
                     });
                 
+
+                if (method_exists($this, 'onAfterStore'))
+                {
+                    $this->onAfterStore( (object) $this->toArray() );
+                }
             }
         }
     }

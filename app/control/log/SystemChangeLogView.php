@@ -35,6 +35,7 @@ class SystemChangeLogView extends TStandardList
         parent::addFilterField('login');
         parent::addFilterField('class_name', 'like'); // add a filter field
         parent::addFilterField('session_id', 'like'); // add a filter field
+        parent::addFilterField('columnname', 'like'); // add a filter field
         parent::setLimit(20);
 
         $this->form = new BootstrapFormBuilder('form_table_logger');
@@ -45,9 +46,11 @@ class SystemChangeLogView extends TStandardList
         $login       = new TEntry('login');
         $class_name  = new TEntry('class_name');
         $session_id  = new TEntry('session_id');
+        $columnname  = new TEntry('columnname');
         
         $this->form->addFields( [new TLabel(_t('Table'))], [$tablename], [new TLabel(_t('Program'))], [$class_name] );
         $this->form->addFields( [new TLabel('Login')], [$login], [new TLabel(_t('Session'))], [$session_id]);
+        $this->form->addFields( [new TLabel(_t('Column'))], [$columnname], [],[] );
         
         $this->form->setData( TSession::getValue('SystemChangeLogView_filter_data') );
         

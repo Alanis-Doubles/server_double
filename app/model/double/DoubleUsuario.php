@@ -1,8 +1,8 @@
 <?php
 
+use Adianti\Database\TRecord;
 use Adianti\Database\TCriteria;
 use Adianti\Database\TDatabase;
-use Adianti\Database\TRecord;
 use Adianti\Database\TTransaction;
 
 class DoubleUsuario extends DoubleRecord
@@ -13,6 +13,7 @@ class DoubleUsuario extends DoubleRecord
     const DELETEDAT  = 'deleted_at';
 
     use RecordTrait;
+    use ProfitChangeLogTrait;
 
     private $user;
     private $obj_plataforma;

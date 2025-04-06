@@ -1,9 +1,10 @@
 <?php
 
-use GuzzleHttp\Client as GuzzleClient;
+use Predis\Client;
 use Adianti\Registry\TSession;
 use Adianti\Database\TDatabase;
 use Adianti\Database\TTransaction;
+use GuzzleHttp\Client as GuzzleClient;
 
 class TDoubleCron
 {
@@ -178,7 +179,7 @@ class TDoubleCron
                                 rm.botao_1_url
                             FROM double_usuario u
                             JOIN double_recuperacao_mensagem rm on rm.status = u.status AND rm.deleted_at IS null
-                        WHERE mensagem_direta = 'Y'
+                        WHERE mensagem_direta = 'Y' 
                             AND mensagem_direta_enviada = 'N' ";
                 $conn = TTransaction::get();
                 $list = TDatabase::getData(
@@ -197,91 +198,176 @@ class TDoubleCron
                 return $list;
             });
 
-            $ids = [];
-            $total = 0;
             echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens a serem enviadas: " . count($list);
             $count = count($list);
             foreach ($list as $key => $value) {
-                echo "\n [" . $total+1 . " de " . $count . "] Enviando mensagem para o usuario_id: " . $value['usuario_id'] . " - " . $value['recuperacao_mensagem_id'];
-                $id = TUtils::openFakeConnection('double', function() use ($value){
-                    $usuario = new DoubleUsuario($value['usuario_id'], false);
+                echo "\n [" . $key+1 . " de " . $count . "] Enviando mensagem para o usuario_id: " . $value['usuario_id'] . " - mensagem_id: " . $value['recuperacao_mensagem_id'];
+                $usuario = DoubleUsuario::identificarPorId($value['usuario_id']);
+                $payloadTelegram = [
+                    'token' => $usuario->canal->telegram_token,
+                    'sendMessage' => [
+                        'chat_id' => $usuario->chat_id,
+                        'text' => str_replace(['{usuario}'], [$usuario->nome], $value['mensagem']
+                        ),
+                        'reply_markup' => $value['botao_1_mensagem'] ? 
+                            [
+                                'inline_keyboard' => [
+                                    [['text' => $value['botao_1_mensagem'],  'url' => $value['botao_1_url']]], 
+                                ]
+                            ] : [],
+                    ]
+                ];
 
-                    $telegram = $usuario->canal->telegram;
-                    $msg = str_replace(
-                        ['{usuario}'], 
-                        [$usuario->nome], 
-                        $value['mensagem']
-                    );
-
-                    $botao = [];
-                    if ($value['botao_1_mensagem'])
-                    {
-                        $botao = [
-                            "resize_keyboard" => true, 
-                            "inline_keyboard" => [
-                                [["text" => $value['botao_1_mensagem'],  "url" => $value['botao_1_url']]], 
-                            ]
-                        ];
-                    }
-
-                    $telegram->sendMessage($usuario->chat_id, $msg, $botao);
-
-                    if (!$usuario->data_envio_recuperacao) {
-                        $usuario->data_envio_recuperacao = date('Y-m-d H:i:s');
-                        $usuario->save();
-                    }
-
-                    $server_root = DoubleConfiguracao::getConfiguracao('server_root');
-                    if (!$server_root) 
-                        {
-                            $server_root = $_SERVER['DOCUMENT_ROOT'];
-                            DoubleConfiguracao::setConfiguracao('server_root', $server_root);
-                        }
-                    
-                    $imagens = DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
-                    foreach ($imagens as $key => $img) {
-                        $imagem = $server_root . '/'. $img;
-                        $telegram->sendPhoto($usuario->chat_id, $imagem);
-                    }
-                    
-                    $videos = DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'video');
-                    foreach ($videos as $key => $vid) {
-                        $video = $server_root . '/'. $vid;
-                        $telegram->sendVideo($usuario->chat_id, $video);
-                    }
-
-                    return $value['recuperacao_mensagem_id'];
-                });
-
-                if (!in_array($id, $ids)) {
-                    $ids[] = $id;
+                $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+                if (!$server_root) 
+                {
+                    $server_root = $_SERVER['DOCUMENT_ROOT'];
+                    DoubleConfiguracao::setConfiguracao('server_root', $server_root);
                 }
-                $total += 1;
-            }
-
-            if (count($ids) == 0) {
-                echo "\n" . date('Y-m-d H:i:s') . " - Nenhuma mensagem a ser enviada";
-            } else {
-                echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
-                TUtils::openConnection('double', function() use ($ids){
-                    $conn = TTransaction::get();
-
-                    $criteria = new TCriteria;
-                    $criteria->add(
-                        new TFilter('id', 'IN', $ids)
-                    );
-
-                    TDatabase::updateData(
-                        $conn, 
-                        'double_recuperacao_mensagem', 
-                        ['mensagem_direta_enviada' => 'Y'],
-                        $criteria
-                    );
+                
+                $imagens = TUtils::openFakeConnection('double', function() use ($value){
+                    return DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
                 });
+                foreach ($imagens as $key => $img) {
+                    $imagem = $server_root . '/'. $img;
+                    $payloadTelegram['sendPhoto'][] = [
+                        'chat_id' => $usuario->chat_id,
+                        'photo' => $imagem
+                    ];
+                    // $telegram->sendPhoto($usuario->chat_id, $imagem);
+                }
+                
+                $videos = TUtils::openFakeConnection('double', function() use ($value){
+                    return DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'video');
+                });
+                foreach ($videos as $key => $vid) {
+                    $video = $server_root . '/'. $vid;
+                    $payloadTelegram['sendVideo'][] = [
+                        'chat_id' => $usuario->chat_id,
+                        'video' => $video
+                    ];
+                    // $telegram->sendVideo($usuario->chat_id, $video);
+                }
+
+                $jsonPayload = json_encode($payloadTelegram);
+                echo "\n" . $jsonPayload;
+                $this->enviar_fila_cron_mensagens($jsonPayload);
             }
+
+            TUtils::openConnection('double', function(){
+                $conn = TTransaction::get();
+
+                $criteria = new TCriteria;
+                $criteria->add( new TFilter('mensagem_direta', '=', 'Y') );
+                $criteria->add( new TFilter('mensagem_direta_enviada', '=', 'N') );
+
+                TDatabase::updateData(
+                    $conn, 
+                    'double_recuperacao_mensagem', 
+                    ['mensagem_direta_enviada' => 'Y'],
+                    $criteria
+                );
+            });
+
+            echo "\n" . date('Y-m-d H:i:s') . " - Finalizando envio de mensagens diretas";
+
+            // $ids = [];
+            // $total = 0;
+            // echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens a serem enviadas: " . count($list);
+            // $count = count($list);
+            // foreach ($list as $key => $value) {
+            //     echo "\n [" . $total+1 . " de " . $count . "] Enviando mensagem para o usuario_id: " . $value['usuario_id'] . " - " . $value['recuperacao_mensagem_id'];
+            //     $id = TUtils::openFakeConnection('double', function() use ($value){
+            //         $usuario = new DoubleUsuario($value['usuario_id'], false);
+
+            //         $telegram = $usuario->canal->telegram;
+            //         $msg = str_replace(
+            //             ['{usuario}'], 
+            //             [$usuario->nome], 
+            //             $value['mensagem']
+            //         );
+
+            //         $botao = [];
+            //         if ($value['botao_1_mensagem'])
+            //         {
+            //             $botao = [
+            //                 "resize_keyboard" => true, 
+            //                 "inline_keyboard" => [
+            //                     [["text" => $value['botao_1_mensagem'],  "url" => $value['botao_1_url']]], 
+            //                 ]
+            //             ];
+            //         }
+
+            //         $telegram->sendMessage($usuario->chat_id, $msg, $botao);
+
+            //         if (!$usuario->data_envio_recuperacao) {
+            //             $usuario->data_envio_recuperacao = date('Y-m-d H:i:s');
+            //             $usuario->save();
+            //         }
+
+            //         $server_root = DoubleConfiguracao::getConfiguracao('server_root');
+            //         if (!$server_root) 
+            //             {
+            //                 $server_root = $_SERVER['DOCUMENT_ROOT'];
+            //                 DoubleConfiguracao::setConfiguracao('server_root', $server_root);
+            //             }
+                    
+            //         $imagens = DoubleRecuperacaoImagem::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'imagem');
+            //         foreach ($imagens as $key => $img) {
+            //             $imagem = $server_root . '/'. $img;
+            //             $telegram->sendPhoto($usuario->chat_id, $imagem);
+            //         }
+                    
+            //         $videos = DoubleRecuperacaoVideo::where('recuperacao_mensagem_id', '=', $value['recuperacao_mensagem_id'])->getIndexedArray('id', 'video');
+            //         foreach ($videos as $key => $vid) {
+            //             $video = $server_root . '/'. $vid;
+            //             $telegram->sendVideo($usuario->chat_id, $video);
+            //         }
+
+            //         return $value['recuperacao_mensagem_id'];
+            //     });
+
+            //     if (!in_array($id, $ids)) {
+            //         $ids[] = $id;
+            //     }
+            //     $total += 1;
+            // }
+
+            // if (count($ids) == 0) {
+            //     echo "\n" . date('Y-m-d H:i:s') . " - Nenhuma mensagem a ser enviada";
+            // } else {
+            //     echo "\n" . date('Y-m-d H:i:s') . " - Total de mensagens enviadas: " . $total;
+            //     TUtils::openConnection('double', function() use ($ids){
+            //         $conn = TTransaction::get();
+
+            //         $criteria = new TCriteria;
+            //         $criteria->add(
+            //             new TFilter('id', 'IN', $ids)
+            //         );
+
+            //         TDatabase::updateData(
+            //             $conn, 
+            //             'double_recuperacao_mensagem', 
+            //             ['mensagem_direta_enviada' => 'Y'],
+            //             $criteria
+            //         );
+            //     });
+            // }
             
             sleep(30); // Aguarda 30 segundos antes de executar novamente
         }
+    }
+
+    private function enviar_fila_cron_mensagens($payload) {
+        $redis = new Client([
+            'scheme' => 'tcp',
+            'host'   => DoubleConfiguracao::getConfiguracao('host_usuario'), // IP do seu Redis
+            'port'   => 6379, // Porta padrão do Redis
+        ]);
+        $server_name = DoubleConfiguracao::getConfiguracao('server_name');
+        $queue = "{$server_name}_cron_telegram_queue";
+
+        $redis->lpush($queue, $payload);
     }
 
     public function atualizar_objetivos()

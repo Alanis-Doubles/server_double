@@ -79,7 +79,7 @@ class SystemScheduleForm extends TPage
         $minute->enableSearch();
         $minute->setSize('100%');
         
-        $schedule_type->addItems(['M' => _t('Once a month'), 'W' => _t('Once a week'), 'D' => _t('Once a day'), 'F' => _t('Each five minutes')]);
+        $schedule_type->addItems(['M' => _t('Once a month'), 'W' => _t('Once a week'), 'D' => _t('Once a day'), 'F' => _t('Each minute')]);
         $schedule_type->setLayout('horizontal');
         $schedule_type->setUseButton();
         $schedule_type->setSize('100%');

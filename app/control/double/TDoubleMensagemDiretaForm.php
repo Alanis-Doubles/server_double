@@ -21,7 +21,7 @@ class TDoubleMensagemDiretaForm  extends TStandardForm
             [$this->makeTHidden(['name' => 'mensagem_direta', 'value' => 'Y'])],
         );
 
-        $status = ['NOVO' => 'Novo', 'ATIVO' => 'Ativo', 'DEMO' => 'Demo']; 
+        $status = ['NOVO' => 'Novo', 'ATIVO' => 'Ativo', 'DEMO' => 'Demo', 'AGUARDANDO_PAGAMENTO' => ' Aguardando Pagamento']; 
         // $tipo_tempo = ['HORA' => 'Hora', 'MINUTO' => 'minuto'];
 
         $this->form->addFields(
@@ -79,8 +79,6 @@ class TDoubleMensagemDiretaForm  extends TStandardForm
             $this->saveFiles($object, $data, 'imagens', 'app/images/recuperacao', 'DoubleRecuperacaoImagem', 'imagem', 'recuperacao_mensagem_id');
             $this->saveFiles($object, $data, 'videos', 'app/images/recuperacao', 'DoubleRecuperacaoVideo', 'video', 'recuperacao_mensagem_id');
         });
-
-        TUtils::cmd_run('TDoubleCron', 'enviar_mensagem_direta', []);
 
         Self::onClose([]);
 
