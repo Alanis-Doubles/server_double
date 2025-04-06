@@ -33,6 +33,7 @@ class ApplicationAuthenticationRestService
             $token['userunitid'] =  TSession::getValue('userunitid');
             $token['userunitname'] =  TSession::getValue('userunitname');
             $token['unit_database'] =  TSession::getValue('unit_database');//$user->unit->connection_name;
+            $token['usergroupids'] = TSession::getValue('usergroupids');
         }
         
         return JWT::encode($token, $key, 'HS256');

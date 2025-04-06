@@ -4,8 +4,7 @@ trait ProfitChangeLogTrait
 {
     public function onAfterDelete( $object )
     {
-        $usuario_logado = TSession::getValue('login');
-        if ($usuario_logado == 'api')
+        if (!TUtils::isDoubleAdministrador())
           return;
         
         $deletedat = self::getDeletedAtColumn();
@@ -27,8 +26,7 @@ trait ProfitChangeLogTrait
     
     public function onBeforeStore($object)
     {
-        $usuario_logado = TSession::getValue('login');
-        if ($usuario_logado == 'api')
+        if (!TUtils::isDoubleAdministrador())
           return;
         
         $pk = $this->getPrimaryKey();
@@ -47,8 +45,7 @@ trait ProfitChangeLogTrait
     
     public function onAfterStore($object)
     {
-        $usuario_logado = TSession::getValue('login');
-        if ($usuario_logado == 'api')
+        if (!TUtils::isDoubleAdministrador())
           return;
 
         SystemChangeLogService::register($this, $this->lastState, (array) $object);

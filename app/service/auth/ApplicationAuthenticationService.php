@@ -171,6 +171,9 @@ class ApplicationAuthenticationService
             TSession::setValue('userunitname', $token['userunitname']);
             TSession::setValue('unit_database', $token['unit_database']);
         }
+
+        if (array_key_exists('usergroupids', $token))
+            TSession::setValue('usergroupids', $token['usergroupids']);
     }
     
     /**
