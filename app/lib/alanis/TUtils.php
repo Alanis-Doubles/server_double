@@ -131,6 +131,10 @@ class TUtils
         if (substr($method, 0, 2) == 'is') {
             $permission = substr($method, 2);
             $userGroups = TSession::getValue('usergroupids');
+            if (!$userGroups) {
+                return false;
+            }
+            
             foreach ($userGroups as $group) {
                 $obj = SystemGroup::findInTransaction('permission', $group);
                 if ($obj->name == $permission) {

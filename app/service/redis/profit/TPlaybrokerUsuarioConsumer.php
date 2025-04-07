@@ -175,6 +175,15 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                 $usuario->quantidade_loss = 0;
                                 $usuario->saveInTransaction();
                             } elseif ($payload->tipo === 'ORDEM_REALIZADA') {}
+                            elseif ($payload->tipo === 'demo_fnalizao') {
+                                $usuario->robo_iniciar = 'N';
+                                $usuario->robo_status = 'PARADO';
+                                $usuario->saveInTransaction();
+                                echo "Usuário {$usuario->id} sem jogadas\n";
+
+                                $usuario->plataforma->service->finalizar($usuario);
+                                break;
+                            }
                             else { // outros
                                 echo "Saiu aqui\n";
                                 break;
@@ -215,23 +224,24 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                     $message = (object) $message;
                     if ($message->kind === 'message' ) 
                     {
-                        if ($usuario->status == 'DEMO') {
-                            if ($usuario->demo_jogadas <=0) {
-                                $usuario->robo_iniciar = 'N';
-                                $usuario->robo_status = 'PARADO';
-                                $usuario->saveInTransaction();
-                                echo "Usuário {$usuario->id} sem jogadas\n";
-                            }
-                        } else if ($usuario->status != 'ATIVO') {
-                            $usuario->robo_iniciar = 'S';
-                            $usuario->robo_status = 'EXECUTANDO';
-                            $usuario->saveInTransaction();
-                            echo "Usuário {$usuario->id} sem status\n";
-                        }
+                        // if ($usuario->status == 'DEMO') {
+                        //     if ($usuario->demo_jogadas <=0) {
+                        //         $usuario->robo_iniciar = 'N';
+                        //         $usuario->robo_status = 'PARADO';
+                        //         $usuario->saveInTransaction();
+                        //         echo "Usuário {$usuario->id} sem jogadas\n";
+                        //     }
+                        // } else if ($usuario->status != 'ATIVO') {
+                        //     $usuario->robo_iniciar = 'S';
+                        //     $usuario->robo_status = 'EXECUTANDO';
+                        //     $usuario->saveInTransaction();
+                        //     echo "Usuário {$usuario->id} sem status\n";
+                        // }
 
+                        $usuario = DoubleUsuario::identificarPorId($usuario->id);
                         if ($usuario->roboStatus == 'EXECUTANDO') 
                         {
-                            $usuario = DoubleUsuario::identificarPorId($usuario->id);
+                            // $usuario = DoubleUsuario::identificarPorId($usuario->id);
         
                             // // Verifica se o usuário possui estratégias próprias e se o histórico é do canal
                             // // >> se SIM ignora a mensagem
@@ -261,6 +271,7 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                             $this->processar_sinais($usuario, $message);
                             if ($usuario->roboStatus !== 'EXECUTANDO') 
                             {
+                                $usuario->plataforma->service->finalizar($usuario);
                                 $this->pubsub->unsubscribe(self::redis_canal);
                                 // $this->pubsub->unsubscribe($this->channel_historico);
                                 // $this->pubsub->unsubscribe($this->usuario_historico);
@@ -268,6 +279,7 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                             }
                         } else 
                         {
+                            $usuario->plataforma->service->finalizar($usuario);
                             $this->pubsub->unsubscribe(self::redis_canal);
                             // $this->pubsub->unsubscribe($this->channel_historico);
                             // $this->pubsub->unsubscribe($this->usuario_historico);

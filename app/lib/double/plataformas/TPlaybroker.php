@@ -233,5 +233,6 @@ class TPlaybroker extends TDoublePlataforma
             unlink($filename);
 
         sleep(2); // Espera 2 segundos para finalizar o arquivo
+        // echo "Finalizando arquivo supervisor\n";
     }
 }
