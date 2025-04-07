@@ -968,6 +968,8 @@ trait TUIBuilderTrait
             $widget->setMinLength( (int) $properties->{'minlen'} );
         if (isset($properties->{'maxsize'})) 
 	        $widget->setMaxSize( (int) $properties->{'maxsize'} );
+        if (isset($properties->{'separator'})) 
+	        $widget->setValueSeparator( $properties->{'separator'} );
 	    
         $widget->setProperty('style', 'box-sizing: border-box !important', FALSE);
 	    

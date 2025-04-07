@@ -147,6 +147,13 @@ class SystemScheduleList extends TStandardList
         $action_onoff->setField('id');
         $this->datagrid->addAction($action_onoff);
         
+        $action_execute = new TDataGridAction([$this, 'onExecute'], [ 'register_state' => 'false' ]);
+        $action_execute->setButtonClass('btn btn-default');
+        $action_execute->setLabel('Executar');
+        $action_execute->setImage('fa:bolt');
+        $action_execute->setField('id');
+        $this->datagrid->addAction($action_execute);
+        
         // create the datagrid model
         $this->datagrid->createModel();
         
@@ -290,6 +297,37 @@ class SystemScheduleList extends TStandardList
             {
                 $schedule->active = $schedule->active == 'Y' ? 'N' : 'Y';
                 $schedule->store();
+            }
+            
+            TTransaction::close();
+            
+            $this->onReload($param);
+        }
+        catch (Exception $e)
+        {
+            new TMessage('error', $e->getMessage());
+            TTransaction::rollback();
+        }
+    }
+
+    /**
+     * Execute scheduling
+     */
+    public function onExecute($param)
+    {
+        try
+        {
+            TTransaction::open('communication');
+            $schedule = SystemSchedule::find($param['id']);
+            if ($schedule instanceof SystemSchedule)
+            {
+                $class = $schedule->class_name;
+                $method = $schedule->method;
+                
+                ob_start();
+                $class::$method([]);
+                $result = ob_get_clean();
+                new TMessage('info', $result);
             }
             
             TTransaction::close();

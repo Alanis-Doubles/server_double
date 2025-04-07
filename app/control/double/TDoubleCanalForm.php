@@ -56,6 +56,23 @@ class TDoubleCanalForm  extends TStandardForm
             [$this->makeTCombo(['name' => 'protecao_branco', 'label' => $label, 'items' => ['Y' => 'Sim', 'N' => 'Não'], 'width' => '100%'])],
         );
 
+        $inicio = new DateTime('00:00');
+        $fim = new DateTime('23:59'); // precisa ser maior que 23:30 para incluir
+
+        $intervalo = new DateInterval('PT30M'); // intervalo de 30 minutos
+        $periodo = new DatePeriod($inicio, $intervalo, $fim);
+
+        $horarios = [];
+
+        foreach ($periodo as $hora) {
+            $horarios[$hora->format('H:i')] = $hora->format('H:i');
+        }
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Horário Sessão'])],
+            [$this->makeTMultiSearch(['name' => 'horario_sessao', 'label' => $label, 'items' => $horarios, 'separator' => ',', 'minlen' => 2, 'height' => 40, 'width' => '100%'])],
+        );
+
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Telegram Token - Robô'])],
             [$this->makeTEntry(['name' => 'telegram_token', 'label' => $label, 'required' => true, 'editable' => $param['method'] != 'onView'])],

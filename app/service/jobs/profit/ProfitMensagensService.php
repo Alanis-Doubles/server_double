@@ -4,7 +4,7 @@ use Predis\Client;
 
 class ProfitMensagensService
 {
-    public function enviarMensagensAgendadas() {
+    static public function enviarMensagensAgendadas() {
         TTransaction::open('communication');
         
         $monthday  = date('d');
@@ -123,14 +123,14 @@ class ProfitMensagensService
 
                 $jsonPayload = json_encode($payloadTelegram);
                 echo "\n" . $jsonPayload;
-                $this->enviar_fila_cron_mensagens($jsonPayload);
+                self::enviar_fila_cron_mensagens($jsonPayload);
             }
 
             echo "\n" . date('Y-m-d H:i:s') . " - Finalizando envio de mensagens diretas";
         }
     }
 
-    private function enviar_fila_cron_mensagens($payload) {
+    static private function enviar_fila_cron_mensagens($payload) {
         $redis = new Client([
             'scheme' => 'tcp',
             'host'   => DoubleConfiguracao::getConfiguracao('host_usuario'), // IP do seu Redis

@@ -215,6 +215,20 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                     $message = (object) $message;
                     if ($message->kind === 'message' ) 
                     {
+                        if ($usuario->status == 'DEMO') {
+                            if ($usuario->demo_jogadas <=0) {
+                                $usuario->robo_iniciar = 'N';
+                                $usuario->robo_status = 'PARADO';
+                                $usuario->saveInTransaction();
+                                echo "Usuário {$usuario->id} sem jogadas\n";
+                            }
+                        } else if ($usuario->status != 'ATIVO') {
+                            $usuario->robo_iniciar = 'S';
+                            $usuario->robo_status = 'EXECUTANDO';
+                            $usuario->saveInTransaction();
+                            echo "Usuário {$usuario->id} sem status\n";
+                        }
+
                         if ($usuario->roboStatus == 'EXECUTANDO') 
                         {
                             $usuario = DoubleUsuario::identificarPorId($usuario->id);
