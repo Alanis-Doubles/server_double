@@ -339,12 +339,12 @@ class TProfitDashboardUsuario extends TPage
     
             $translate = $usuario->plataforma->translate;
     
-            $valor_minimo = $usuario->valor_minimo;
+            $valor_minimo = $usuario->plataforma->valor_minimo;
             if ($usuario->valor < $valor_minimo) {
                 new TMessage(
                     'error',
                     str_replace(
-                        ['valor_minimo'],
+                        ['{valor}'],
                         [$valor_minimo],
                         $translate->MSG_INICIO_ROBO_2
                     )
@@ -356,7 +356,7 @@ class TProfitDashboardUsuario extends TPage
                 new TMessage(
                     'error',
                     str_replace(
-                        ['valor_minimo'],
+                        ['{valor}'],
                         [$valor_minimo],
                         $translate->MSG_INICIO_ROBO_3
                     )
