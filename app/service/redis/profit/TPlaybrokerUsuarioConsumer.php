@@ -76,6 +76,9 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                         ->sumBy('valor', 'total');
                                 }) ?? 0;
 
+                                echo "Perda/Lucro Atual: {$payload->valor_entrada}\n";
+                                echo "Perda/Lucro Acumulado: {$lucro}\n";
+
                                 $this->validarStopWinLoss(
                                     $usuario,
                                     $lucro,
@@ -112,13 +115,17 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                         ->where('sequencia', '=', $usuario->robo_sequencia)
                                         ->sumBy('valor', 'total');
                                 }) ?? 0;
-                                
+
+                                echo "Perda/Lucro Atual: {-$payload->valor_entrada}\n";
+                                echo "Perda/Lucro Acumulado: {$lucro}\n";
+
                                 $this->validarStopWinLoss(
                                     $usuario,
                                     $lucro,
                                     $botao,
                                     $botao_inicio
                                 ); 
+
                                 break;
                             } elseif ($payload->tipo === 'GALE') {
                                 // $usuario->quantidade_loss += 1;
@@ -351,12 +358,19 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                 ] 
             ];
     
-
-        $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+        $lucro = 0;
+        if (isset($param['lucro'])) {
+            $lucro = $param['lucro'];
+        } 
+        echo "Perda/Lucro Atual: {$lucro}\n";
+        
+        $lucro += TUtils::openFakeConnection('double', function() use($usuario) {
             return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
                 ->where('sequencia', '=', $usuario->robo_sequencia)
                 ->sumBy('valor', 'total');
         }) ?? 0;
+
+        echo "Perda/Lucro Acumulado: {$lucro}\n";
 
         return $this->validarStopWinLoss($usuario, $lucro, $botao, $botao_inicio);
     }
