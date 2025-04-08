@@ -86,7 +86,8 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                     $botao_inicio
                                 ); 
                                 break;
-                            } elseif ($payload->tipo === 'LOSS') {
+                            } 
+                            elseif ($payload->tipo === 'LOSS') {
                                 // $usuario->quantidade_loss += 1;
                                 // $usuario->saveInTransaction();
 
@@ -116,6 +117,9 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                         ->sumBy('valor', 'total');
                                 }) ?? 0;
 
+                                $usuario->quantidade_loss = 0;
+                                $usuario->saveInTransaction();
+
                                 echo "Perda/Lucro Atual: {-$payload->valor_entrada}\n";
                                 echo "Perda/Lucro Acumulado: {$lucro}\n";
 
@@ -127,7 +131,8 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                 ); 
 
                                 break;
-                            } elseif ($payload->tipo === 'GALE') {
+                            } 
+                            elseif ($payload->tipo === 'GALE') {
                                 // $usuario->quantidade_loss += 1;
                                 // $usuario->saveInTransaction();
 
@@ -150,7 +155,8 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'ticker_description' => $payload->ticker_description,
                                     'ticker_classifier' => $payload->ticker_classifier
                                 ]);
-                            } elseif ($payload->tipo === 'saldo_insuficiente') {
+                            } 
+                            elseif ($payload->tipo === 'saldo_insuficiente') {
                                 $usuario->robo_iniciar = 'N';
                                 $usuario->robo_status = 'PARANDO';
                                 $usuario->saveInTransaction();
@@ -162,7 +168,8 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                     $botao_inicio
                                 );
                                 break;
-                            } elseif ($payload->tipo === 'STOP') {
+                            } 
+                            elseif ($payload->tipo === 'STOP') {
                                 if ($usuario->robo_status == "EXECUTANDO") {
                                     $usuario->robo_iniciar = 'N';
                                     $usuario->robo_status = 'PARADO';
@@ -177,11 +184,9 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                 }
                                 
                                 break;
-                            } elseif ($payload->tipo === 'ENTRADA') {
-                                echo "Entrou aqui\n";
-                                $usuario->quantidade_loss = 0;
-                                $usuario->saveInTransaction();
-                            } elseif ($payload->tipo === 'ORDEM_REALIZADA') {}
+                            } 
+                            elseif ($payload->tipo === 'ENTRADA') {}
+                            elseif ($payload->tipo === 'ORDEM_REALIZADA') {}
                             elseif ($payload->tipo === 'demo_fnalizao') {
                                 $usuario->robo_iniciar = 'N';
                                 $usuario->robo_status = 'PARADO';

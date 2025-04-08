@@ -352,6 +352,7 @@ class TProfitDashboardUsuario extends TPage
                 return;
             }
     
+            $usuario->ultimo_saldo = $usuario->plataforma->service->saldo($usuario);
             if ($usuario->ultimo_saldo < $valor_minimo) {
                 new TMessage(
                     'error',

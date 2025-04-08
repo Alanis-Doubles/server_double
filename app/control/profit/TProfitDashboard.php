@@ -127,7 +127,7 @@ class TProfitDashboard extends TPage
         $html2->enableSection(
             'main',
             [
-                'indicator1' => TUtils::renderInfoBox('usuariosAtivos', 'Usuários Jogando', 'trophy', 'red', 0),
+                'indicator1' => TUtils::renderInfoBox('usuariosAtivos', 'Usuários Onine', 'trophy', 'red', 0),
                 'indicator2' => TUtils::renderInfoBox('totalTestesIniciados', 'Total Testes Iniciados', 'gamepad', 'aqua', 0),
                 'indicator3' => $permite_total_assinaturas == 'N' ? '' : TUtils::renderInfoBox('valorTotalAssinaturas', 'Valor Total Assinaturas', 'dollar-sign', 'orange', ' R$ 0,00'),
             ]
@@ -216,154 +216,7 @@ class TProfitDashboard extends TPage
         $this->form->setData($session);
         $this->filterRanking->setData($session);
 
-        // TScript::create($this->getJavaScript());
         TScript::create($this->getProfitJavaScript());
-    }
-
-    private function getJavaScript()
-    {
-        $host = DoubleConfiguracao::getConfiguracao('servidor_ws');
-        
-        return <<<JAVASCRIPT
-            function atualiza_contadores() {
-                $.get("engine.php?class=TProfitDashboard&method=doConsultar&static=1", function(data) {
-                    const options = { 
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                        style: "currency",
-                        currency: "BRL"
-                    };
-
-                    const dados = JSON.parse(data);
-
-                    document.querySelector("#totalUsuarios").textContent = dados["totalUsuarios"];
-                    document.querySelector("#novosUsuarios").textContent = dados["novosUsuarios"];
-                    document.querySelector("#totalPlanosAssinados").textContent = dados["totalPlanosAssinados"];
-                    document.querySelector("#usuariosAtivos").textContent = dados["usuariosAtivos"];
-                    document.querySelector("#totalTestesIniciados").textContent = dados["totalTestesIniciados"];
-                    document.querySelector("#valorTotalAssinaturas").textContent = Number(dados["valorTotalAssinaturas"]).toLocaleString("pt-BR", options);;
-                });
-            }
-
-            function atualiza_ranking() {
-                
-                $.get("engine.php?class=TProfitDashboard&method=doConsultarRanking&static=1", function(data) {
-                    
-                    $("#dataraking tbody").remove();
-                    $("#dataraking").append(data);
-                });
-            }
-
-            atualiza_contadores();
-            atualiza_ranking();
-
-            setInterval( atualiza_contadores, 5000);
-            setInterval( atualiza_ranking, 7000 );
-
-            let data = [];
-            let ativoAtual = "";
-            let entradaAtivo = null;
-
-            let options = {
-                series: [{
-                    data: data
-                }],
-                chart: {
-                    type: 'candlestick',
-                    height: 350,
-                    animations: {
-                        enabled: false
-                    }
-                },
-                xaxis: {
-                    type: 'string'
-                },
-                yaxis: {
-                    tooltip: {
-                        enabled: true
-                    }
-                },
-                annotations: {
-                    yaxis: []
-                }
-            };
-
-            let chart = new ApexCharts(document.querySelector('#candlestick_chart') ?? '', options);
-            chart.render();
-
-            let socket = new WebSocket(`{$host}`);
-
-            socket.onopen = function(event) {
-                console.log('Conexão WebSocket estabelecida.');
-            };
-
-            socket.onmessage = function (event) {
-                let data = JSON.parse(event.data);
-
-                if (data.type === "candle_update") {
-                    atualizarNomeAtivo(data.moeda);
-                    atualizarGrafico(data);
-                    tarrowstep_set_current('step', data.gale);
-                } else if (data.type === "win") {
-                    console.log("win:", event.data);
-                    document.getElementById('step_' + data.gale).innerHTML = "✅ " + document.getElementById('step_' + data.gale).innerHTML;
-                } else if (data.type === "loss") {
-                    console.log("loss:", event.data);
-                    document.getElementById('step_' + data.gale).innerHTML = "❌ " + document.getElementById('step_' + data.gale).innerHTML;
-                } else if (data.type === "indisponivel") {
-                    console.log("indisponivel:", event.data);
-                    document.getElementById('step_' + data.gale).innerHTML = "🚫 " + document.getElementById('step_' + data.gale).innerHTML;
-                } else if (data.type === "entrada") {
-                    console.log("entrada:", event.data);
-                    document.getElementById('step_99').innerHTML = "Operção";
-                    document.getElementById('step_0').innerHTML = "Entrada";
-                    document.getElementById('step_1').innerHTML = "Proteção 1";
-                    document.getElementById('step_2').innerHTML = "Proteção 2";
-                    document.getElementById('step_3').innerHTML = "Proteção 3";
-                }
-            };
-
-            function atualizarNomeAtivo(nome) {
-                document.getElementById('labelAtivo').innerHTML = "Gráfico do Ativo: <b>" + nome + "</b>";
-                const tema = document.documentElement.getAttribute("data-bs-theme");
-                atualizarTemaGrafico(tema);
-            }
-
-            function atualizarGrafico(message) {
-                document.getElementById('step_99').innerHTML = "Operção - " + message.acao;
-                data = message.historico.map(vela => ({
-                    x: vela.datahora, 
-                    y: [vela.open, vela.high, vela.low, vela.close]
-                }));
-
-                entradaUsuario = null; 
-                chart.updateOptions({ annotations: { yaxis: [] } }); 
-
-                chart.updateSeries([{ data }]);
-
-                ultimoClose = data[data.length - 1].y[3];
-                ultinoOpen = data[data.length - 1].y[0];
-
-                _updateOptions = [];
-                
-                if (message.entrada) {
-                    _updateOptions.push({
-                        y: ultimoClose,
-                        borderColor: ultinoOpen < ultimoClose ? '#00B746' : '#FF0000',
-                        label: {
-                            text: ultimoClose,
-                            style: { color: '#fff', background: ultinoOpen < ultimoClose ? '#00B746' : '#FF0000' }
-                        }
-                    });
-                }
-                
-                chart.updateOptions({
-                    annotations: {
-                        yaxis: _updateOptions
-                    }
-                });
-            }
-JAVASCRIPT;
     }
 
     private function getProfitJavaScript()
@@ -436,7 +289,18 @@ JAVASCRIPT;
                     document.querySelector("#totalPlanosAssinados").textContent = dados["totalPlanosAssinados"];
                     document.querySelector("#usuariosAtivos").textContent = dados["usuariosAtivos"];
                     document.querySelector("#totalTestesIniciados").textContent = dados["totalTestesIniciados"];
-                    document.querySelector("#valorTotalAssinaturas").textContent = Number(dados["valorTotalAssinaturas"]).toLocaleString("pt-BR", options);;
+                    document.querySelector("#valorTotalAssinaturas").textContent = Number(dados["valorTotalAssinaturas"]).toLocaleString("pt-BR", options);
+
+                    atualiza_ranking();
+                });
+            }
+
+            function atualiza_ranking() {
+                
+                $.get("engine.php?class=TProfitDashboard&method=doConsultarRanking&static=1", function(data) {
+                    
+                    $("#dataraking tbody").remove();
+                    $("#dataraking").append(data);
                 });
             }
 
@@ -461,12 +325,14 @@ JAVASCRIPT;
                     
                     __adianti_show_toast('success', 'Win', 'top right', 'far:check-circle');
                     addStep("WIN ", "#27ae60");
+                    atualiza_contadores();
                 } else if (data.type === "loss") {
                     atualizando = false;
                     console.log("loss:", event.data);
                     
                     __adianti_show_toast('error', 'Loss', 'top right', 'far:times-circle');
                     addStep("LOSS ", "#e74c3c");
+                    atualiza_contadores();
                 } else if (data.type === "gale") {
                     console.log("gale:", event.data);
                     addStep("Proteção " + data.gale, getGradientColor(data.gale, {$canal->protecoes}))
@@ -481,6 +347,7 @@ JAVASCRIPT;
                     clearSteps();
                     document.getElementById('step_0').innerHTML = "Entrada" ;
                     atualizando = true;
+                    atualiza_contadores();
                 }
             };
 
@@ -804,15 +671,28 @@ JAVASCRIPT;
 
     public static function doConsultarRanking($paraam)
     {
+        $canal = TUtils::openFakeConnection("double", function () {
+            return DoubleCanal::where('nome', '=', 'Playbroker')
+                ->first();
+        });
+
         $raking = new TProfitRanking;
         $datagrid = $raking->datagrid;
 
         $session = TSession::getValue('form_TProfitDashboard_filter_data');
-        if ($session and $session->canal_id) {
+        if (!$session) {
+            $session = new stdClass;
+            $session->usuarios_canal = '';
+            $session->data_inicio = date('Y-m-0');
+            $session->data_fim = date('Y-m-t');
+            $session->data_ranking = date('Y-m-d');
+        }
+
+        if ($canal and $canal->id) {
             try {
-                $lista = TUtils::openFakeConnection('double',  function () use ($session) {
-                    $filtro1 = 'dh.canal_id = ' . $session->{'canal_id'};
-                    $filtro2 = 'c.id = ' . $session->{'canal_id'};
+                $lista = TUtils::openFakeConnection('double',  function () use ($session, $canal) {
+                    $filtro1 = 'dh.canal_id = ' . $canal->id;
+                    $filtro2 = 'c.id = ' . $canal->id;
 
                     if (!isset($session->data_ranking))
                         $session->data_ranking = date('Y-m-d');
@@ -920,7 +800,6 @@ JAVASCRIPT;
         $object = TSession::getValue('form_TProfitDashboard_filter_data');
         if (!$object) {
             $object = new stdClass;
-            $canal->id = '';
             $object->usuarios_canal = '';
             $object->data_inicio = date('Y-m-0');
             $object->data_fim = date('Y-m-t');
@@ -953,11 +832,9 @@ JAVASCRIPT;
                 $totalCancelamentos  = $totalCancelamentos->where('canal_id', '=', $canal->id);
                 $totalAssinaturas    = $totalAssinaturas->where('canal_id', '=', $canal->id);
 
-                $sqlAtivos = "SELECT COUNT(DISTINCT dh.usuario_id) total
-                                FROM double_usuario_historico dh
-                                JOIN double_usuario du on du.id = dh.usuario_id
-                               WHERE dh.created_at >= NOW() - INTERVAL 1 HOUR
-                                 AND du.canal_id = {$canal->id}
+                $sqlAtivos = "SELECT COUNT(1) total
+                                FROM double_usuario du
+                               WHERE du.canal_id = {$canal->id}
                                  and du.robo_status = 'EXECUTANDO'";
 
                 $conn = TTransaction::get();
