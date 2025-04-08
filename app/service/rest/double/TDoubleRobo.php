@@ -12,7 +12,7 @@ class TDoubleRobo
         'data_expiracao', 'ciclo', 'robo_iniciar', 'robo_iniciar_apos_loss', 'demo_jogadas', 'logado', 'robo_processando_jogada',
         'entrada_automatica', 'entrada_automatica_total_loss', 'tipo_stop_loss', 'entrada_automatica_tipo', 'metas',
         'usuario_meta', 'valor_max_ciclo', 'protecao_branco', 'modo_treinamento', 'banca_treinamento', 'status_objetivo', 'robo_status',
-        'fator_multiplicador', 'fator_multiplicador_branco', 'valor_branco', 'expiration', 'classificacao'
+        'fator_multiplicador', 'fator_multiplicador_branco', 'valor_branco', 'expiration', 'classificacao', 'demo_jogadas_restantes'
     ];
 
     public function carregar($param)

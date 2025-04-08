@@ -268,9 +268,9 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                         $message .= $usuario->plataforma->translate->MSG_OPERACAO_ENTRADA_CICLO;
                     
                     if ($usuario->status == 'DEMO') {
-                        $usuario = DoubleUsuario::identificarPorId($usuario->id);
-                        $usuario->demo_jogadas -= 1;
-                        $usuario->saveInTransaction();
+                        // $usuario = DoubleUsuario::identificarPorId($usuario->id);
+                        // $usuario->demo_jogadas -= 1;
+                        // $usuario->saveInTransaction();
                         $message .= str_replace(
                             ['{demo_jogadas}'],
                             [$usuario->demo_jogadas],

@@ -25,8 +25,9 @@ class ProfitSessaoSinais
             ]);
     
             $redis->publish("profit_sessao", 'iniciar');
+            echo "- Iniciando sessão de sinais";
         } else {
-            echo "\n" . date('Y-m-d H:i:s') . " - Não é horário de sessão de sinais";
+            throw new Exception("Não é horário de sessão de sinais", 1);
         }
     }
 }

@@ -76,7 +76,7 @@ class DoubleUsuario extends DoubleRecord
         $this->protecao = $this->protecao == null ? 0 : $this->protecao;
         $this->stop_win = $this->stop_win == null ? 0 : $this->stop_win;
         $this->stop_loss = $this->stop_loss == null ? 0 : $this->stop_loss;
-        $this->demo_jogadas = $this->demo_jogadas == null ? 0 : $this->demo_jogadas;
+        $this->demo_jogadas = $this->demo_jogadas == null ? 50 : $this->demo_jogadas;
         $this->ciclo = $this->ciclo == null ? 'N' : $this->ciclo;
         // $this->robo_status = $this->roboStatus;
         // $this->robo_inicio = $this->roboInicio;
@@ -651,5 +651,37 @@ class DoubleUsuario extends DoubleRecord
             return $this->usuario_objetivo->status;
         else
             return 'PARADO';
+    }
+
+    public function get_demo_jogadas_restantes()
+    {
+        $sql = "SELECT count(1) as total
+                  FROM double_usuario_historico d
+                  JOIN double_usuario u ON u.id = d.usuario_id
+                 WHERE u.id = {$this->id}
+                   AND d.created_at >= u.demo_inicio";
+
+        $results = TUtils::openFakeConnection('double', function () use($sql){
+            $conn = TTransaction::get();
+            $list = TDatabase::getData(
+                $conn, 
+                $sql
+            );
+
+            return $list;
+        });
+
+        if ($results)
+            $total = $results[0]['total'];
+        else
+            $total = 0;
+
+        // $total = TUtils::openFakeConnection('double', function () {
+        //     return DoubleUsuarioHistorico::where('usuario_id', '=', $this->id)
+        //         ->where('created_at', '>=', $this->demo_inicio)
+        //         ->count();
+        // });
+
+        return $total ? $this->demo_jogadas - $total : $this->demo_jogadas;
     }
 }
