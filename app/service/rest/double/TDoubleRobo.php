@@ -698,5 +698,15 @@ class TDoubleRobo
 
         return $list;
     }
+
+    public function mensagens($param)
+    {
+        if (!isset($param['plataforma']))
+            throw new Exception('Plataforma não informada.');
+
+        $plataforma = DoublePlataforma::indentificar($param['plataforma'], $param['idioma']);
+
+        return $plataforma->translate->list();
+    }
 }
 

@@ -46,6 +46,12 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                             echo "received message: {$message->channel} - {$message->payload}\n";
                             $payload = json_decode($message->payload); 
                             if ($payload->tipo === 'WIN') {
+                                $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                                    return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                                        ->where('sequencia', '=', $usuario->robo_sequencia)
+                                        ->sumBy('valor', 'total');
+                                }) ?? 0;
+
                                 $this->notificar_usuario_historico_consumidores([
                                     'sequencia' => $usuario->robo_sequencia,
                                     'usuario_id' => $usuario->id,
@@ -70,11 +76,7 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                 $usuario->ultimo_saldo = $payload->banca;
                                 $usuario->saveInTransaction();
 
-                                $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
-                                    return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
-                                        ->where('sequencia', '=', $usuario->robo_sequencia)
-                                        ->sumBy('valor', 'total');
-                                }) ?? 0;
+                                $lucro += $payload->valor;
 
                                 echo "Perda/Lucro Atual: {$payload->valor_entrada}\n";
                                 echo "Perda/Lucro Acumulado: {$lucro}\n";
@@ -90,6 +92,12 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                             elseif ($payload->tipo === 'LOSS') {
                                 // $usuario->quantidade_loss += 1;
                                 // $usuario->saveInTransaction();
+
+                                $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
+                                    return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
+                                        ->where('sequencia', '=', $usuario->robo_sequencia)
+                                        ->sumBy('valor', 'total');
+                                }) ?? 0;
 
                                 $this->notificar_usuario_historico_consumidores([
                                     'sequencia' => $usuario->robo_sequencia,
@@ -111,16 +119,9 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
                                     'ticker_classifier' => $payload->ticker_classifier
                                 ]);
 
-                                $lucro = TUtils::openFakeConnection('double', function() use($usuario) {
-                                    return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
-                                        ->where('sequencia', '=', $usuario->robo_sequencia)
-                                        ->sumBy('valor', 'total');
-                                }) ?? 0;
+                                $lucro -= $payload->valor_entrada;
 
-                                $usuario->quantidade_loss = 0;
-                                $usuario->saveInTransaction();
-
-                                echo "Perda/Lucro Atual: {-$payload->valor_entrada}\n";
+                                echo "Perda/Lucro Atual: -{$payload->valor_entrada}\n";
                                 echo "Perda/Lucro Acumulado: {$lucro}\n";
 
                                 $this->validarStopWinLoss(
@@ -367,15 +368,12 @@ class TPlaybrokerUsuarioConsumer extends TDoubleUsuarioConsumer
         if (isset($param['lucro'])) {
             $lucro = $param['lucro'];
         } 
-        echo "Perda/Lucro Atual: {$lucro}\n";
         
         $lucro += TUtils::openFakeConnection('double', function() use($usuario) {
             return DoubleUsuarioHistorico::where('usuario_id', '=', $usuario->id)
                 ->where('sequencia', '=', $usuario->robo_sequencia)
                 ->sumBy('valor', 'total');
         }) ?? 0;
-
-        echo "Perda/Lucro Acumulado: {$lucro}\n";
 
         return $this->validarStopWinLoss($usuario, $lucro, $botao, $botao_inicio);
     }

@@ -599,11 +599,13 @@ class TDoubleUsuarioConsumer extends TDoubleRedis
                 if ($ocorreu_stop_win) 
                     $usuario->robo_sequencia += 1;
                 $usuario->ultimo_saldo = $usuario->plataforma->service->saldo($usuario);
+                $usuario->saveInTransaction();
             }
             else
             {
                 $usuario->robo_iniciar = 'N';
-                $usuario->robo_status = 'PARANDO';
+                $usuario->robo_status = 'PARADO';
+                $usuario->saveInTransaction();
 
                 // TDoubleRobo::removerArquivoSupervisor($usuario);
                 $usuario->plataforma->service->finalizar($usuario);
