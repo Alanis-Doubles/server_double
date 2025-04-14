@@ -31,7 +31,7 @@
       <menuitem label="🕛 Mensagens Agendadas">
         <action>TDoubleMensagemAgendadaList</action>
       </menuitem>
-      <menuitem label="📆 Histórico">
+      <menuitem label="📆 Histórico}">
         <action>TDoubleHistoricoUsuario</action>
       </menuitem>
     </menu>

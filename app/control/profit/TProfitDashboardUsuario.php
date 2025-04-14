@@ -87,19 +87,19 @@ class TProfitDashboardUsuario extends TPage
         });
 
         if (!$usuario) {
-            new TMessage('error', 'Usuário não encontrado.');
+            new TMessage('error', _t('Usuário não encontrado.'));
             return;
         }
 
         if ($usuario->robo_status == 'EXECUTANDO') {
-            $configuracao = new TPanelGroup('<div id="robo-status"><span class="cor_verde">Robô em execução</span></div>');
+            $configuracao = new TPanelGroup('<div id="robo-status"><span class="cor_verde">' . _t('Robô em execução') . '</span></div>');
         } else {
-            $configuracao = new TPanelGroup('<div id="robo-status"><span class="cor_vermelho">Robô parado</span></div>');
+            $configuracao = new TPanelGroup('<div id="robo-status"><span class="cor_vermelho">' . _t('Robô parado') . '</span></div>');
         }
 
         $action_config = $configuracao->addHeaderActionLink('', new TAction(['TProfitConfiguracaoUsuario', "onEdit"], ['register_state' => 'false', 'key' => $usuario->id, 'fromClass' => 'TProfitDashboardUsuario']), 'fa:cog');
         $action_config->style = 'width: 50px;';
-        $action_config->{'title'} = 'Alterar configurações';
+        $action_config->{'title'} = _t('Alterar configurações');
         $action_config->{'data-toggle'} = 'tooltip';
         $action_config->{'data-placement'} = 'top';
         $action_config->{'id'} = 'btn_config';
@@ -107,7 +107,7 @@ class TProfitDashboardUsuario extends TPage
         $action_iniciar = $configuracao->addHeaderActionLink('', new TAction([$this, "onIniciarRobo"], ['register_state' => 'false']), 'fa:play');
         $action_iniciar->style = 'width: 50px;';
         $action_iniciar->{"class"} = $action_iniciar->{"class"} . ' cor_verde';
-        $action_iniciar->{'title'} = 'Iniciar robô';
+        $action_iniciar->{'title'} = _t('Iniciar robô');
         $action_iniciar->{'data-toggle'} = 'tooltip';
         $action_iniciar->{'data-placement'} = 'top';
         $action_iniciar->{'id'} = 'btn_iniciar';
@@ -115,7 +115,7 @@ class TProfitDashboardUsuario extends TPage
         $action_parar = $configuracao->addHeaderActionLink('', new TAction([$this, "questionaParar"], ['register_state' => 'false']), 'fa:pause');
         $action_parar->style = 'width: 50px;';
         $action_parar->{"class"} = $action_parar->{"class"} . ' cor_vermelho';
-        $action_parar->{'title'} = 'Parar robô';
+        $action_parar->{'title'} = _t('Parar robô');
         $action_parar->{'data-toggle'} = 'tooltip';
         $action_parar->{'data-placement'} = 'top';
         $action_parar->{'id'} = 'btn_parar';
@@ -133,15 +133,15 @@ class TProfitDashboardUsuario extends TPage
         $table->{'style'} = 'width: 100%;';
 
         $valores = [
-            '5' => '5 segundos',
-            '10' => '10 segundos',
-            '15' => '15 segundos',
-            '30' => '30 segundos',
-            '45' => '45 segundos',
-            '60' => '1 minuto',
-            '120' => '2 minutos',
-            '180' => '3 minutos',
-            '300' => '5 minutos'
+            '5' => '5 ' . _t('segundos'),
+            '10' => '10 ' . _t('segundos'),
+            '15' => '15 ' . _t('segundos'),
+            '30' => '30 ' . _t('segundos'),
+            '45' => '45 ' . _t('segundos'),
+            '60' => '1 ' . _t('minuto'),
+            '120' => '2 ' . _t('minuto'),
+            '180' => '3 ' . _t('minuto'),
+            '300' => '5 ' . _t('minuto')
         ];
 
         $tempo_expiracao = $valores[$usuario->expiration];
@@ -149,23 +149,23 @@ class TProfitDashboardUsuario extends TPage
         if ($usuario->tipo_stop_loss == 'VALOR') {
             $stop_loss = number_format($usuario->stop_loss, 2, ',', '.') . ' [Valor]';
         } else {
-            $stop_loss = $usuario->stop_loss  . ' [Quantidade]';
+            $stop_loss = $usuario->stop_loss  . ' [' . _t('Quantidade') . ']';
         }
 
         if ($usuario->ciclo == 'N') {
-            $ciclo = '<span class="cor_vermelho" id="ciclo">Desabilitado</span>';
+            $ciclo = '<span class="cor_vermelho" id="ciclo">' . _t('Desabilitado') .'</span>';
         } else {
-            $ciclo = '<span class="cor_verde" id="ciclo">Habilitado</span>';
+            $ciclo = '<span class="cor_verde" id="ciclo">' . _t('Habilitado') .' </span>';
         }
 
-        $table->addRowSet('<b>💸 Valor operação:</b>', '<span id="valor_aposta">' . number_format($usuario->valor, 2, ',', '.') . '</span>');
-        $table->addRowSet('<b>🔒 Proteções:</b>', '<span id="gales">' . $usuario->protecao . '</span>');
-        $table->addRowSet('<b>⏰ Tempo expiração:</b>', '<span id="tempo_expiracao">' . $tempo_expiracao . '</span>');
-        $table->addRowSet('<b>🔎 Classificação:</b>', '<span id="classificacao">' . $usuario->classificacao . '</span>');
-        $table->addRowSet('<b>♻ Fator multiplicador:</b>', '<span id="fator_multiplicador">' . number_format($usuario->fator_multiplicador, 2, ',', '.') . '</span>');
+        $table->addRowSet('<b>💸 ' . _t('Valor operação') . ':</b>', '<span id="valor_aposta">' . number_format($usuario->valor, 2, ',', '.') . '</span>');
+        $table->addRowSet('<b>🔒 ' . _t('Proteções') . ':</b>', '<span id="gales">' . $usuario->protecao . '</span>');
+        $table->addRowSet('<b>⏰ ' . _t('Tempo expiração') . ':</b>', '<span id="tempo_expiracao">' . $tempo_expiracao . '</span>');
+        $table->addRowSet('<b>🔎 ' . _t('Classificação') . ':</b>', '<span id="classificacao">' . $usuario->classificacao . '</span>');
+        $table->addRowSet('<b>♻ ' . _t('Fator multiplicador') . ':</b>', '<span id="fator_multiplicador">' . number_format($usuario->fator_multiplicador, 2, ',', '.') . '</span>');
         $table->addRowSet('<b>✅ Stop WIN:</b>', '<span id="stop_win">' . number_format($usuario->stop_win, 2, ',', '.') . '</span>');
         $table->addRowSet('<b>❌ Stop LOSS:</b>', '<span id="stop_loss">' . $stop_loss  . '</span>');
-        $table->addRowSet('<b>↪️ Ciclo:</b>', $ciclo);
+        $table->addRowSet('<b>↪️ ' . _t('Ciclo') . ':</b>', $ciclo);
 
 
         $configuracao->add($table);
@@ -175,7 +175,7 @@ class TProfitDashboardUsuario extends TPage
         $table->id = 'ativos';
 
         $header = $table->addRow();
-        $header->addCell('<b>Ativo</b>');
+        $header->addCell('<b>' . _t('Ativo') . '</b>');
         $header->addCell('<b>Win</b>');
         $header->addCell('<b>Loss</b>');
 
@@ -183,17 +183,17 @@ class TProfitDashboardUsuario extends TPage
         $divWrapper->{'style'} = 'height: 330px; overflow-y: auto;';
         $divWrapper->add($table);
 
-        $ativosPanel = new TPanelGroup("Histórico de Ativos");
+        $ativosPanel = new TPanelGroup(_t("Histórico de Ativos"));
         $ativosPanel->{'style'} = 'width: 100%; height: 420px; margin: 0px; margin-bottom: 15px; min-height: 50px;';
         $ativosPanel->add($divWrapper);
 
 
-        $labelAtivo = new TLabel('Gráfico do Ativo: <b>Aguardando ativo...</b>');
+        $labelAtivo = new TLabel(_t('Gráfico do Ativo'). ': <b>' . _t('Aguardando ativo...') . '</b>');
         $labelAtivo->setId('labelAtivo');
 
         $step = new TArrowStep('step');
-        $step->addItem('Operação', 99, '#3498db');
-        $step->addItem('Entrada', 0, '#27ae60');
+        $step->addItem(_t('Operação'), 99, '#3498db');
+        $step->addItem(_t('Entrada'), 0, '#27ae60');
         $step->setCurrentKey(99);
         $step->setHeight(40);
 
@@ -216,10 +216,10 @@ class TProfitDashboardUsuario extends TPage
                 'configuracao' => $configuracao,
                 'indicator1'   => TUtils::renderInfoBox('total-win', 'WIN', 'trophy', 'green', 0),
                 'indicator2'   => TUtils::renderInfoBox('total-loss', 'LOSS', 'times', 'red', 0),
-                'indicator3'   => TUtils::renderInfoBox('total-lucro', 'Lucro/Perda', 'dollar-sign', 'green', '$ 0,00'),
-                'indicator4'   => TUtils::renderInfoBox('total-saldo', 'Saldo Atual', 'money-bill-alt', 'green', '$ 0,00'),
-                'indicator5'   => TUtils::renderInfoBox('maior-entrada', 'Maior Entrada', 'arrow-alt-circle-up', 'green', '$ 0,00'),
-                'indicator6'   => TUtils::renderInfoBox('assertividade', 'Assertividade', 'percent', 'green', '0 %'),
+                'indicator3'   => TUtils::renderInfoBox('total-lucro', _t('Lucro/Perda'), 'dollar-sign', 'green', '$ 0,00'),
+                'indicator4'   => TUtils::renderInfoBox('total-saldo', _t('Saldo Atual'), 'money-bill-alt', 'green', '$ 0,00'),
+                'indicator5'   => TUtils::renderInfoBox('maior-entrada', _t('Maior Entrada'), 'arrow-alt-circle-up', 'green', '$ 0,00'),
+                'indicator6'   => TUtils::renderInfoBox('assertividade', _t('Assertividade'), 'percent', 'green', '0 %'),
                 'ativos'       => $ativosPanel,
                 'grafico'      => $panelGrafio,
 
@@ -234,7 +234,7 @@ class TProfitDashboardUsuario extends TPage
 
         $container = new TVBox;
         $container->style = 'width: 100%';
-        $container->add(TUtils::createXMLBreadCrumb('menu-top.xml', __CLASS__));
+        // $container->add(TUtils::createXMLBreadCrumb('menu-top.xml', __CLASS__));
         $container->add($body);
 
         parent::add($container);
@@ -251,7 +251,7 @@ class TProfitDashboardUsuario extends TPage
 
     public function questionaSalvar($param)
     {
-        $message = 'Tem certeza que deseja salvar a configuração?';
+        $message = _t('Tem certeza que deseja salvar a configuração?');
         $action = new TAction([$this, 'onSave'], $param);
 
         new TQuestion($message, $action);
@@ -259,7 +259,7 @@ class TProfitDashboardUsuario extends TPage
 
     public function questionaParar($param)
     {
-        $message = 'Tem certeza que deseja parar a execução?';
+        $message = _t('Tem certeza que deseja parar a execução?');
         $action = new TAction([$this, 'onPararRobo'], $param);
 
         new TQuestion($message, $action);
@@ -282,7 +282,7 @@ class TProfitDashboardUsuario extends TPage
                     ->first();
 
                 if ($estrategia)
-                    throw new Exception("Você já possui esta estratégia na sua lista");
+                    throw new Exception((string)_t("Você já possui esta estratégia na sua lista"));
 
                 $max = DoubleEstrategia::where('usuario_id', '=', $usuario->id)
                     ->where('canal_id', '=', $canal_id)
@@ -300,7 +300,7 @@ class TProfitDashboardUsuario extends TPage
                 $new->save();
             });
 
-            new TMessage('info', 'Estratégia copiada com sucesso.');
+            new TMessage('info', _t('Estratégia copiada com sucesso.'));
         } catch (\Throwable $th) {
             new TMessage('error', $th->getMessage());
         }
@@ -368,7 +368,7 @@ class TProfitDashboardUsuario extends TPage
             $telegram = $usuario->canal->telegram;
     
             if (in_array($usuario->status, ['ATIVO', 'DEMO'])) {
-                $telegram->sendMessage($usuario->chat_id, 'Robô iniciado no Dashboard');
+                $telegram->sendMessage($usuario->chat_id, _t('Robô iniciado no Dashboard'));
     
                 $telegram->sendMessage(
                     $usuario->chat_id,
@@ -425,9 +425,9 @@ class TProfitDashboardUsuario extends TPage
     
             TScript::create('atualiza_status()', TRUE, 5000); // 5 segundos
     
-            new TMessage('info', 'Robô iniciado com sucesso.');
+            new TMessage('info', _t('Robô iniciado com sucesso.'));
         } catch (\Throwable $th) {
-            new TMessage('error', 'Erro ao iniciar o robô.');
+            new TMessage('error', _t('Erro ao iniciar o robô.'));
         }
     }
 
@@ -474,16 +474,16 @@ class TProfitDashboardUsuario extends TPage
             ];
     
             $telegram = $usuario->canal->telegram;
-            $telegram->sendMessage($usuario->chat_id, 'Robô parado no Dashboard');
+            $telegram->sendMessage($usuario->chat_id, _t('Robô parado no Dashboard'));
             $telegram->sendMessage($usuario->chat_id, $usuario->plataforma->translate->MSG_PARAR_ROBO, $botao_inicio);
     
             // TForm::sendData('form_TProfitDashboardUsuario', $arrData, FALSE, TRUE, 1000);
     
             TScript::create('atualiza_status()', TRUE, 5000); // 5 segundos
     
-            new TMessage('info', 'Robô parado com sucesso.');
+            new TMessage('info', _t('Robô parado com sucesso.'));
         } catch (\Throwable $th) {
-            new TMessage('error', 'Erro ao parar o robô.');
+            new TMessage('error', _t('Erro ao parar o robô.'));
         }
     }
 
@@ -531,7 +531,7 @@ class TProfitDashboardUsuario extends TPage
 
             TTransaction::close();
 
-            new TMessage('info', 'Configuração salva com sucesso.');
+            new TMessage('info', _t('Configuração salva com sucesso.'));
         } catch (\Throwable $e) {
             TTransaction::rollback();
             new TMessage('error', $e->getMessage());
@@ -720,7 +720,7 @@ class TProfitDashboardUsuario extends TPage
             }
 
             function atualizarNomeAtivo(nome, hora) {
-                document.getElementById('labelAtivo').innerHTML = "Gráfico do Ativo: <b>" + nome + "</b> - Entrada às " + hora;
+                document.getElementById('labelAtivo').innerHTML = _t("Gráfico do Ativo") + ": <b>" + nome + "</b> - " + _t("Entrada às") + " + hora;
             }
 
             function atualizarGrafico(message) {
@@ -817,13 +817,13 @@ class TProfitDashboardUsuario extends TPage
                     var executando = data.status_objetivo == 'EXECUTANDO' || data.robo_status == 'EXECUTANDO';
                         
                     if (executando) {
-                        document.querySelector("#robo-status").innerHTML = '<span class="cor_verde">Robô em execução</span>';
+                        document.querySelector("#robo-status").innerHTML = '<span class="cor_verde">_t("Robô em execução")</span>';
                         document.querySelector('#btn_config').style.display = 'none';
                         document.querySelector('#btn_iniciar').style.display = 'none';
                         document.querySelector('#btn_parar').style.display = 'inline';
                     }
                     else {
-                        document.querySelector("#robo-status").innerHTML = '<span class="cor_vermelho">Robô parado</span>';
+                        document.querySelector("#robo-status").innerHTML = '<span class="cor_vermelho">_t("Robô parado")</span>';
                         document.querySelector('#btn_config').style.display = 'inline';
                         document.querySelector('#btn_iniciar').style.display = 'inline';
                         document.querySelector('#btn_parar').style.display = 'none';

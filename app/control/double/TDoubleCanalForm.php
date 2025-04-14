@@ -68,6 +68,18 @@ class TDoubleCanalForm  extends TStandardForm
             $horarios[$hora->format('H:i')] = $hora->format('H:i');
         }
 
+        $mensagem_apoio = new TAlert(
+            'primary', 
+            '<code>Se o <b>ID Canal Sessão</b> estiver vazio será utilizado o <b>Id Canal</b> para enviar mensagem ao Telegram.</code>', 
+            false
+        );
+
+        $this->form->addFields(
+            [$label = $this->makeTLabel(['value' => 'Id Canal Sessão'])],
+            [$this->makeTEntry(['name' => 'channel_id_sessao', 'label' => $label])],
+            [$mensagem_apoio]
+        )->layout = ['col-sm-2', 'col-sm-4', 'col-sm-6'];
+
         $this->form->addFields(
             [$label = $this->makeTLabel(['value' => 'Horário Sessão'])],
             [$this->makeTMultiSearch(['name' => 'horario_sessao', 'label' => $label, 'items' => $horarios, 'separator' => ',', 'minlen' => 2, 'height' => 40, 'width' => '100%'])],
